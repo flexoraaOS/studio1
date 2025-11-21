@@ -7,8 +7,11 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import { useTheme } from 'next-themes';
 
 export default function SettingsPage() {
+    const { theme, setTheme } = useTheme();
+
     return (
         <div className="flex flex-col gap-6">
             <div>
@@ -58,7 +61,7 @@ export default function SettingsPage() {
                         <CardContent className="space-y-4">
                             <div className="space-y-2">
                                 <Label htmlFor="theme">Theme</Label>
-                                <Select defaultValue="dark">
+                                 <Select value={theme} onValueChange={setTheme}>
                                     <SelectTrigger>
                                         <SelectValue placeholder="Select theme" />
                                     </SelectTrigger>

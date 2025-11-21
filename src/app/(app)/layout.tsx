@@ -1,12 +1,13 @@
 import React from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { LayoutDashboard, ArrowRightLeft, Upload, BarChart2, Settings, LifeBuoy, LogOut, User } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger, DropdownMenuSub, DropdownMenuSubTrigger, DropdownMenuSubContent } from '@/components/ui/dropdown-menu';
+import { LayoutDashboard, ArrowRightLeft, Upload, BarChart2, Settings, LifeBuoy, LogOut, User, Monitor, Sun, Moon } from 'lucide-react';
 import Link from 'next/link';
 import { TradeSightProLogo } from '@/components/icons';
 import SearchBar from '@/components/search-bar';
 import { cn } from '@/lib/utils';
+import { ThemeToggle } from '@/components/theme-toggle';
 
 const navItems = [
     { href: '/dashboard', label: 'Dashboard' },
@@ -69,6 +70,14 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                             <DropdownMenuSeparator />
                             <DropdownMenuItem><User className="mr-2" /> Profile</DropdownMenuItem>
                             <DropdownMenuItem><Settings className="mr-2" /> Settings</DropdownMenuItem>
+                            <DropdownMenuSub>
+                                <DropdownMenuSubTrigger>
+                                     <Monitor className="mr-2" /> Theme
+                                </DropdownMenuSubTrigger>
+                                <DropdownMenuSubContent>
+                                    <ThemeToggle />
+                                </DropdownMenuSubContent>
+                            </DropdownMenuSub>
                             <DropdownMenuItem><LifeBuoy className="mr-2" /> Support</DropdownMenuItem>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem><LogOut className="mr-2" /> Logout</DropdownMenuItem>
