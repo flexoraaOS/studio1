@@ -1,8 +1,8 @@
 'use client';
 import React from 'react';
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Tooltip, ReferenceLine, LabelList } from 'recharts';
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Tooltip, ReferenceLine, Cell } from 'recharts';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
+import { ChartContainer } from '@/components/ui/chart';
 import { StrategyContribution } from '@/lib/types';
 import { cn } from '@/lib/utils';
 
@@ -52,17 +52,18 @@ export default function StrategyWaterfallChart({ data }: StrategyWaterfallChartP
                 <ChartContainer config={{}} className="h-[350px] w-full">
                     <BarChart
                         data={chartData}
+                        layout="vertical"
                         margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
                     >
-                        <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                        <XAxis dataKey="name" type="category" angle={-45} textAnchor="end" height={60} />
-                        <YAxis 
+                        <CartesianGrid strokeDasharray="3 3" horizontal={false} />
+                        <YAxis dataKey="name" type="category" width={80} />
+                        <XAxis 
                             type="number" 
                             tickFormatter={(value) => `₹${Number(value) / 1000}k`}
                             domain={['dataMin - 10000', 'dataMax + 10000']}
                         />
                         <Tooltip content={<CustomTooltip />} cursor={{ fill: 'hsl(var(--muted))' }} />
-                        <ReferenceLine y={0} stroke="#000" />
+                        <ReferenceLine x={0} stroke="#000" />
                         <Bar dataKey="range">
                           {chartData.map((entry, index) => {
                              const isPositive = entry.value >= 0;
