@@ -17,6 +17,18 @@ const navItems = [
 ];
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
+    const userName = "John Doe";
+    const getInitials = (name: string) => {
+        const names = name.split(' ');
+        if (names.length > 1) {
+            return `${names[0][0]}${names[names.length - 1][0]}`.toUpperCase();
+        }
+        if (names.length === 1 && names[0].length > 1) {
+            return names[0].substring(0, 2).toUpperCase();
+        }
+        return "U";
+    };
+
     return (
        <div className={cn("flex min-h-screen w-full flex-col", "animated-background")}>
            <header className="sticky top-0 flex h-16 items-center gap-4 border-b bg-background/80 backdrop-blur-sm px-4 md:px-6 z-10">
@@ -47,7 +59,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                             <Button variant="secondary" size="icon" className="rounded-full">
                                <Avatar>
                                     <AvatarImage src="https://picsum.photos/seed/user/40/40" alt="User" />
-                                    <AvatarFallback>U</AvatarFallback>
+                                    <AvatarFallback>{getInitials(userName)}</AvatarFallback>
                                 </Avatar>
                                 <span className="sr-only">Toggle user menu</span>
                             </Button>
