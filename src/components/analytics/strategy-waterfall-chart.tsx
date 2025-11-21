@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Tooltip, ReferenceLine, Cell } from 'recharts';
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Tooltip, ReferenceLine, Cell, LabelList } from 'recharts';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChartContainer } from '@/components/ui/chart';
 import { StrategyContribution } from '@/lib/types';
@@ -12,17 +12,22 @@ interface StrategyWaterfallChartProps {
 
 export default function StrategyWaterfallChart({ data }: StrategyWaterfallChartProps) {
     let cumulative = 0;
-    const chartData = data.map(item => {
+    const chartData = data.map((item, index) => {
         const start = item.isTotal ? 0 : cumulative;
         const value = item.value;
         const end = start + value;
         if (!item.isTotal) {
             cumulative = end;
         }
+        
+        // Make sure the range is always [min, max]
+        const range = value >= 0 ? [start, end] : [end, start];
+        
         return {
             ...item,
-            range: [start, end],
-            value: value
+            range: range,
+            value: value,
+            labelPosition: value >= 0 ? end + 500 : end - 500,
         };
     });
 
@@ -52,28 +57,39 @@ export default function StrategyWaterfallChart({ data }: StrategyWaterfallChartP
                 <ChartContainer config={{}} className="h-[350px] w-full">
                     <BarChart
                         data={chartData}
-                        layout="vertical"
+                        layout="horizontal"
                         margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
+                        stackOffset="none"
                     >
-                        <CartesianGrid strokeDasharray="3 3" horizontal={false} />
-                        <YAxis dataKey="name" type="category" width={80} />
-                        <XAxis 
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                        <XAxis dataKey="name" type="category" />
+                        <YAxis 
                             type="number" 
                             tickFormatter={(value) => `₹${Number(value) / 1000}k`}
                             domain={['dataMin - 10000', 'dataMax + 10000']}
                         />
                         <Tooltip content={<CustomTooltip />} cursor={{ fill: 'hsl(var(--muted))' }} />
-                        <ReferenceLine x={0} stroke="#000" />
+                        <ReferenceLine y={0} stroke="#000" />
                         <Bar dataKey="range">
                           {chartData.map((entry, index) => {
                              const isPositive = entry.value >= 0;
                              const isTotal = entry.name.toLowerCase().includes('balance');
-                             let color = 'hsl(var(--primary))';
-                             if (!isTotal) {
-                               color = isPositive ? 'hsl(var(--chart-1))' : 'hsl(var(--destructive))';
+                             let color = 'hsl(var(--primary-foreground))';
+                             if (isTotal) {
+                               color = 'hsl(var(--primary))';
+                             } else if (isPositive) {
+                                color = 'hsl(var(--chart-2))';
+                             } else {
+                                color = 'hsl(var(--destructive))';
                              }
                              return <Cell key={`cell-${index}`} fill={color} />;
                           })}
+                           <LabelList 
+                                dataKey="value" 
+                                position="top" 
+                                formatter={(value: number) => `₹${(value / 1000).toFixed(1)}k`} 
+                                className="fill-foreground font-semibold"
+                            />
                         </Bar>
                     </BarChart>
                 </ChartContainer>

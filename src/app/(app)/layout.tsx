@@ -3,10 +3,10 @@ import { SidebarProvider, Sidebar, SidebarTrigger, SidebarContent, SidebarHeader
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Input } from '@/components/ui/input';
-import { Search, LayoutDashboard, ArrowRightLeft, Upload, BarChart2, Settings, LifeBuoy, LogOut, User } from 'lucide-react';
+import { LayoutDashboard, ArrowRightLeft, Upload, BarChart2, Settings, LifeBuoy, LogOut, User } from 'lucide-react';
 import Link from 'next/link';
 import { TradeSightProLogo } from '@/components/icons';
+import SearchBar from '@/components/search-bar';
 
 const navItems = [
     { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
@@ -44,10 +44,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             <SidebarInset>
                 <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
                     <SidebarTrigger className="sm:hidden" />
-                    <div className="relative flex-1 ml-auto">
-                        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                        <Input type="search" placeholder="Search trades, strategies..." className="w-full rounded-lg bg-secondary pl-8 md:w-[280px] lg:w-[320px]" />
-                    </div>
+                    <SearchBar />
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button variant="secondary" size="icon" className="overflow-hidden rounded-full">

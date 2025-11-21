@@ -20,6 +20,7 @@ const importOptions = [
         title: 'Connect Broker API',
         description: 'Connect directly to your broker for seamless, automatic trade synchronization.',
         buttonText: 'Connect API',
+        disabled: true,
     },
     {
         icon: Waypoints,
@@ -49,11 +50,9 @@ export default function ImportPage() {
                             </div>
                         </CardHeader>
                         <CardFooter className="mt-auto">
-                            {option.title === 'Connect Broker API' ? (
-                                <p className="text-sm text-muted-foreground p-2 text-center w-full">overhere they will need to connect broker api and then they can upload all data</p>
-                            ) : (
-                                <Button className="w-full">{option.buttonText}</Button>
-                            )}
+                           <Button className="w-full" disabled={!!option.disabled}>
+                                {option.buttonText}
+                            </Button>
                         </CardFooter>
                     </Card>
                 ))}

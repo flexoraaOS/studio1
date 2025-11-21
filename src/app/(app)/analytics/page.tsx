@@ -1,6 +1,6 @@
 import React from 'react';
 import type { Metadata } from 'next';
-import { TrendingUp, TrendingDown, Target, Percent } from 'lucide-react';
+import { TrendingUp, TrendingDown, Target } from 'lucide-react';
 import {
     mockKpis,
     mockEquityCurve,

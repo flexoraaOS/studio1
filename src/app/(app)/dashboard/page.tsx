@@ -1,12 +1,11 @@
 import React from 'react';
 import type { Metadata } from 'next';
-import { TrendingUp, TrendingDown, Percent, Target } from 'lucide-react';
+import { TrendingUp, TrendingDown, Target } from 'lucide-react';
 import { mockKpis, mockEquityCurve, mockPerformanceData, mockTrades } from '@/lib/data';
 import KpiCard from '@/components/dashboard/kpi-card';
 import EquityChart from '@/components/dashboard/equity-chart';
 import PerformanceChart from '@/components/dashboard/performance-chart';
 import RecentTradesTable from '@/components/dashboard/recent-trades-table';
-import { Button } from '@/components/ui/button';
 
 export const metadata: Metadata = {
     title: 'Dashboard | TradeSight Pro',
