@@ -1,190 +1,153 @@
 'use client';
 import React from 'react';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
-import { useTheme } from 'next-themes';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Upload } from 'lucide-react';
-import { useUser } from '@/firebase';
+import {
+  User,
+  Palette,
+  Bell,
+  Lock,
+  Database,
+  Code,
+  CreditCard,
+  ChevronRight,
+} from 'lucide-react';
+import {
+  SidebarProvider,
+  Sidebar,
+  SidebarHeader,
+  SidebarContent,
+  SidebarMenu,
+  SidebarMenuItem,
+  SidebarMenuButton,
+  SidebarInset,
+} from '@/components/ui/sidebar';
+import AccountSettings from '@/components/settings/account-settings';
+import AppearanceSettings from '@/components/settings/appearance-settings';
+import NotificationsSettings from '@/components/settings/notifications-settings';
+import APISettings from '@/components/settings/api-settings';
+import SecuritySettings from '@/components/settings/security-settings';
+import DataPrivacySettings from '@/components/settings/data-privacy-settings';
+import BillingSettings from '@/components/settings/billing-settings';
+import { cn } from '@/lib/utils';
+import { useIsMobile } from '@/hooks/use-mobile';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+
+const settingsSections = [
+  { id: 'account', label: 'Account', icon: User, component: AccountSettings },
+  {
+    id: 'appearance',
+    label: 'Appearance',
+    icon: Palette,
+    component: AppearanceSettings,
+  },
+  {
+    id: 'notifications',
+    label: 'Notifications',
+    icon: Bell,
+    component: NotificationsSettings,
+  },
+  {
+    id: 'security',
+    label: 'Security',
+    icon: Lock,
+    component: SecuritySettings,
+  },
+  {
+    id: 'data-privacy',
+    label: 'Data & Privacy',
+    icon: Database,
+    component: DataPrivacySettings,
+  },
+  { id: 'api', label: 'API', icon: Code, component: APISettings },
+  {
+    id: 'billing',
+    label: 'Billing',
+    icon: CreditCard,
+    component: BillingSettings,
+  },
+];
 
 export default function SettingsPage() {
-    const { theme, setTheme } = useTheme();
-    const { user } = useUser();
-    
-    const getInitials = (name: string | null | undefined) => {
-        if (!name) return "U";
-        const names = name.split(' ');
-        if (names.length > 1) {
-            return `${names[0][0]}${names[names.length - 1][0]}`.toUpperCase();
-        }
-        if (names.length === 1 && names[0].length > 1) {
-            return names[0].substring(0, 2).toUpperCase();
-        }
-        return "U";
-    };
+  const [activeSection, setActiveSection] = React.useState('account');
+  const ActiveComponent =
+    settingsSections.find((s) => s.id === activeSection)?.component ||
+    AccountSettings;
+  const isMobile = useIsMobile();
 
+  const handleSectionChange = (sectionId: string) => {
+    setActiveSection(sectionId);
+  };
+
+  if (isMobile) {
     return (
-        <div className="flex flex-col gap-6">
-            <div>
-                <h1 className="text-3xl font-bold tracking-tight font-headline text-gradient">Settings</h1>
-                <p className="text-muted-foreground">Manage your account and application preferences.</p>
-            </div>
-            <Tabs defaultValue="profile" className="w-full">
-                <TabsList className="grid w-full grid-cols-4">
-                    <TabsTrigger value="profile">Profile</TabsTrigger>
-                    <TabsTrigger value="appearance">Appearance</TabsTrigger>
-                    <TabsTrigger value="notifications">Notifications</TabsTrigger>
-                    <TabsTrigger value="api">API</TabsTrigger>
-                </TabsList>
-                <TabsContent value="profile">
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Profile</CardTitle>
-                            <CardDescription>
-                                This is how others will see you on the site.
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-6">
-                             <div className="flex items-center gap-4">
-                                <Avatar className="h-20 w-20">
-                                    <AvatarImage src={user?.photoURL || ''} alt={user?.displayName || 'User'} />
-                                    <AvatarFallback>{getInitials(user?.displayName)}</AvatarFallback>
-                                </Avatar>
-                                <Button variant="outline">
-                                    <Upload className="mr-2 h-4 w-4" />
-                                    Change Photo
-                                </Button>
-                            </div>
-                            <div className="grid md:grid-cols-2 gap-4">
-                                <div className="space-y-2">
-                                    <Label htmlFor="name">Name</Label>
-                                    <Input id="name" defaultValue={user?.displayName || ''} />
-                                </div>
-                                <div className="space-y-2">
-                                    <Label htmlFor="username">Username</Label>
-                                    <Input id="username" defaultValue={user?.email?.split('@')[0] || ''} />
-                                </div>
-                            </div>
-                             <div className="space-y-2">
-                                <Label htmlFor="email">Email</Label>
-                                <Input id="email" type="email" defaultValue={user?.email || ''} disabled />
-                            </div>
-                        </CardContent>
-                        <CardFooter>
-                            <Button>Save Profile</Button>
-                        </CardFooter>
-                    </Card>
-                </TabsContent>
-                <TabsContent value="appearance">
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Appearance</CardTitle>
-                            <CardDescription>
-                                Customize the look and feel of your dashboard.
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-6">
-                             <div className="space-y-2">
-                                <Label>Theme</Label>
-                                 <Select value={theme} onValueChange={setTheme}>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Select theme" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="light">Light</SelectItem>
-                                        <SelectItem value="dark">Dark</SelectItem>
-                                        <SelectItem value="system">System</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                             <div className="space-y-2">
-                                <Label htmlFor="base-currency">Base Currency</Label>
-                                <Select defaultValue="INR">
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Select currency" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="INR">INR (₹)</SelectItem>
-                                        <SelectItem value="USD">USD ($)</SelectItem>
-                                        <SelectItem value="EUR">EUR (€)</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                        </CardContent>
-                        <CardFooter>
-                            <Button>Save Preferences</Button>
-                        </CardFooter>
-                    </Card>
-                </TabsContent>
-                <TabsContent value="notifications">
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Notifications</CardTitle>
-                            <CardDescription>
-                                Choose what you want to be notified about.
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-6">
-                            <div className="flex flex-row items-center justify-between rounded-lg border p-4">
-                                <div className="space-y-0.5">
-                                    <Label className="text-base">Weekly Reports</Label>
-                                    <p className="text-sm text-muted-foreground">
-                                       Receive a summary of your trading performance every week.
-                                    </p>
-                                </div>
-                                <Switch />
-                            </div>
-                            <div className="flex flex-row items-center justify-between rounded-lg border p-4">
-                                <div className="space-y-0.5">
-                                    <Label className="text-base">Security Alerts</Label>
-                                    <p className="text-sm text-muted-foreground">
-                                        Get notified about any unusual activity on your account.
-                                    </p>
-                                </div>
-                                <Switch defaultChecked />
-                            </div>
-                             <div className="flex flex-row items-center justify-between rounded-lg border p-4">
-                                <div className="space-y-0.5">
-                                    <Label className="text-base">Trade Alerts</Label>
-                                    <p className="text-sm text-muted-foreground">
-                                        Get real-time notifications for trade executions.
-                                    </p>
-                                </div>
-                                <Switch defaultChecked />
-                            </div>
-                        </CardContent>
-                         <CardFooter>
-                            <Button>Save Notifications</Button>
-                         </CardFooter>
-                    </Card>
-                </TabsContent>
-                <TabsContent value="api">
-                     <Card>
-                        <CardHeader>
-                            <CardTitle>API Access</CardTitle>
-                            <CardDescription>
-                                Manage API keys for programmatic access to your trading data.
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                            <div className="p-4 bg-muted rounded-md flex items-center justify-center">
-                                <p className="text-sm text-muted-foreground">
-                                You have no API keys.
-                                </p>
-                            </div>
-                           
-                        </CardContent>
-                         <CardFooter>
-                             <Button useAnimation>Create New API Key</Button>
-                         </CardFooter>
-                    </Card>
-                </TabsContent>
-            </Tabs>
+      <div className="flex flex-col gap-6">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight font-headline text-gradient">
+            Settings
+          </h1>
+          <p className="text-muted-foreground">
+            Manage your account and application preferences.
+          </p>
         </div>
+        <Select value={activeSection} onValueChange={setActiveSection}>
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="Select a setting" />
+          </SelectTrigger>
+          <SelectContent>
+            {settingsSections.map((section) => (
+              <SelectItem key={section.id} value={section.id}>
+                <div className="flex items-center gap-2">
+                  <section.icon className="h-4 w-4" />
+                  <span>{section.label}</span>
+                </div>
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <div className="mt-4">
+          <ActiveComponent />
+        </div>
+      </div>
     );
+  }
+
+  return (
+    <div className="flex flex-col gap-6">
+      <div>
+        <h1 className="text-3xl font-bold tracking-tight font-headline text-gradient">
+          Settings
+        </h1>
+        <p className="text-muted-foreground">
+          Manage your account and application preferences.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-[240px_1fr] gap-8 items-start">
+        <nav className="flex flex-col gap-1 sticky top-20">
+          {settingsSections.map((section) => (
+            <button
+              key={section.id}
+              onClick={() => handleSectionChange(section.id)}
+              className={cn(
+                'flex items-center gap-3 rounded-md px-3 py-2 text-muted-foreground transition-all hover:bg-muted hover:text-foreground',
+                activeSection === section.id && 'bg-muted text-foreground'
+              )}
+            >
+              <section.icon className="h-5 w-5" />
+              <span className="flex-1 text-left">{section.label}</span>
+              <ChevronRight className="h-4 w-4 text-muted-foreground" />
+            </button>
+          ))}
+        </nav>
+        <div>
+          <ActiveComponent />
+        </div>
+      </div>
+    </div>
+  );
 }
