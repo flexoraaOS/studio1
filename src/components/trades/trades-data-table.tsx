@@ -54,16 +54,16 @@ export default function TradesDataTable({ trades }: TradesDataTableProps) {
                                 <TableRow key={trade.id}>
                                     <TableCell className="font-medium">{trade.symbol}</TableCell>
                                     <TableCell>
-                                        <Badge variant={trade.direction === 'Long' ? 'default' : 'secondary'} className={cn(trade.direction === 'Long' ? 'bg-chart-2/20 text-chart-2' : 'bg-destructive/20 text-destructive', 'font-medium')}>{trade.direction}</Badge>
+                                        <Badge variant={trade.direction === 'Long' ? 'default' : 'secondary'} className={cn(trade.direction === 'Long' ? 'bg-green-600/20 text-green-400 border-green-600/40 hover:bg-green-600/30' : 'bg-red-600/20 text-red-400 border-red-600/40 hover:bg-red-600/30', 'font-medium')}>{trade.direction}</Badge>
                                     </TableCell>
                                     <TableCell>{trade.strategy}</TableCell>
                                     <TableCell>
                                         <Badge variant={trade.status === 'Closed' ? 'default' : 'secondary'} className={cn(trade.status !== 'Closed' && 'bg-accent text-accent-foreground')}>{trade.status}</Badge>
                                     </TableCell>
-                                    <TableCell className={cn("text-right", trade.pnlPercent > 0 ? 'text-chart-2' : 'text-destructive')}>
+                                    <TableCell className={cn("text-right", trade.pnlPercent > 0 ? 'text-green-400' : 'text-red-400')}>
                                         {trade.pnlPercent.toFixed(2)}%
                                     </TableCell>
-                                    <TableCell className={cn("text-right font-semibold", trade.realizedPnl > 0 ? 'text-chart-2' : trade.realizedPnl < 0 ? 'text-destructive' : 'text-foreground')}>
+                                    <TableCell className={cn("text-right font-semibold", trade.realizedPnl > 0 ? 'text-green-400' : trade.realizedPnl < 0 ? 'text-red-400' : 'text-foreground')}>
                                         {trade.currency === 'INR' ? '₹' : trade.currency === 'USD' ? '$' : '€'}
                                         {trade.realizedPnl.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                     </TableCell>

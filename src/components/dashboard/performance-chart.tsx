@@ -10,7 +10,7 @@ const chartConfig = {
         label: 'P&L',
     },
     positive: {
-        color: 'hsl(var(--chart-2))',
+        color: 'hsl(var(--chart-1))',
     },
     negative: {
         color: 'hsl(var(--destructive))',
