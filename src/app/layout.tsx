@@ -8,7 +8,7 @@ import { ThemeProvider } from '@/components/theme-provider';
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
 export const metadata: Metadata = {
-  title: 'TradeSight Pro',
+  title: 'Flexoraa TraderOS',
   description: 'The ultimate trading journal and analytics platform.',
 };
 

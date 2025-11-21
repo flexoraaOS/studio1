@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { TradeSightProLogo } from "@/components/icons"
+import { FlexoraaTraderOSLogo } from "@/components/icons"
 import Link from 'next/link'
 import { cn } from "@/lib/utils"
 
@@ -48,8 +48,8 @@ export default function LoginPage() {
       <Card className="mx-auto max-w-sm w-full bg-card/80 backdrop-blur-sm">
         <CardHeader className="text-center">
             <div className="flex justify-center items-center gap-2 mb-4">
-                <TradeSightProLogo className="w-8 h-8 text-primary" />
-                <CardTitle className="text-2xl text-gradient">TradeSight Pro</CardTitle>
+                <FlexoraaTraderOSLogo className="w-8 h-8 text-primary" />
+                <CardTitle className="text-2xl text-gradient">Flexoraa TraderOS</CardTitle>
             </div>
           <CardDescription>
             Enter your email below to login to your account

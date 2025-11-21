@@ -7,7 +7,7 @@ import { mockTrades } from '@/lib/data';
 import AddTradeSheet from '@/components/trades/add-trade-sheet';
 
 export const metadata: Metadata = {
-    title: 'Trades | TradeSight Pro',
+    title: 'Trades | Flexoraa TraderOS',
 };
 
 export default function TradesPage() {

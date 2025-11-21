@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger, DropdownMenuSub, DropdownMenuSubTrigger, DropdownMenuSubContent } from '@/components/ui/dropdown-menu';
 import { Settings, LogOut, User, Monitor } from 'lucide-react';
 import Link from 'next/link';
-import { TradeSightProLogo } from '@/components/icons';
+import { FlexoraaTraderOSLogo } from '@/components/icons';
 import SearchBar from '@/components/search-bar';
 import { cn } from '@/lib/utils';
 import { ThemeToggle } from '@/components/theme-toggle';
@@ -38,8 +38,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                         href="/dashboard"
                         className="flex items-center gap-2 text-lg font-semibold md:text-base"
                     >
-                        <TradeSightProLogo className="h-6 w-6" />
-                        <span className="sr-only">TradeSight Pro</span>
+                        <FlexoraaTraderOSLogo className="h-6 w-6" />
+                        <span className="sr-only">Flexoraa TraderOS</span>
                     </Link>
                     {navItems.map((item) => (
                         <Link
