@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { useTheme } from 'next-themes';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Upload } from 'lucide-react';
 
 export default function SettingsPage() {
     const { theme, setTheme } = useTheme();
@@ -33,21 +35,35 @@ export default function SettingsPage() {
                                 This is how others will see you on the site.
                             </CardDescription>
                         </CardHeader>
-                        <CardContent className="space-y-4">
-                            <div className="space-y-2">
-                                <Label htmlFor="name">Name</Label>
-                                <Input id="name" defaultValue="John Doe" />
+                        <CardContent className="space-y-6">
+                             <div className="flex items-center gap-4">
+                                <Avatar className="h-20 w-20">
+                                    <AvatarImage src="https://picsum.photos/seed/user/80/80" alt="User" />
+                                    <AvatarFallback>JD</AvatarFallback>
+                                </Avatar>
+                                <Button variant="outline">
+                                    <Upload className="mr-2 h-4 w-4" />
+                                    Change Photo
+                                </Button>
                             </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="username">Username</Label>
-                                <Input id="username" defaultValue="@johndoe" />
+                            <div className="grid md:grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <Label htmlFor="name">Name</Label>
+                                    <Input id="name" defaultValue="John Doe" />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="username">Username</Label>
+                                    <Input id="username" defaultValue="@johndoe" />
+                                </div>
                             </div>
                              <div className="space-y-2">
                                 <Label htmlFor="email">Email</Label>
-                                <Input id="email" type="email" defaultValue="john.doe@example.com" />
+                                <Input id="email" type="email" defaultValue="john.doe@example.com" disabled />
                             </div>
-                            <Button>Save changes</Button>
                         </CardContent>
+                        <CardFooter>
+                            <Button>Save Profile</Button>
+                        </CardFooter>
                     </Card>
                 </TabsContent>
                 <TabsContent value="appearance">
@@ -58,9 +74,9 @@ export default function SettingsPage() {
                                 Customize the look and feel of your dashboard.
                             </CardDescription>
                         </CardHeader>
-                        <CardContent className="space-y-4">
-                            <div className="space-y-2">
-                                <Label htmlFor="theme">Theme</Label>
+                        <CardContent className="space-y-6">
+                             <div className="space-y-2">
+                                <Label>Theme</Label>
                                  <Select value={theme} onValueChange={setTheme}>
                                     <SelectTrigger>
                                         <SelectValue placeholder="Select theme" />
@@ -85,8 +101,10 @@ export default function SettingsPage() {
                                     </SelectContent>
                                 </Select>
                             </div>
-                            <Button>Save preferences</Button>
                         </CardContent>
+                        <CardFooter>
+                            <Button>Save Preferences</Button>
+                        </CardFooter>
                     </Card>
                 </TabsContent>
                 <TabsContent value="notifications">
@@ -116,8 +134,19 @@ export default function SettingsPage() {
                                 </div>
                                 <Switch defaultChecked />
                             </div>
-                            <Button>Save settings</Button>
+                             <div className="flex flex-row items-center justify-between rounded-lg border p-4">
+                                <div className="space-y-0.5">
+                                    <Label className="text-base">Trade Alerts</Label>
+                                    <p className="text-sm text-muted-foreground">
+                                        Get real-time notifications for trade executions.
+                                    </p>
+                                </div>
+                                <Switch defaultChecked />
+                            </div>
                         </CardContent>
+                         <CardFooter>
+                            <Button>Save Notifications</Button>
+                        </CardFooter>
                     </Card>
                 </TabsContent>
                 <TabsContent value="api">
@@ -129,13 +158,16 @@ export default function SettingsPage() {
                             </CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-4">
-                            <div className="p-4 bg-secondary rounded-md">
+                            <div className="p-4 bg-muted rounded-md flex items-center justify-center">
                                 <p className="text-sm text-muted-foreground">
                                 You have no API keys.
                                 </p>
                             </div>
-                            <Button>Create new API key</Button>
+                           
                         </CardContent>
+                         <CardFooter>
+                             <Button useAnimation>Create New API Key</Button>
+                         </CardFooter>
                     </Card>
                 </TabsContent>
             </Tabs>

@@ -2,7 +2,7 @@ import React from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger, DropdownMenuSub, DropdownMenuSubTrigger, DropdownMenuSubContent } from '@/components/ui/dropdown-menu';
-import { LayoutDashboard, ArrowRightLeft, Upload, BarChart2, Settings, LifeBuoy, LogOut, User, Monitor, Sun, Moon } from 'lucide-react';
+import { Settings, LogOut, User, Monitor } from 'lucide-react';
 import Link from 'next/link';
 import { TradeSightProLogo } from '@/components/icons';
 import SearchBar from '@/components/search-bar';
@@ -35,7 +35,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
            <header className="sticky top-0 flex h-16 items-center gap-4 border-b bg-background/80 backdrop-blur-sm px-4 md:px-6 z-10">
                 <nav className="hidden flex-col gap-6 text-lg font-medium md:flex md:flex-row md:items-center md:gap-5 lg:gap-6">
                     <Link
-                        href="#"
+                        href="/dashboard"
                         className="flex items-center gap-2 text-lg font-semibold md:text-base"
                     >
                         <TradeSightProLogo className="h-6 w-6" />
@@ -68,8 +68,16 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                         <DropdownMenuContent align="end">
                             <DropdownMenuLabel>My Account</DropdownMenuLabel>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem><User className="mr-2" /> Profile</DropdownMenuItem>
-                            <DropdownMenuItem><Settings className="mr-2" /> Settings</DropdownMenuItem>
+                            <DropdownMenuItem>
+                                <Link href="/settings" className="flex items-center w-full">
+                                    <User className="mr-2" /> Profile
+                                </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem>
+                                <Link href="/settings" className="flex items-center w-full">
+                                    <Settings className="mr-2" /> Settings
+                                </Link>
+                            </DropdownMenuItem>
                             <DropdownMenuSub>
                                 <DropdownMenuSubTrigger>
                                      <Monitor className="mr-2" /> Theme
@@ -78,9 +86,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                                     <ThemeToggle />
                                 </DropdownMenuSubContent>
                             </DropdownMenuSub>
-                            <DropdownMenuItem><LifeBuoy className="mr-2" /> Support</DropdownMenuItem>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem><LogOut className="mr-2" /> Logout</DropdownMenuItem>
+                            <DropdownMenuItem>
+                                <Link href="/login" className="flex items-center w-full">
+                                    <LogOut className="mr-2" /> Logout
+                                </Link>
+                            </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
                 </div>
