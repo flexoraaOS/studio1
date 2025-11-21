@@ -4,6 +4,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/com
 import { PnlCalendarData } from '@/lib/types';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 
 interface PnlCalendarProps {
   data: PnlCalendarData[];
@@ -53,45 +54,65 @@ const PnlCalendar = ({ data }: PnlCalendarProps) => {
     return { monthName, days };
   });
 
+  const monthGroups = [];
+  for (let i = 0; i < months.length; i += 3) {
+      monthGroups.push(months.slice(i, i + 3));
+  }
+
   const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
   return (
     <Card>
       <CardHeader>
         <CardTitle>P&L Calendar Heatmap</CardTitle>
-        <CardDescription>Daily profit and loss over the past year.</CardDescription>
+        <CardDescription>Daily profit and loss, 3 months at a time.</CardDescription>
       </CardHeader>
-      <CardContent className="overflow-x-auto">
+      <CardContent>
         <TooltipProvider>
-            <div className="flex flex-wrap gap-8">
-              {months.map(({ monthName, days }) => (
-                <div key={monthName} className="flex flex-col items-center">
-                  <h3 className="text-lg font-semibold mb-2">{monthName}</h3>
-                  <div className="grid grid-cols-7 gap-1">
-                    {weekDays.map(day => <div key={day} className="w-6 text-center text-xs text-muted-foreground">{day}</div>)}
-                    {days.map((day, index) => (
-                      <Tooltip key={index} delayDuration={100}>
-                          <TooltipTrigger asChild>
-                              <div className={cn(
-                                  "w-6 h-6 rounded-sm",
-                                  day ? getColorForPnl(day.pnl) : 'bg-transparent',
-                                  day?.isPlaceholder && 'bg-muted/50'
-                              )} />
-                          </TooltipTrigger>
-                          {day && !day.isPlaceholder && (
-                              <TooltipContent>
-                                  <p className="text-sm font-medium">{new Date(day.date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
-                                  <p className={cn("font-semibold", day.pnl > 0 ? 'text-green-500' : 'text-red-500')}>
-                                      P&L: ₹{day.pnl.toFixed(2)}
-                                  </p>
-                              </TooltipContent>
-                          )}
-                      </Tooltip>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
+            <Carousel
+              opts={{
+                align: "start",
+              }}
+              className="w-full"
+            >
+              <CarouselContent>
+                {monthGroups.map((group, groupIndex) => (
+                  <CarouselItem key={groupIndex}>
+                    <div className="p-1 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                      {group.map(({ monthName, days }) => (
+                        <div key={monthName} className="flex flex-col items-center">
+                          <h3 className="text-lg font-semibold mb-2">{monthName}</h3>
+                          <div className="grid grid-cols-7 gap-1">
+                            {weekDays.map(day => <div key={day} className="w-6 text-center text-xs text-muted-foreground">{day}</div>)}
+                            {days.map((day, index) => (
+                              <Tooltip key={index} delayDuration={100}>
+                                  <TooltipTrigger asChild>
+                                      <div className={cn(
+                                          "w-6 h-6 rounded-sm",
+                                          day ? getColorForPnl(day.pnl) : 'bg-transparent',
+                                          day?.isPlaceholder && 'bg-muted/50'
+                                      )} />
+                                  </TooltipTrigger>
+                                  {day && !day.isPlaceholder && (
+                                      <TooltipContent>
+                                          <p className="text-sm font-medium">{new Date(day.date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                                          <p className={cn("font-semibold", day.pnl > 0 ? 'text-green-500' : 'text-red-500')}>
+                                              P&L: ₹{day.pnl.toFixed(2)}
+                                          </p>
+                                      </TooltipContent>
+                                  )}
+                              </Tooltip>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              <CarouselPrevious />
+              <CarouselNext />
+            </Carousel>
         </TooltipProvider>
       </CardContent>
     </Card>
