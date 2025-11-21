@@ -146,7 +146,7 @@ export default function SettingsPage() {
                         </CardContent>
                          <CardFooter>
                             <Button>Save Notifications</Button>
-                        </CardFooter>
+                         </CardFooter>
                     </Card>
                 </TabsContent>
                 <TabsContent value="api">

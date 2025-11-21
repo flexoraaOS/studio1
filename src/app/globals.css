@@ -14,37 +14,41 @@ h1, h2, h3, h4, h5, h6 {
   @apply bg-gradient-to-r from-red-500 via-orange-400 to-yellow-400 text-transparent bg-clip-text;
 }
 
-.btn-animated-border {
+.btn-animated-sheen {
     position: relative;
     overflow: hidden;
+    background-color: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+    transition: background-color 0.3s ease;
 }
 
-.btn-animated-border::before {
+.btn-animated-sheen:hover {
+    background-color: hsl(var(--primary) / 0.9);
+}
+
+.btn-animated-sheen::after {
     content: '';
     position: absolute;
-    top: 0;
-    left: 0;
+    top: -50%;
+    left: -50%;
     width: 200%;
-    height: 100%;
-    background: linear-gradient(115deg, #4fcf70, #fad648, #a767e5, #12bcfe, #44ce7b);
-    background-size: 50% 100%;
-    animation: gradient-animation 4s infinite linear;
-    z-index: 0;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0) 60%);
+    transform: rotate(0deg);
+    animation: sheen-animation 5s infinite linear;
+    pointer-events: none;
 }
 
-.btn-animated-border > * {
-    position: relative;
-    z-index: 1;
-}
 
-@keyframes gradient-animation {
+@keyframes sheen-animation {
     0% {
-        transform: translateX(0);
+        transform: rotate(0deg) translate(-20%, -20%);
     }
     100% {
-        transform: translateX(-50%);
+        transform: rotate(360deg) translate(-20%, -20%);
     }
 }
+
 
 .animated-background {
     background:

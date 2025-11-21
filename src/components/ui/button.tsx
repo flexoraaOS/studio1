@@ -43,16 +43,27 @@ export interface ButtonProps
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant, size, asChild = false, useAnimation = false, children, ...props }, ref) => {
     const Comp = asChild ? Slot : "button"
-    const animationClass = useAnimation ? 'btn-animated-border' : '';
+    
+    // The inner span is no longer needed if we apply animation directly
+    if (useAnimation) {
+      return (
+        <Comp
+          className={cn(buttonVariants({ variant, size }), 'btn-animated-sheen', className)}
+          ref={ref}
+          {...props}
+        >
+          {children}
+        </Comp>
+      )
+    }
+
     return (
       <Comp
-        className={cn(buttonVariants({ variant, size, className }), animationClass)}
+        className={cn(buttonVariants({ variant, size, className }))}
         ref={ref}
         {...props}
       >
-        <span className={cn('flex items-center gap-2', { 'bg-primary rounded-md px-4 py-2': useAnimation })}>
-            {children}
-        </span>
+        {children}
       </Comp>
     )
   }
