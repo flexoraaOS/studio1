@@ -6,6 +6,7 @@ import { LayoutDashboard, ArrowRightLeft, Upload, BarChart2, Settings, LifeBuoy,
 import Link from 'next/link';
 import { TradeSightProLogo } from '@/components/icons';
 import SearchBar from '@/components/search-bar';
+import { cn } from '@/lib/utils';
 
 const navItems = [
     { href: '/dashboard', label: 'Dashboard' },
@@ -17,8 +18,8 @@ const navItems = [
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
     return (
-       <div className="flex min-h-screen w-full flex-col">
-           <header className="sticky top-0 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6">
+       <div className={cn("flex min-h-screen w-full flex-col", "animated-background")}>
+           <header className="sticky top-0 flex h-16 items-center gap-4 border-b bg-background/80 backdrop-blur-sm px-4 md:px-6 z-10">
                 <nav className="hidden flex-col gap-6 text-lg font-medium md:flex md:flex-row md:items-center md:gap-5 md:text-sm lg:gap-6">
                     <Link
                         href="#"
