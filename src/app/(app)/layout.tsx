@@ -50,7 +50,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                     </div>
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <Button variant="outline" size="icon" className="overflow-hidden rounded-full">
+                            <Button variant="secondary" size="icon" className="overflow-hidden rounded-full">
                                 <Avatar>
                                     <AvatarImage src="https://picsum.photos/seed/user/40/40" alt="User" />
                                     <AvatarFallback>U</AvatarFallback>

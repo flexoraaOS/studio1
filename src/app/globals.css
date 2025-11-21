@@ -12,26 +12,26 @@ h1, h2, h3, h4, h5, h6 {
 
 @layer base {
   :root {
-    --background: 210 40% 98%;
+    --background: 240 5% 96.1%; /* #F0F0F0 light gray */
     --foreground: 222.2 84% 4.9%;
-    --card: 210 40% 98%;
+    --card: 240 5% 100%; /* Slightly whiter than background */
     --card-foreground: 222.2 84% 4.9%;
-    --popover: 210 40% 98%;
+    --popover: 240 5% 100%;
     --popover-foreground: 222.2 84% 4.9%;
-    --primary: 275 80% 35%;
+    --primary: 271 100% 25%; /* #4B0082 deep indigo */
     --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 94%;
+    --secondary: 240 4.8% 95.9%;
     --secondary-foreground: 222.2 84% 4.9%;
-    --muted: 210 40% 94%;
+    --muted: 240 4.8% 95.9%;
     --muted-foreground: 215 20.2% 65.1%;
-    --accent: 39 100% 50%;
+    --accent: 39 100% 50%; /* #FFA500 vibrant orange */
     --accent-foreground: 24 9.8% 10%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 275 80% 45%;
-    --chart-1: 275 70% 50%;
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 271 100% 25%;
+    --chart-1: 271 100% 25%;
     --chart-2: 39 100% 50%;
     --chart-3: 197 37% 24%;
     --chart-4: 43 74% 66%;
@@ -53,7 +53,7 @@ h1, h2, h3, h4, h5, h6 {
     --card-foreground: 210 40% 98%;
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
-    --primary: 275 80% 60%;
+    --primary: 271 100% 75%;
     --primary-foreground: 222.2 84% 4.9%;
     --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: 210 40% 98%;
@@ -65,8 +65,8 @@ h1, h2, h3, h4, h5, h6 {
     --destructive-foreground: 210 40% 98%;
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
-    --ring: 275 80% 55%;
-    --chart-1: 275 70% 60%;
+    --ring: 271 100% 75%;
+    --chart-1: 271 100% 75%;
     --chart-2: 39 100% 55%;
     --chart-3: 197 37% 34%;
     --chart-4: 43 74% 76%;
