@@ -56,33 +56,33 @@ h1, h2, h3, h4, h5, h6 {
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
  
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
+ 
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
  
     --primary: 0 84.2% 60.2%;
     --primary-foreground: 0 0% 98%;
  
-    --secondary: 0 0% 96.1%;
-    --secondary-foreground: 0 0% 9%;
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
  
-    --muted: 0 0% 96.1%;
-    --muted-foreground: 0 0% 45.1%;
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
  
-    --accent: 25 95% 53%;
-    --accent-foreground: 0 0% 9%;
+    --accent: 34.9 87.5% 57.5%;
+    --accent-foreground: 240 5.9% 10%;
  
-    --destructive: 0 84.2% 60.2%;
+    --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 0 0% 89.8%;
-    --input: 0 0% 89.8%;
-    --ring: 0 84.2% 60.2%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 34.9 87.5% 57.5%;
  
     --radius: 0.5rem;
 
@@ -112,7 +112,7 @@ h1, h2, h3, h4, h5, h6 {
     --popover: 0 0% 3.9%;
     --popover-foreground: 0 0% 98%;
 
-    --primary: 0 84.2% 60.2%; /* Vibrant Red */
+    --primary: 0 72.2% 50.6%; /* Vibrant Red */
     --primary-foreground: 0 0% 98%;
 
     --secondary: 0 0% 14.9%;
@@ -124,12 +124,12 @@ h1, h2, h3, h4, h5, h6 {
     --accent: 25 95% 53%; /* Vibrant Orange for accent */
     --accent-foreground: 0 0% 98%;
 
-    --destructive: 0 72.2% 50.6%;
+    --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
 
     --border: 0 0% 14.9%;
     --input: 0 0% 14.9%;
-    --ring: 0 84.2% 60.2%;
+    --ring: 0 72.2% 50.6%;
     
     --chart-1: 0 72% 51%;
     --chart-2: 25 95% 53%;
@@ -154,5 +154,26 @@ h1, h2, h3, h4, h5, h6 {
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  .chart-glow-1 {
+    filter: drop-shadow(0 0 6px hsl(var(--chart-1)));
+  }
+  .chart-glow-2 {
+    filter: drop-shadow(0 0 6px hsl(var(--chart-2)));
+  }
+  .chart-glow-3 {
+    filter: drop-shadow(0 0 6px hsl(var(--chart-3)));
+  }
+  .chart-glow-4 {
+    filter: drop-shadow(0 0 6px hsl(var(--chart-4)));
+  }
+  .chart-glow-5 {
+    filter: drop-shadow(0 0 6px hsl(var(--chart-5)));
+  }
+  .chart-glow-destructive {
+    filter: drop-shadow(0 0 6px hsl(var(--destructive)));
   }
 }

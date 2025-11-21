@@ -61,6 +61,7 @@ export default function DrawdownChart({ data }: DrawdownChartProps) {
                             stroke="var(--color-Drawdown)"
                             strokeWidth={2}
                             dot={false}
+                            className="chart-glow-destructive"
                         />
                     </AreaChart>
                 </ChartContainer>

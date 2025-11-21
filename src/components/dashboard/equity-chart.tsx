@@ -53,6 +53,7 @@ export default function EquityChart({ data }: EquityChartProps) {
                             stroke="var(--color-Equity)"
                             strokeWidth={2}
                             dot={false}
+                            className="chart-glow-1"
                         />
                     </LineChart>
                 </ChartContainer>

@@ -73,6 +73,7 @@ export default function RollingMetricsChart({ data }: RollingMetricsChartProps) 
                             stroke="var(--color-sharpe)"
                             strokeWidth={2}
                             dot={false}
+                            className="chart-glow-1"
                         />
                         <Line
                             dataKey="volatility"
@@ -81,6 +82,7 @@ export default function RollingMetricsChart({ data }: RollingMetricsChartProps) 
                             stroke="var(--color-volatility)"
                             strokeWidth={2}
                             dot={false}
+                            className="chart-glow-2"
                         />
                     </LineChart>
                 </ChartContainer>
