@@ -20,19 +20,34 @@ const getColorForPnl = (pnl: number) => {
 };
 
 const PnlCalendar = ({ data }: PnlCalendarProps) => {
-  const year = new Date(data[0]?.date).getFullYear();
+  if (!data || data.length === 0) {
+    return (
+        <Card>
+            <CardHeader>
+                <CardTitle>P&L Calendar Heatmap</CardTitle>
+                <CardDescription>Daily profit and loss over the past year.</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <p>No P&L data available for the calendar.</p>
+            </CardContent>
+        </Card>
+    )
+  }
+
+  const year = new Date(data[0].date).getFullYear();
   const weeks: (PnlCalendarData | null)[][] = Array.from({ length: 53 }, () => Array(7).fill(null));
-  const monthLabels: { name: string; week: number }[] = [];
+  const monthLabels: { name: string; startWeek: number }[] = [];
 
   let lastMonth = -1;
+  const firstDayOfYear = new Date(year, 0, 1);
+  const yearStartDay = firstDayOfYear.getDay();
 
   data.forEach(day => {
     const date = new Date(day.date);
     if (date.getFullYear() === year) {
       const dayOfWeek = date.getDay();
-      const firstDayOfYear = new Date(year, 0, 1);
       const dayOfYear = Math.floor((date.getTime() - firstDayOfYear.getTime()) / (1000 * 60 * 60 * 24));
-      const weekOfYear = Math.floor((dayOfYear + firstDayOfYear.getDay()) / 7);
+      const weekOfYear = Math.floor((dayOfYear + yearStartDay) / 7);
 
       if(weeks[weekOfYear]) {
         weeks[weekOfYear][dayOfWeek] = day;
@@ -40,7 +55,7 @@ const PnlCalendar = ({ data }: PnlCalendarProps) => {
       
       const month = date.getMonth();
       if (month !== lastMonth) {
-        monthLabels.push({ name: date.toLocaleString('default', { month: 'short' }), week: weekOfYear });
+        monthLabels.push({ name: date.toLocaleString('default', { month: 'short' }), startWeek: weekOfYear });
         lastMonth = month;
       }
     }
@@ -52,14 +67,21 @@ const PnlCalendar = ({ data }: PnlCalendarProps) => {
         <CardTitle>P&L Calendar Heatmap</CardTitle>
         <CardDescription>Daily profit and loss over the past year.</CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="overflow-x-auto">
         <TooltipProvider>
-            <div className="flex flex-col items-center">
-                 <div className="grid grid-flow-col gap-1">
+            <div className="inline-block">
+                <div className="grid grid-cols-53 grid-rows-1 gap-2.5 mb-2 text-xs text-muted-foreground">
+                    {monthLabels.map((label) => (
+                        <div key={label.name} style={{ gridColumnStart: label.startWeek + 1 }} className="col-span-4 text-left">
+                            {label.name}
+                        </div>
+                    ))}
+                </div>
+                 <div className="grid grid-flow-col auto-cols-max gap-1">
                      {weeks.map((week, weekIndex) => (
                         <div key={weekIndex} className="grid grid-rows-7 gap-1">
                             {week.map((day, dayIndex) => (
-                                <Tooltip key={dayIndex}>
+                                <Tooltip key={dayIndex} delayDuration={100}>
                                     <TooltipTrigger asChild>
                                         <div className={cn(
                                             "w-4 h-4 rounded-sm",
@@ -68,7 +90,10 @@ const PnlCalendar = ({ data }: PnlCalendarProps) => {
                                     </TooltipTrigger>
                                     {day && (
                                         <TooltipContent>
-                                            <p>{new Date(day.date).toLocaleDateString()}: ₹{day.pnl.toFixed(2)}</p>
+                                            <p className="text-sm font-medium">{new Date(day.date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                                            <p className={cn("font-semibold", day.pnl > 0 ? 'text-green-500' : 'text-red-500')}>
+                                                P&L: ₹{day.pnl.toFixed(2)}
+                                            </p>
                                         </TooltipContent>
                                     )}
                                 </Tooltip>
@@ -76,13 +101,6 @@ const PnlCalendar = ({ data }: PnlCalendarProps) => {
                         </div>
                     ))}
                  </div>
-                <div className="flex justify-between w-full mt-2 self-start pl-8">
-                     {monthLabels.map(label => (
-                        <div key={label.name} style={{ gridColumnStart: label.week + 1 }} className="text-xs text-muted-foreground">
-                            {label.name}
-                        </div>
-                    ))}
-                </div>
             </div>
         </TooltipProvider>
       </CardContent>
