@@ -1,4 +1,4 @@
-import type { Trade, Kpi, ChartData } from './types';
+import type { Trade, Kpi, ChartData, RollingMetric, StrategyContribution, PnlCalendarData } from './types';
 
 export const mockTrades: Trade[] = [
   { id: 'T001', entryTime: '2023-10-26 09:30', exitTime: '2023-10-26 10:00', symbol: 'RELIANCE', direction: 'Long', size: 100, entryPrice: 2300.50, exitPrice: 2315.75, realizedPnl: 1525.00, pnlPercent: 0.66, currency: 'INR', strategy: 'Breakout', status: 'Closed' },
@@ -17,14 +17,23 @@ export const mockKpis: Kpi[] = [
   { title: 'Max Drawdown', value: '₹-42,108.30', description: 'All time' },
 ];
 
-export const mockEquityCurve: ChartData[] = Array.from({ length: 90 }, (_, i) => {
+const equityData: ChartData[] = Array.from({ length: 90 }, (_, i) => {
   const date = new Date();
   date.setDate(date.getDate() - 90 + i);
-  const value = 100000 + (i * 1000) + (Math.sin(i / 5) * 5000) + (Math.random() * 3000);
+  const equity = 100000 + (i * 1000) + (Math.sin(i / 5) * 5000) + (Math.random() * 3000);
   return {
     date: date.toISOString().split('T')[0],
-    Equity: value,
-    Drawdown: (Math.random() * -5000),
+    Equity: equity,
+  };
+});
+
+export const mockEquityCurve: ChartData[] = equityData.map((dataPoint, index) => {
+  const high = Math.max(...equityData.slice(0, index + 1).map(d => d.Equity as number));
+  const equity = dataPoint.Equity as number;
+  const drawdown = ((equity - high) / high) * 100;
+  return {
+    ...dataPoint,
+    Drawdown: isFinite(drawdown) ? drawdown : 0,
   };
 });
 
@@ -35,3 +44,35 @@ export const mockPerformanceData: ChartData[] = [
     { name: 'Scalping', 'P&L': 780, trades: 110 },
     { name: 'Swing', 'P&L': 5400, trades: 12 },
 ];
+
+export const mockRollingMetrics: RollingMetric[] = Array.from({ length: 60 }, (_, i) => {
+    const date = new Date();
+    date.setDate(date.getDate() - 60 + i);
+    return {
+        date: date.toISOString().split('T')[0],
+        sharpe: 1.5 + Math.sin(i / 10) * 0.5 + (Math.random() - 0.5) * 0.2,
+        volatility: 0.8 + Math.cos(i / 15) * 0.3 + (Math.random() - 0.5) * 0.1,
+    };
+});
+
+export const mockStrategyContributions: StrategyContribution[] = [
+    { name: 'Opening Balance', value: 100000 },
+    { name: 'Breakout', value: 15000 },
+    { name: 'Momentum', value: 22000 },
+    { name: 'Mean Reversion', value: -8000 },
+    { name: 'Scalping', value: 4500 },
+    { name: 'Swing', value: 18000 },
+    { name: 'Fees & Comm.', value: -2500 },
+    { name: 'Closing Balance', value: 149000, isTotal: true },
+];
+
+export const mockPnlCalendar: PnlCalendarData[] = Array.from({ length: 365 }, (_, i) => {
+    const date = new Date();
+    date.setFullYear(date.getFullYear() -1);
+    date.setDate(date.getDate() + i);
+    const pnl = (Math.random() - 0.45) * 5000;
+    return {
+        date: date.toISOString().split('T')[0],
+        pnl,
+    };
+});

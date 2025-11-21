@@ -23,6 +23,23 @@ export type Kpi = {
 };
 
 export type ChartData = {
-  date: string;
-  [key: string]: number | string;
+  date?: string;
+  [key: string]: number | string | undefined;
 };
+
+export type RollingMetric = {
+    date: string;
+    sharpe: number;
+    volatility: number;
+}
+
+export type StrategyContribution = {
+    name: string;
+    value: number;
+    isTotal?: boolean;
+}
+
+export type PnlCalendarData = {
+    date: string;
+    pnl: number;
+}
