@@ -12,6 +12,8 @@ export type Trade = {
   currency: 'USD' | 'INR' | 'EUR';
   strategy: string;
   status: 'Closed' | 'Open';
+  entryDate?: string;
+  exitDate?: string;
 };
 
 export type Kpi = {

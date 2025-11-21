@@ -4,6 +4,7 @@ import { Area, AreaChart, CartesianGrid, XAxis, YAxis, Tooltip } from 'recharts'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartConfig } from '@/components/ui/chart';
 import type { ChartData } from '@/lib/types';
+import { format } from 'date-fns';
 
 const chartConfig = {
     Drawdown: {
@@ -38,7 +39,7 @@ export default function DrawdownChart({ data }: DrawdownChartProps) {
                             tickLine={false}
                             axisLine={false}
                             tickMargin={8}
-                            tickFormatter={(value) => new Date(value).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                            tickFormatter={(value) => format(new Date(value), 'MMM d')}
                         />
                         <YAxis
                             tickFormatter={(value) => `${value.toFixed(1)}%`}
@@ -50,6 +51,7 @@ export default function DrawdownChart({ data }: DrawdownChartProps) {
                         <Tooltip
                             cursor={false}
                             content={<ChartTooltipContent
+                                labelFormatter={(label) => format(new Date(label), 'PPpp')}
                                 formatter={(value) => `${Number(value).toFixed(2)}%`}
                                 indicator="dot"
                             />}

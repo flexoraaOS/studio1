@@ -4,6 +4,7 @@ import { Line, LineChart, CartesianGrid, XAxis, YAxis, Tooltip } from 'recharts'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartConfig } from '@/components/ui/chart';
 import type { ChartData } from '@/lib/types';
+import { format } from 'date-fns';
 
 const chartConfig = {
     Equity: {
@@ -32,7 +33,7 @@ export default function EquityChart({ data }: EquityChartProps) {
                             tickLine={false}
                             axisLine={false}
                             tickMargin={8}
-                            tickFormatter={(value) => new Date(value).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                            tickFormatter={(value) => format(new Date(value), 'MMM d')}
                         />
                         <YAxis 
                             tickFormatter={(value) => `₹${Number(value) / 1000}k`}
@@ -43,6 +44,7 @@ export default function EquityChart({ data }: EquityChartProps) {
                         <Tooltip
                             cursor={false}
                             content={<ChartTooltipContent 
+                                labelFormatter={(label) => format(new Date(label), 'PPpp')}
                                 formatter={(value) => `₹${Number(value).toLocaleString('en-IN')}`}
                                 indicator="dot" 
                             />}

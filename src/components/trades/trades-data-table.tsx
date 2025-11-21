@@ -9,6 +9,7 @@ import { MoreHorizontal } from 'lucide-react';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuLabel, DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
 import type { Trade } from '@/lib/types';
+import { format } from 'date-fns';
 
 interface TradesDataTableProps {
     trades: Trade[];
@@ -31,6 +32,11 @@ export default function TradesDataTable({ trades }: TradesDataTableProps) {
         setPage(1);
     }, [searchQuery]);
 
+    const formatDate = (dateString?: string) => {
+        if (!dateString) return 'N/A';
+        return format(new Date(dateString), 'PPpp');
+    };
+
     return (
         <Card>
             <CardContent className="p-0">
@@ -41,6 +47,8 @@ export default function TradesDataTable({ trades }: TradesDataTableProps) {
                                 <TableHead>Symbol</TableHead>
                                 <TableHead>Direction</TableHead>
                                 <TableHead>Strategy</TableHead>
+                                <TableHead>Entry Time</TableHead>
+                                <TableHead>Exit Time</TableHead>
                                 <TableHead>Status</TableHead>
                                 <TableHead className="text-right">P&L (%)</TableHead>
                                 <TableHead className="text-right">Realized P&L</TableHead>
@@ -57,6 +65,8 @@ export default function TradesDataTable({ trades }: TradesDataTableProps) {
                                         <Badge variant={trade.direction === 'Long' ? 'default' : 'secondary'} className={cn(trade.direction === 'Long' ? 'bg-green-600/20 text-green-400 border-green-600/40 hover:bg-green-600/30' : 'bg-red-600/20 text-red-400 border-red-600/40 hover:bg-red-600/30', 'font-medium')}>{trade.direction}</Badge>
                                     </TableCell>
                                     <TableCell>{trade.strategy}</TableCell>
+                                    <TableCell>{formatDate(trade.entryDate)}</TableCell>
+                                    <TableCell>{trade.status === 'Closed' ? formatDate(trade.exitDate) : 'N/A'}</TableCell>
                                     <TableCell>
                                         <Badge variant={trade.status === 'Closed' ? 'default' : 'secondary'} className={cn(trade.status !== 'Closed' && 'bg-accent text-accent-foreground')}>{trade.status}</Badge>
                                     </TableCell>
@@ -86,7 +96,7 @@ export default function TradesDataTable({ trades }: TradesDataTableProps) {
                                 </TableRow>
                             )) : (
                                 <TableRow>
-                                    <TableCell colSpan={7} className="h-24 text-center">
+                                    <TableCell colSpan={9} className="h-24 text-center">
                                         No results found.
                                     </TableCell>
                                 </TableRow>

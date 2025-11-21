@@ -7,12 +7,20 @@ import { Button } from '@/components/ui/button';
 import { ArrowUpRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { Trade } from '@/lib/types';
+import { format } from 'date-fns';
 
 interface RecentTradesTableProps {
     trades: Trade[];
 }
 
 export default function RecentTradesTable({ trades }: RecentTradesTableProps) {
+
+    const formatDate = (dateString?: string) => {
+        if (!dateString) return 'N/A';
+        return format(new Date(dateString), 'PPp');
+    };
+
+
     return (
         <Card>
             <CardHeader className="flex flex-row items-center">
@@ -33,6 +41,7 @@ export default function RecentTradesTable({ trades }: RecentTradesTableProps) {
                         <TableRow>
                             <TableHead>Symbol</TableHead>
                             <TableHead className="hidden sm:table-cell">Direction</TableHead>
+                            <TableHead className="hidden sm:table-cell">Entry Time</TableHead>
                             <TableHead className="hidden sm:table-cell">Status</TableHead>
                             <TableHead className="text-right">Realized P&L</TableHead>
                         </TableRow>
@@ -47,6 +56,7 @@ export default function RecentTradesTable({ trades }: RecentTradesTableProps) {
                                 <TableCell className="hidden sm:table-cell">
                                      <Badge variant={trade.direction === 'Long' ? 'default' : 'secondary'} className={cn(trade.direction === 'Long' ? 'bg-green-600/20 text-green-400 border-green-600/40 hover:bg-green-600/30' : 'bg-red-600/20 text-red-400 border-red-600/40 hover:bg-red-600/30')}>{trade.direction}</Badge>
                                 </TableCell>
+                                <TableCell className="hidden sm:table-cell">{formatDate(trade.entryDate)}</TableCell>
                                 <TableCell className="hidden sm:table-cell">
                                     <Badge variant={trade.status === 'Closed' ? 'default' : 'secondary'} className={cn(trade.status !== 'Closed' && 'bg-accent text-accent-foreground')}>{trade.status}</Badge>
                                 </TableCell>

@@ -1,13 +1,13 @@
 import type { Trade, Kpi, ChartData, RollingMetric, StrategyContribution, PnlCalendarData } from './types';
 
 export const mockTrades: Trade[] = [
-  { id: 'T001', entryTime: '2023-10-26 09:30', exitTime: '2023-10-26 10:00', symbol: 'RELIANCE', direction: 'Long', size: 100, entryPrice: 2300.50, exitPrice: 2315.75, realizedPnl: 1525.00, pnlPercent: 0.66, currency: 'INR', strategy: 'Breakout', status: 'Closed' },
-  { id: 'T002', entryTime: '2023-10-26 11:05', exitTime: '2023-10-26 11:45', symbol: 'TSLA', direction: 'Short', size: 10, entryPrice: 215.20, exitPrice: 212.10, realizedPnl: 31.00, pnlPercent: 1.44, currency: 'USD', strategy: 'Momentum', status: 'Closed' },
-  { id: 'T003', entryTime: '2023-10-27 14:10', exitTime: '2023-10-27 15:00', symbol: 'EUR/USD', direction: 'Long', size: 10000, entryPrice: 1.0560, exitPrice: 1.0540, realizedPnl: -20.00, pnlPercent: -0.19, currency: 'EUR', strategy: 'Scalping', status: 'Closed' },
-  { id: 'T004', entryTime: '2023-10-28 10:00', exitTime: '2023-10-28 12:30', symbol: 'INFY', direction: 'Long', size: 200, entryPrice: 1450.00, exitPrice: 1435.50, realizedPnl: -2900.00, pnlPercent: -1.00, currency: 'INR', strategy: 'Mean Reversion', status: 'Closed' },
-  { id: 'T005', entryTime: '2023-10-29 09:45', exitTime: '2023-10-29 10:15', symbol: 'AAPL', direction: 'Long', size: 50, entryPrice: 170.10, exitPrice: 172.30, realizedPnl: 110.00, pnlPercent: 1.29, currency: 'USD', strategy: 'Breakout', status: 'Closed' },
-  { id: 'T006', entryTime: '2023-11-01 20:30', exitTime: '2023-11-01 21:00', symbol: 'BTC/USD', direction: 'Short', size: 0.5, entryPrice: 34500, exitPrice: 34800, realizedPnl: -150.00, pnlPercent: -0.87, currency: 'USD', strategy: 'Momentum', status: 'Closed' },
-  { id: 'T007', entryTime: '2023-11-02 11:00', exitTime: '2023-11-02 11:00', symbol: 'HDFCBANK', direction: 'Long', size: 150, entryPrice: 1490.25, exitPrice: 0, realizedPnl: 0, pnlPercent: 0, currency: 'INR', strategy: 'Breakout', status: 'Open' },
+  { id: 'T001', entryTime: '2023-10-26 09:30', exitTime: '2023-10-26 10:00', symbol: 'RELIANCE', direction: 'Long', size: 100, entryPrice: 2300.50, exitPrice: 2315.75, realizedPnl: 1525.00, pnlPercent: 0.66, currency: 'INR', strategy: 'Breakout', status: 'Closed', entryDate: '2023-10-26T09:30:00Z', exitDate: '2023-10-26T10:00:00Z' },
+  { id: 'T002', entryTime: '2023-10-26 11:05', exitTime: '2023-10-26 11:45', symbol: 'TSLA', direction: 'Short', size: 10, entryPrice: 215.20, exitPrice: 212.10, realizedPnl: 31.00, pnlPercent: 1.44, currency: 'USD', strategy: 'Momentum', status: 'Closed', entryDate: '2023-10-26T11:05:00Z', exitDate: '2023-10-26T11:45:00Z' },
+  { id: 'T003', entryTime: '2023-10-27 14:10', exitTime: '2023-10-27 15:00', symbol: 'EUR/USD', direction: 'Long', size: 10000, entryPrice: 1.0560, exitPrice: 1.0540, realizedPnl: -20.00, pnlPercent: -0.19, currency: 'EUR', strategy: 'Scalping', status: 'Closed', entryDate: '2023-10-27T14:10:00Z', exitDate: '2023-10-27T15:00:00Z' },
+  { id: 'T004', entryTime: '2023-10-28 10:00', exitTime: '2023-10-28 12:30', symbol: 'INFY', direction: 'Long', size: 200, entryPrice: 1450.00, exitPrice: 1435.50, realizedPnl: -2900.00, pnlPercent: -1.00, currency: 'INR', strategy: 'Mean Reversion', status: 'Closed', entryDate: '2023-10-28T10:00:00Z', exitDate: '2023-10-28T12:30:00Z' },
+  { id: 'T005', entryTime: '2023-10-29 09:45', exitTime: '2023-10-29 10:15', symbol: 'AAPL', direction: 'Long', size: 50, entryPrice: 170.10, exitPrice: 172.30, realizedPnl: 110.00, pnlPercent: 1.29, currency: 'USD', strategy: 'Breakout', status: 'Closed', entryDate: '2023-10-29T09:45:00Z', exitDate: '2023-10-29T10:15:00Z' },
+  { id: 'T006', entryTime: '2023-11-01 20:30', exitTime: '2023-11-01 21:00', symbol: 'BTC/USD', direction: 'Short', size: 0.5, entryPrice: 34500, exitPrice: 34800, realizedPnl: -150.00, pnlPercent: -0.87, currency: 'USD', strategy: 'Momentum', status: 'Closed', entryDate: '2023-11-01T20:30:00Z', exitDate: '2023-11-01T21:00:00Z' },
+  { id: 'T007', entryTime: '2023-11-02 11:00', exitTime: '2023-11-02 11:00', symbol: 'HDFCBANK', direction: 'Long', size: 150, entryPrice: 1490.25, exitPrice: 0, realizedPnl: 0, pnlPercent: 0, currency: 'INR', strategy: 'Breakout', status: 'Open', entryDate: '2023-11-02T11:00:00Z' },
 ];
 
 export const mockKpis: Kpi[] = [
@@ -22,7 +22,7 @@ const equityData: ChartData[] = Array.from({ length: 90 }, (_, i) => {
   date.setDate(date.getDate() - 90 + i);
   const equity = 100000 + (i * 1000) + (Math.sin(i / 5) * 5000) + (Math.random() * 3000);
   return {
-    date: date.toISOString().split('T')[0],
+    date: date.toISOString(),
     Equity: equity,
   };
 });
@@ -49,7 +49,7 @@ export const mockRollingMetrics: RollingMetric[] = Array.from({ length: 60 }, (_
     const date = new Date();
     date.setDate(date.getDate() - 60 + i);
     return {
-        date: date.toISOString().split('T')[0],
+        date: date.toISOString(),
         sharpe: 1.5 + Math.sin(i / 10) * 0.5 + (Math.random() - 0.5) * 0.2,
         volatility: 0.8 + Math.cos(i / 15) * 0.3 + (Math.random() - 0.5) * 0.1,
     };
