@@ -1,4 +1,7 @@
-import React from 'react';
+'use client';
+import React, { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useUser, useAuth } from '@/firebase';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger, DropdownMenuSub, DropdownMenuSubTrigger, DropdownMenuSubContent } from '@/components/ui/dropdown-menu';
@@ -8,6 +11,7 @@ import { FlexoraaTraderOSLogo } from '@/components/icons';
 import SearchBar from '@/components/search-bar';
 import { cn } from '@/lib/utils';
 import { ThemeToggle } from '@/components/theme-toggle';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const navItems = [
     { href: '/dashboard', label: 'Dashboard' },
@@ -18,8 +22,18 @@ const navItems = [
 ];
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
-    const userName = "John Doe";
-    const getInitials = (name: string) => {
+    const { user, isUserLoading } = useUser();
+    const auth = useAuth();
+    const router = useRouter();
+
+    useEffect(() => {
+        if (!isUserLoading && !user) {
+            router.push('/login');
+        }
+    }, [isUserLoading, user, router]);
+    
+    const getInitials = (name: string | null | undefined) => {
+        if (!name) return "U";
         const names = name.split(' ');
         if (names.length > 1) {
             return `${names[0][0]}${names[names.length - 1][0]}`.toUpperCase();
@@ -29,6 +43,32 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         }
         return "U";
     };
+
+    const handleLogout = async () => {
+        await auth.signOut();
+        router.push('/login');
+    };
+    
+    if (isUserLoading || !user) {
+        return (
+            <div className="flex flex-col min-h-screen w-full animated-background">
+                <header className="sticky top-0 flex h-16 items-center gap-4 border-b bg-background/80 backdrop-blur-sm px-4 md:px-6 z-10">
+                    <Skeleton className="h-8 w-8" />
+                    <div className="hidden md:flex gap-5">
+                        <Skeleton className="h-5 w-20" />
+                        <Skeleton className="h-5 w-20" />
+                        <Skeleton className="h-5 w-20" />
+                    </div>
+                    <div className="ml-auto">
+                        <Skeleton className="h-10 w-10 rounded-full" />
+                    </div>
+                </header>
+                <main className="flex flex-1 items-center justify-center">
+                    <p>Loading user profile...</p>
+                </main>
+            </div>
+        );
+    }
 
     return (
        <div className={cn("flex min-h-screen w-full flex-col", "animated-background")}>
@@ -59,21 +99,21 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                         <DropdownMenuTrigger asChild>
                             <Button variant="secondary" size="icon" className="rounded-full">
                                <Avatar>
-                                    <AvatarImage src="https://picsum.photos/seed/user/40/40" alt="User" />
-                                    <AvatarFallback>{getInitials(userName)}</AvatarFallback>
+                                    <AvatarImage src={user?.photoURL || ''} alt={user?.displayName || 'User'} />
+                                    <AvatarFallback>{getInitials(user?.displayName)}</AvatarFallback>
                                 </Avatar>
                                 <span className="sr-only">Toggle user menu</span>
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                            <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                            <DropdownMenuLabel>{user.displayName}</DropdownMenuLabel>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem>
+                            <DropdownMenuItem asChild>
                                 <Link href="/settings" className="flex items-center w-full">
                                     <User className="mr-2" /> Profile
                                 </Link>
                             </DropdownMenuItem>
-                            <DropdownMenuItem>
+                            <DropdownMenuItem asChild>
                                 <Link href="/settings" className="flex items-center w-full">
                                     <Settings className="mr-2" /> Settings
                                 </Link>
@@ -87,10 +127,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                                 </DropdownMenuSubContent>
                             </DropdownMenuSub>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem>
-                                <Link href="/login" className="flex items-center w-full">
-                                    <LogOut className="mr-2" /> Logout
-                                </Link>
+                            <DropdownMenuItem onClick={handleLogout}>
+                                <LogOut className="mr-2" /> Logout
                             </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>

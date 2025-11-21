@@ -10,9 +10,23 @@ import { Switch } from "@/components/ui/switch";
 import { useTheme } from 'next-themes';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Upload } from 'lucide-react';
+import { useUser } from '@/firebase';
 
 export default function SettingsPage() {
     const { theme, setTheme } = useTheme();
+    const { user } = useUser();
+    
+    const getInitials = (name: string | null | undefined) => {
+        if (!name) return "U";
+        const names = name.split(' ');
+        if (names.length > 1) {
+            return `${names[0][0]}${names[names.length - 1][0]}`.toUpperCase();
+        }
+        if (names.length === 1 && names[0].length > 1) {
+            return names[0].substring(0, 2).toUpperCase();
+        }
+        return "U";
+    };
 
     return (
         <div className="flex flex-col gap-6">
@@ -38,8 +52,8 @@ export default function SettingsPage() {
                         <CardContent className="space-y-6">
                              <div className="flex items-center gap-4">
                                 <Avatar className="h-20 w-20">
-                                    <AvatarImage src="https://picsum.photos/seed/user/80/80" alt="User" />
-                                    <AvatarFallback>JD</AvatarFallback>
+                                    <AvatarImage src={user?.photoURL || ''} alt={user?.displayName || 'User'} />
+                                    <AvatarFallback>{getInitials(user?.displayName)}</AvatarFallback>
                                 </Avatar>
                                 <Button variant="outline">
                                     <Upload className="mr-2 h-4 w-4" />
@@ -49,16 +63,16 @@ export default function SettingsPage() {
                             <div className="grid md:grid-cols-2 gap-4">
                                 <div className="space-y-2">
                                     <Label htmlFor="name">Name</Label>
-                                    <Input id="name" defaultValue="John Doe" />
+                                    <Input id="name" defaultValue={user?.displayName || ''} />
                                 </div>
                                 <div className="space-y-2">
                                     <Label htmlFor="username">Username</Label>
-                                    <Input id="username" defaultValue="@johndoe" />
+                                    <Input id="username" defaultValue={user?.email?.split('@')[0] || ''} />
                                 </div>
                             </div>
                              <div className="space-y-2">
                                 <Label htmlFor="email">Email</Label>
-                                <Input id="email" type="email" defaultValue="john.doe@example.com" disabled />
+                                <Input id="email" type="email" defaultValue={user?.email || ''} disabled />
                             </div>
                         </CardContent>
                         <CardFooter>

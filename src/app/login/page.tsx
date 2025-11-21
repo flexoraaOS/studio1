@@ -1,3 +1,4 @@
+'use client';
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -12,6 +13,11 @@ import { Label } from "@/components/ui/label"
 import { FlexoraaTraderOSLogo } from "@/components/icons"
 import Link from 'next/link'
 import { cn } from "@/lib/utils"
+import { useAuth } from '@/firebase';
+import { GoogleAuthProvider, signInWithRedirect } from 'firebase/auth';
+import { useRouter } from 'next/navigation';
+import { useUser } from '@/firebase';
+import { useEffect } from "react";
 
 function GoogleIcon(props: React.SVGProps<SVGSVGElement>) {
     return (
@@ -43,6 +49,33 @@ function GoogleIcon(props: React.SVGProps<SVGSVGElement>) {
 }
 
 export default function LoginPage() {
+  const auth = useAuth();
+  const router = useRouter();
+  const { user, isUserLoading } = useUser();
+
+  const handleGoogleSignIn = async () => {
+    const provider = new GoogleAuthProvider();
+    try {
+      await signInWithRedirect(auth, provider);
+    } catch (error) {
+      console.error("Error during Google sign-in:", error);
+    }
+  };
+  
+  useEffect(() => {
+    if (!isUserLoading && user) {
+      router.push('/dashboard');
+    }
+  }, [user, isUserLoading, router]);
+
+  if (isUserLoading || user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p>Loading...</p>
+      </div>
+    );
+  }
+
   return (
     <div className={cn("min-h-screen flex items-center justify-center animated-background", "p-4")}>
       <Card className="mx-auto max-w-sm w-full bg-card/80 backdrop-blur-sm">
@@ -78,12 +111,10 @@ export default function LoginPage() {
               </div>
               <Input id="password" type="password" required />
             </div>
-            <Link href="/dashboard" className="w-full">
-                <Button useAnimation className="w-full">
-                    Login
-                </Button>
-            </Link>
-            <Button variant="outline" className="w-full">
+            <Button useAnimation className="w-full">
+                Login
+            </Button>
+            <Button variant="outline" className="w-full" onClick={handleGoogleSignIn}>
                 <GoogleIcon className="mr-2" />
                 Login with Google
             </Button>
