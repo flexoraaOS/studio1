@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Tooltip } from 'recharts';
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Tooltip, Cell } from 'recharts';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartConfig } from '@/components/ui/chart';
 import type { ChartData } from '@/lib/types';
@@ -8,7 +8,12 @@ import type { ChartData } from '@/lib/types';
 const chartConfig = {
     'P&L': {
         label: 'P&L',
+    },
+    positive: {
         color: 'hsl(var(--chart-1))',
+    },
+    negative: {
+        color: 'hsl(var(--destructive))',
     },
 } satisfies ChartConfig;
 
@@ -50,7 +55,11 @@ export default function PerformanceChart({ data }: PerformanceChartProps) {
                                 </div>
                             )} />}
                         />
-                        <Bar dataKey="P&L" fill="var(--color-P&L)" radius={4} />
+                        <Bar dataKey="P&L" radius={4}>
+                            {data.map((entry, index) => (
+                                <Cell key={`cell-${index}`} fill={(entry['P&L'] as number) >= 0 ? 'var(--color-positive)' : 'var(--color-negative)'} />
+                            ))}
+                        </Bar>
                     </BarChart>
                 </ChartContainer>
             </CardContent>
