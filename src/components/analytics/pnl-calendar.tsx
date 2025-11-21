@@ -35,31 +35,25 @@ const PnlCalendar = ({ data }: PnlCalendarProps) => {
   }
 
   const year = new Date(data[0].date).getFullYear();
-  const weeks: (PnlCalendarData | null)[][] = Array.from({ length: 53 }, () => Array(7).fill(null));
-  const monthLabels: { name: string; startWeek: number }[] = [];
+  const months = Array.from({ length: 12 }, (_, i) => {
+    const month = i;
+    const monthName = new Date(year, month).toLocaleString('default', { month: 'long' });
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const daysInMonth = lastDay.getDate();
+    const firstDayOfWeek = firstDay.getDay();
 
-  let lastMonth = -1;
-  const firstDayOfYear = new Date(year, 0, 1);
-  const yearStartDay = firstDayOfYear.getDay();
+    const days = Array.from({ length: firstDayOfWeek }, () => null).concat(
+      Array.from({ length: daysInMonth }, (_, dayIndex) => {
+        const date = new Date(year, month, dayIndex + 1);
+        return data.find(d => new Date(d.date).toDateString() === date.toDateString()) || { date: date.toISOString(), pnl: 0, isPlaceholder: true };
+      })
+    );
 
-  data.forEach(day => {
-    const date = new Date(day.date);
-    if (date.getFullYear() === year) {
-      const dayOfWeek = date.getDay();
-      const dayOfYear = Math.floor((date.getTime() - firstDayOfYear.getTime()) / (1000 * 60 * 60 * 24));
-      const weekOfYear = Math.floor((dayOfYear + yearStartDay) / 7);
-
-      if(weeks[weekOfYear]) {
-        weeks[weekOfYear][dayOfWeek] = day;
-      }
-      
-      const month = date.getMonth();
-      if (month !== lastMonth) {
-        monthLabels.push({ name: date.toLocaleString('default', { month: 'short' }), startWeek: weekOfYear });
-        lastMonth = month;
-      }
-    }
+    return { monthName, days };
   });
+
+  const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
   return (
     <Card>
@@ -69,38 +63,34 @@ const PnlCalendar = ({ data }: PnlCalendarProps) => {
       </CardHeader>
       <CardContent className="overflow-x-auto">
         <TooltipProvider>
-            <div className="inline-block">
-                <div className="grid grid-cols-53 grid-rows-1 gap-2.5 mb-2 text-xs text-muted-foreground">
-                    {monthLabels.map((label) => (
-                        <div key={label.name} style={{ gridColumnStart: label.startWeek + 1 }} className="col-span-4 text-left">
-                            {label.name}
-                        </div>
+            <div className="flex flex-wrap gap-8">
+              {months.map(({ monthName, days }) => (
+                <div key={monthName} className="flex flex-col items-center">
+                  <h3 className="text-lg font-semibold mb-2">{monthName}</h3>
+                  <div className="grid grid-cols-7 gap-1">
+                    {weekDays.map(day => <div key={day} className="w-6 text-center text-xs text-muted-foreground">{day}</div>)}
+                    {days.map((day, index) => (
+                      <Tooltip key={index} delayDuration={100}>
+                          <TooltipTrigger asChild>
+                              <div className={cn(
+                                  "w-6 h-6 rounded-sm",
+                                  day ? getColorForPnl(day.pnl) : 'bg-transparent',
+                                  day?.isPlaceholder && 'bg-muted/50'
+                              )} />
+                          </TooltipTrigger>
+                          {day && !day.isPlaceholder && (
+                              <TooltipContent>
+                                  <p className="text-sm font-medium">{new Date(day.date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                                  <p className={cn("font-semibold", day.pnl > 0 ? 'text-green-500' : 'text-red-500')}>
+                                      P&L: ₹{day.pnl.toFixed(2)}
+                                  </p>
+                              </TooltipContent>
+                          )}
+                      </Tooltip>
                     ))}
+                  </div>
                 </div>
-                 <div className="grid grid-flow-col auto-cols-max gap-1">
-                     {weeks.map((week, weekIndex) => (
-                        <div key={weekIndex} className="grid grid-rows-7 gap-1">
-                            {week.map((day, dayIndex) => (
-                                <Tooltip key={dayIndex} delayDuration={100}>
-                                    <TooltipTrigger asChild>
-                                        <div className={cn(
-                                            "w-4 h-4 rounded-sm",
-                                            day ? getColorForPnl(day.pnl) : 'bg-gray-200 dark:bg-gray-800'
-                                        )} />
-                                    </TooltipTrigger>
-                                    {day && (
-                                        <TooltipContent>
-                                            <p className="text-sm font-medium">{new Date(day.date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
-                                            <p className={cn("font-semibold", day.pnl > 0 ? 'text-green-500' : 'text-red-500')}>
-                                                P&L: ₹{day.pnl.toFixed(2)}
-                                            </p>
-                                        </TooltipContent>
-                                    )}
-                                </Tooltip>
-                            ))}
-                        </div>
-                    ))}
-                 </div>
+              ))}
             </div>
         </TooltipProvider>
       </CardContent>
