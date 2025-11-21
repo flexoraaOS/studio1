@@ -98,11 +98,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                             <DropdownMenuSeparator />
                             <DropdownMenuItem asChild>
                                 <Link href="/settings" className="flex items-center w-full">
-                                    <User className="mr-2" /> Profile
-                                </Link>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem asChild>
-                                <Link href="/settings" className="flex items-center w-full">
                                     <Settings className="mr-2" /> Settings
                                 </Link>
                             </DropdownMenuItem>
