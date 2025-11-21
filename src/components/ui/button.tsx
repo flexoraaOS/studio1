@@ -37,17 +37,23 @@ export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {
   asChild?: boolean
+  useAnimation?: boolean
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild = false, ...props }, ref) => {
+  ({ className, variant, size, asChild = false, useAnimation = false, children, ...props }, ref) => {
     const Comp = asChild ? Slot : "button"
+    const animationClass = useAnimation ? 'btn-animated-border' : '';
     return (
       <Comp
-        className={cn(buttonVariants({ variant, size, className }))}
+        className={cn(buttonVariants({ variant, size, className }), animationClass)}
         ref={ref}
         {...props}
-      />
+      >
+        <span className={cn('flex items-center gap-2', { 'bg-primary rounded-md px-4 py-2': useAnimation })}>
+            {children}
+        </span>
+      </Comp>
     )
   }
 )

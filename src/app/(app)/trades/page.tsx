@@ -15,7 +15,7 @@ export default function TradesPage() {
         <div className="flex flex-col gap-6">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight font-headline">All Trades</h1>
+                    <h1 className="text-3xl font-bold tracking-tight font-headline text-gradient">All Trades</h1>
                     <p className="text-muted-foreground">Manage and review your trading history.</p>
                 </div>
                 <div className="flex items-center gap-2">

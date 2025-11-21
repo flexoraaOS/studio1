@@ -16,7 +16,7 @@ import { Terminal } from 'lucide-react';
 function SubmitButton() {
     const { pending } = useFormStatus();
     return (
-        <Button type="submit" disabled={pending}>
+        <Button type="submit" disabled={pending} useAnimation>
             {pending ? 'Saving...' : 'Save Trade'}
         </Button>
     );

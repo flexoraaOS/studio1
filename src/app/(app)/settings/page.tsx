@@ -12,7 +12,7 @@ export default function SettingsPage() {
     return (
         <div className="flex flex-col gap-6">
             <div>
-                <h1 className="text-3xl font-bold tracking-tight font-headline">Settings</h1>
+                <h1 className="text-3xl font-bold tracking-tight font-headline text-gradient">Settings</h1>
                 <p className="text-muted-foreground">Manage your account and application preferences.</p>
             </div>
             <Tabs defaultValue="profile" className="w-full">
@@ -58,7 +58,7 @@ export default function SettingsPage() {
                         <CardContent className="space-y-4">
                             <div className="space-y-2">
                                 <Label htmlFor="theme">Theme</Label>
-                                <Select defaultValue="system">
+                                <Select defaultValue="dark">
                                     <SelectTrigger>
                                         <SelectValue placeholder="Select theme" />
                                     </SelectTrigger>

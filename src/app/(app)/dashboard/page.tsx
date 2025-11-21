@@ -22,7 +22,7 @@ export default function DashboardPage() {
     return (
         <div className="flex flex-col gap-6">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-                <h1 className="text-3xl font-bold tracking-tight font-headline">Dashboard</h1>
+                <h1 className="text-3xl font-bold tracking-tight font-headline text-gradient">Dashboard</h1>
                 <div className="flex items-center gap-2">
                     {/* Add date range picker here */}
                 </div>
