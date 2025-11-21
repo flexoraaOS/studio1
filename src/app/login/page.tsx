@@ -114,7 +114,7 @@ export default function LoginPage() {
             <Button useAnimation className="w-full">
                 Login
             </Button>
-            <Button variant="outline" className="w-full" onClick={handleGoogleSignIn}>
+            <Button variant="secondary" useAnimation className="w-full" onClick={handleGoogleSignIn}>
                 <GoogleIcon className="mr-2" />
                 Login with Google
             </Button>
