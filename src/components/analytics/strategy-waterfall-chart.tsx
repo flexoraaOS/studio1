@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, ReferenceLine, LabelList } from 'recharts';
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Tooltip, ReferenceLine, LabelList } from 'recharts';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { StrategyContribution } from '@/lib/types';
@@ -28,10 +28,13 @@ export default function StrategyWaterfallChart({ data }: StrategyWaterfallChartP
 
     const CustomTooltip = ({ active, payload, label }: any) => {
       if (active && payload && payload.length) {
+        const data = payload[0].payload;
         return (
           <div className="p-2 text-sm bg-background border rounded-md shadow-lg">
             <p className="font-bold">{label}</p>
-            <p className="text-foreground">Contribution: ₹{payload[0].value.toLocaleString('en-IN')}</p>
+            <p className={cn("text-foreground", !data.isTotal && (data.value >= 0 ? 'text-green-500' : 'text-red-500'))}>
+                {data.isTotal ? 'Balance' : 'Contribution'}: ₹{data.value.toLocaleString('en-IN')}
+            </p>
           </div>
         );
       }
@@ -48,42 +51,32 @@ export default function StrategyWaterfallChart({ data }: StrategyWaterfallChartP
             <CardContent>
                 <ChartContainer config={{}} className="h-[350px] w-full">
                     <BarChart
-                        layout="vertical"
                         data={chartData}
-                        margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                        margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
                     >
-                        <CartesianGrid strokeDasharray="3 3" horizontal={false} />
-                        <XAxis 
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                        <XAxis dataKey="name" type="category" angle={-45} textAnchor="end" height={60} />
+                        <YAxis 
                             type="number" 
                             tickFormatter={(value) => `₹${Number(value) / 1000}k`}
+                            domain={['dataMin - 10000', 'dataMax + 10000']}
                         />
-                        <YAxis dataKey="name" type="category" width={120} />
-                        <Tooltip content={<CustomTooltip />} />
+                        <Tooltip content={<CustomTooltip />} cursor={{ fill: 'hsl(var(--muted))' }} />
                         <ReferenceLine y={0} stroke="#000" />
-                        <Bar dataKey="range" shape={<WaterfallBar />} />
+                        <Bar dataKey="range">
+                          {chartData.map((entry, index) => {
+                             const isPositive = entry.value >= 0;
+                             const isTotal = entry.name.toLowerCase().includes('balance');
+                             let color = 'hsl(var(--primary))';
+                             if (!isTotal) {
+                               color = isPositive ? 'hsl(var(--chart-1))' : 'hsl(var(--destructive))';
+                             }
+                             return <Cell key={`cell-${index}`} fill={color} />;
+                          })}
+                        </Bar>
                     </BarChart>
                 </ChartContainer>
             </CardContent>
         </Card>
     );
 }
-
-const WaterfallBar = (props: any) => {
-  const { x, y, width, height, range, value, name } = props;
-  const isPositive = value >= 0;
-  const isTotal = name.toLowerCase().includes('balance');
-
-  if (!range) return null;
-  
-  const [start, end] = range;
-  
-  const barX = value >= 0 ? x : x + width;
-  const barWidth = Math.abs(width);
-
-
-  if(isTotal){
-     return <rect x={x} y={y} width={width} height={height} fill="hsl(var(--primary))" />;
-  }
-
-  return <rect x={x} y={y} width={width} height={height} fill={isPositive ? 'hsl(var(--chart-1))' : 'hsl(var(--destructive))'} />;
-};
