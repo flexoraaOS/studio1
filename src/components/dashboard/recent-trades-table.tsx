@@ -45,12 +45,12 @@ export default function RecentTradesTable({ trades }: RecentTradesTableProps) {
                                     <div className="hidden text-sm text-muted-foreground md:inline">{trade.strategy}</div>
                                 </TableCell>
                                 <TableCell className="hidden sm:table-cell">
-                                    <Badge variant={trade.direction === 'Long' ? 'secondary' : 'outline'} className={cn(trade.direction === 'Long' ? 'text-green-600 border-green-200 bg-green-50' : 'text-red-600 border-red-200 bg-red-50')}>{trade.direction}</Badge>
+                                     <Badge variant={trade.direction === 'Long' ? 'default' : 'secondary'} className={cn(trade.direction === 'Long' ? 'bg-chart-2/20 text-chart-2' : 'bg-destructive/20 text-destructive')}>{trade.direction}</Badge>
                                 </TableCell>
                                 <TableCell className="hidden sm:table-cell">
                                     <Badge variant={trade.status === 'Closed' ? 'default' : 'secondary'} className={cn(trade.status !== 'Closed' && 'bg-accent text-accent-foreground')}>{trade.status}</Badge>
                                 </TableCell>
-                                <TableCell className={cn("text-right font-medium", trade.realizedPnl > 0 ? 'text-green-600' : trade.realizedPnl < 0 ? 'text-red-600' : 'text-foreground')}>
+                                <TableCell className={cn("text-right font-medium", trade.realizedPnl > 0 ? 'text-chart-2' : trade.realizedPnl < 0 ? 'text-destructive' : 'text-foreground')}>
                                     {trade.currency === 'INR' ? '₹' : trade.currency === 'USD' ? '$' : '€'}
                                     {trade.realizedPnl.toFixed(2)}
                                 </TableCell>
