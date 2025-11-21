@@ -49,7 +49,11 @@ export default function ImportPage() {
                             </div>
                         </CardHeader>
                         <CardFooter className="mt-auto">
-                            <Button className="w-full">{option.buttonText}</Button>
+                            {option.title === 'Connect Broker API' ? (
+                                <p className="text-sm text-muted-foreground p-2 text-center w-full">overhere they will need to connect broker api and then they can upload all data</p>
+                            ) : (
+                                <Button className="w-full">{option.buttonText}</Button>
+                            )}
                         </CardFooter>
                     </Card>
                 ))}
