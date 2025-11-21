@@ -1,0 +1,763 @@
+{
+  "entities": {
+    "User": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "User",
+      "type": "object",
+      "description": "Represents a user of the TradeSight Pro application.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the user.",
+          "format": "uuid"
+        },
+        "email": {
+          "type": "string",
+          "description": "Email address of the user.",
+          "format": "email"
+        },
+        "firstName": {
+          "type": "string",
+          "description": "First name of the user."
+        },
+        "lastName": {
+          "type": "string",
+          "description": "Last name of the user."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp indicating when the user account was created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp indicating when the user account was last updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "email",
+        "firstName",
+        "lastName",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "Account": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Account",
+      "type": "object",
+      "description": "Represents a trading account associated with a user.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the account.",
+          "format": "uuid"
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to User. (Relationship: User 1:N Account)"
+        },
+        "brokerId": {
+          "type": "string",
+          "description": "Reference to Broker. (Relationship: Broker 1:N Account)"
+        },
+        "accountName": {
+          "type": "string",
+          "description": "Name of the trading account."
+        },
+        "accountNumber": {
+          "type": "string",
+          "description": "Account number at the broker."
+        },
+        "currency": {
+          "type": "string",
+          "description": "Currency of the account."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp indicating when the account was created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp indicating when the account was last updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "brokerId",
+        "accountName",
+        "accountNumber",
+        "currency",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "Broker": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Broker",
+      "type": "object",
+      "description": "Represents a brokerage firm.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the broker.",
+          "format": "uuid"
+        },
+        "brokerName": {
+          "type": "string",
+          "description": "Name of the brokerage firm."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp indicating when the broker was created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp indicating when the broker was last updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "brokerName",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "Trade": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Trade",
+      "type": "object",
+      "description": "Represents a single trade record.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the trade.",
+          "format": "uuid"
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to User. (Relationship: User 1:N Trade)"
+        },
+        "accountId": {
+          "type": "string",
+          "description": "Reference to Account. (Relationship: Account 1:N Trade)"
+        },
+        "strategyId": {
+          "type": "string",
+          "description": "Reference to Strategy. (Relationship: Strategy 1:N Trade)"
+        },
+        "tradeId": {
+          "type": "string",
+          "description": "Trade ID from the broker."
+        },
+        "entryTime": {
+          "type": "string",
+          "description": "Timestamp indicating when the trade was entered.",
+          "format": "date-time"
+        },
+        "exitTime": {
+          "type": "string",
+          "description": "Timestamp indicating when the trade was exited.",
+          "format": "date-time"
+        },
+        "exchange": {
+          "type": "string",
+          "description": "Exchange where the trade was executed."
+        },
+        "marketType": {
+          "type": "string",
+          "description": "Type of market (e.g., stock, futures, forex)."
+        },
+        "symbol": {
+          "type": "string",
+          "description": "Trading symbol (e.g., AAPL, EURUSD)."
+        },
+        "direction": {
+          "type": "string",
+          "description": "Direction of the trade (e.g., long, short)."
+        },
+        "size": {
+          "type": "number",
+          "description": "Size of the trade."
+        },
+        "entryPrice": {
+          "type": "number",
+          "description": "Entry price of the trade."
+        },
+        "exitPrice": {
+          "type": "number",
+          "description": "Exit price of the trade."
+        },
+        "fees": {
+          "type": "number",
+          "description": "Fees associated with the trade."
+        },
+        "slippage": {
+          "type": "number",
+          "description": "Slippage incurred during the trade."
+        },
+        "realizedPnl": {
+          "type": "number",
+          "description": "Realized profit and loss from the trade."
+        },
+        "unrealizedPnl": {
+          "type": "number",
+          "description": "Unrealized profit and loss from the trade."
+        },
+        "currency": {
+          "type": "string",
+          "description": "Currency of the trade."
+        },
+        "baseCurrency": {
+          "type": "string",
+          "description": "Base currency for P&L normalization (e.g., INR)."
+        },
+        "strategyTag": {
+          "type": "string",
+          "description": "Tag associated with the trading strategy."
+        },
+        "strategyVersion": {
+          "type": "string",
+          "description": "Version of the trading strategy."
+        },
+        "orderIds": {
+          "type": "array",
+          "description": "Order IDs associated with the trade.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "brokerId": {
+          "type": "string",
+          "description": "Broker ID associated with the trade."
+        },
+        "notesPre": {
+          "type": "string",
+          "description": "Notes taken before the trade."
+        },
+        "notesPost": {
+          "type": "string",
+          "description": "Notes taken after the trade."
+        },
+        "emotionPre": {
+          "type": "string",
+          "description": "Emotions felt before the trade."
+        },
+        "emotionPost": {
+          "type": "string",
+          "description": "Emotions felt after the trade."
+        },
+        "confidence": {
+          "type": "number",
+          "description": "Confidence level in the trade."
+        },
+        "tradeReason": {
+          "type": "string",
+          "description": "Reason for the trade."
+        },
+        "riskAmount": {
+          "type": "number",
+          "description": "Amount of risk taken on the trade."
+        },
+        "riskPercent": {
+          "type": "number",
+          "description": "Percentage of risk taken on the trade."
+        },
+        "rewardToRisk": {
+          "type": "number",
+          "description": "Reward to risk ratio of the trade."
+        },
+        "durationSeconds": {
+          "type": "number",
+          "description": "Duration of the trade in seconds."
+        },
+        "tags": {
+          "type": "array",
+          "description": "Tags associated with the trade.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "screenshotIds": {
+          "type": "array",
+          "description": "References to Attachments. (Relationship: Attachment 1:N Trade)",
+          "items": {
+            "type": "string"
+          }
+        },
+        "chartSnapshot": {
+          "type": "string",
+          "description": "Link to the chart snapshot of the trade.",
+          "format": "uri"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp indicating when the trade was created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp indicating when the trade was last updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "accountId",
+        "strategyId",
+        "tradeId",
+        "entryTime",
+        "exitTime",
+        "exchange",
+        "marketType",
+        "symbol",
+        "direction",
+        "size",
+        "entryPrice",
+        "exitPrice",
+        "fees",
+        "slippage",
+        "realizedPnl",
+        "unrealizedPnl",
+        "currency",
+        "baseCurrency",
+        "strategyTag",
+        "strategyVersion",
+        "brokerId",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "TradeVersion": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "TradeVersion",
+      "type": "object",
+      "description": "Represents a version of a trade record, used for audit trails.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the trade version.",
+          "format": "uuid"
+        },
+        "tradeId": {
+          "type": "string",
+          "description": "Reference to Trade. (Relationship: Trade 1:N TradeVersion)"
+        },
+        "versionNumber": {
+          "type": "number",
+          "description": "Version number of the trade."
+        },
+        "tradeData": {
+          "type": "string",
+          "description": "JSON string containing the trade data for this version."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp indicating when the trade version was created.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "tradeId",
+        "versionNumber",
+        "tradeData",
+        "createdAt"
+      ]
+    },
+    "Strategy": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Strategy",
+      "type": "object",
+      "description": "Represents a trading strategy.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the strategy.",
+          "format": "uuid"
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to User. (Relationship: User 1:N Strategy)"
+        },
+        "strategyName": {
+          "type": "string",
+          "description": "Name of the trading strategy."
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the trading strategy."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp indicating when the strategy was created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp indicating when the strategy was last updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "strategyName",
+        "description",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "FxRate": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "FxRate",
+      "type": "object",
+      "description": "Represents a foreign exchange rate at a specific timestamp.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the FX rate.",
+          "format": "uuid"
+        },
+        "baseCurrency": {
+          "type": "string",
+          "description": "Base currency of the FX rate (e.g., USD)."
+        },
+        "quoteCurrency": {
+          "type": "string",
+          "description": "Quote currency of the FX rate (e.g., EUR)."
+        },
+        "rate": {
+          "type": "number",
+          "description": "FX rate."
+        },
+        "timestamp": {
+          "type": "string",
+          "description": "Timestamp of the FX rate.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "baseCurrency",
+        "quoteCurrency",
+        "rate",
+        "timestamp"
+      ]
+    },
+    "Attachment": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Attachment",
+      "type": "object",
+      "description": "Represents an attachment (e.g., screenshot, document) associated with a trade.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the attachment.",
+          "format": "uuid"
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to User. (Relationship: User 1:N Attachment)"
+        },
+        "fileName": {
+          "type": "string",
+          "description": "Name of the attached file."
+        },
+        "fileType": {
+          "type": "string",
+          "description": "Type of the attached file (e.g., image/png, application/pdf)."
+        },
+        "fileSize": {
+          "type": "number",
+          "description": "Size of the attached file in bytes."
+        },
+        "storageLocation": {
+          "type": "string",
+          "description": "Location where the file is stored (e.g., S3 URL)."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp indicating when the attachment was created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp indicating when the attachment was last updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "fileName",
+        "fileType",
+        "fileSize",
+        "storageLocation",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "MetricsCache": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "MetricsCache",
+      "type": "object",
+      "description": "Represents a cached metrics value for performance optimization.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the metrics cache entry.",
+          "format": "uuid"
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to User. (Relationship: User 1:N MetricsCache)"
+        },
+        "metricName": {
+          "type": "string",
+          "description": "Name of the metric being cached (e.g., equityCurve, sharpeRatio)."
+        },
+        "cacheKey": {
+          "type": "string",
+          "description": "Key used to identify the cached data (e.g., date range, strategy)."
+        },
+        "metricValue": {
+          "type": "string",
+          "description": "Cached value of the metric (can be a JSON string for complex data)."
+        },
+        "expirationTime": {
+          "type": "string",
+          "description": "Timestamp indicating when the cached data expires.",
+          "format": "date-time"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp indicating when the cache entry was created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp indicating when the cache entry was last updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "metricName",
+        "cacheKey",
+        "metricValue",
+        "expirationTime",
+        "createdAt",
+        "updatedAt"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/users/{userId}",
+        "definition": {
+          "entityName": "User",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "Stores user profiles.  Path-based ownership enforced by the `userId` parameter.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/accounts/{accountId}",
+        "definition": {
+          "entityName": "Account",
+          "schema": {
+            "$ref": "#/backend/entities/Account"
+          },
+          "description": "Stores trading accounts associated with a user. Path-based ownership enforced, with `userId` denormalized in the path.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user."
+            },
+            {
+              "name": "accountId",
+              "description": "The unique identifier for the account."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/brokers/{brokerId}",
+        "definition": {
+          "entityName": "Broker",
+          "schema": {
+            "$ref": "#/backend/entities/Broker"
+          },
+          "description": "Stores information about brokerage firms.  Global access; no user-specific ownership.",
+          "params": [
+            {
+              "name": "brokerId",
+              "description": "The unique identifier for the broker."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/trades/{tradeId}",
+        "definition": {
+          "entityName": "Trade",
+          "schema": {
+            "$ref": "#/backend/entities/Trade"
+          },
+          "description": "Stores individual trade records. Path-based ownership enforced, with `userId` denormalized in the path.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user."
+            },
+            {
+              "name": "tradeId",
+              "description": "The unique identifier for the trade."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/trades/{tradeId}/versions/{versionId}",
+        "definition": {
+          "entityName": "TradeVersion",
+          "schema": {
+            "$ref": "#/backend/entities/TradeVersion"
+          },
+          "description": "Stores versions of trade records for audit trails. Path-based ownership inherited from the parent Trade document.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user."
+            },
+            {
+              "name": "tradeId",
+              "description": "The unique identifier for the trade."
+            },
+            {
+              "name": "versionId",
+              "description": "The unique identifier for the trade version."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/strategies/{strategyId}",
+        "definition": {
+          "entityName": "Strategy",
+          "schema": {
+            "$ref": "#/backend/entities/Strategy"
+          },
+          "description": "Stores trading strategies created by users. Path-based ownership enforced, with `userId` denormalized in the path.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user."
+            },
+            {
+              "name": "strategyId",
+              "description": "The unique identifier for the strategy."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/fx_rates/{fxRateId}",
+        "definition": {
+          "entityName": "FxRate",
+          "schema": {
+            "$ref": "#/backend/entities/FxRate"
+          },
+          "description": "Stores historical foreign exchange rates. Global access; no user-specific ownership.",
+          "params": [
+            {
+              "name": "fxRateId",
+              "description": "The unique identifier for the FX rate."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/attachments/{attachmentId}",
+        "definition": {
+          "entityName": "Attachment",
+          "schema": {
+            "$ref": "#/backend/entities/Attachment"
+          },
+          "description": "Stores attachments (e.g., screenshots) associated with a user's trades. Path-based ownership enforced, with `userId` denormalized in the path.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user."
+            },
+            {
+              "name": "attachmentId",
+              "description": "The unique identifier for the attachment."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/metrics_cache/{metricsCacheId}",
+        "definition": {
+          "entityName": "MetricsCache",
+          "schema": {
+            "$ref": "#/backend/entities/MetricsCache"
+          },
+          "description": "Stores cached metrics values for performance optimization. Path-based ownership enforced, with `userId` denormalized in the path.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user."
+            },
+            {
+              "name": "metricsCacheId",
+              "description": "The unique identifier for the metrics cache entry."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/roles_admin/{userId}",
+        "definition": {
+          "entityName": "role_admin",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "Collection to store admin user roles. Existence of a document implies admin privileges.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore data structure is designed to support the core features of the TradeSight Pro application, focusing on security, scalability, and efficient data retrieval. The design emphasizes authorization independence via denormalization to avoid costly and insecure `get()` calls in security rules.  Data is segregated into collections based on access patterns, and a consistent access modeling approach is employed throughout the structure.\n\n1.  **Authorization Independence (CRITICAL):** The design avoids hierarchical authorization dependencies (`get()`). User ownership is enforced via path-based rules (e.g., `/users/{userId}/accounts/{accountId}`). Collaborative data, if any, would use membership maps denormalized into subcollections.  Global roles are managed using document existence in dedicated collections (e.g., `/roles_admin/{uid}`).\n\n2.  **Clarity of Intent (Debuggability):** The structure makes authorization intent explicit through path-based ownership and consistent field naming.\n\n3.  **DBAC (No Custom Claims):** Roles are stored in the database using the 'existence over content' strategy for global roles.\n\n4.  **QAPs (Rules are not Filters):** The structure facilitates secure `list` operations by ensuring that all documents within a collection share the same security requirements and by denormalizing authorization data.\n\n5.  **Invariants:** The structure supports the integrity of ownership, timestamps, and denormalized data through server-side validation and security rules.\n\n**Specific QAP Considerations:**\n\n*   **Listing Trades:** Trades are stored under `/users/{userId}/trades/{tradeId}`, enabling secure listing of trades owned by a specific user without needing to filter based on content.  The same applies to other user-owned entities like Strategies and Accounts.\n*   **Admin Roles:**  If admin users need to access all trades, a separate collection (e.g., `/admin_trades/{tradeId}`) could mirror trade data.  The existence of a document in `/roles_admin/{userId}` would grant access to this collection.\n\n**Denormalization Strategy:**\n\n*   For entities nested within users (e.g., Accounts, Strategies, Trades, Attachments, MetricsCache), the `userId` is inherently denormalized by being present in both the document and the path. If access to a trade needed to depend on the account status, `accountStatus` would be copied into each `trade` document.\n\nThis structure allows for robust and easily debuggable security rules, ensures scalability, and facilitates the development of a high-performance trading journal application."
+  }
+}

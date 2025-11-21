@@ -1,0 +1,217 @@
+/**
+ * Core Philosophy: This ruleset enforces a strict user-ownership model. All user-generated
+ * data (accounts, trades, strategies, etc.) is private and can only be accessed by the user
+ * who created it. This is achieved by nesting user-specific collections under a path
+ * containing their unique user ID.
+ *
+ * Data Structure: The data is organized into two main categories:
+ * 1. User-Private Data: All collections containing a user's personal trading information are
+ *    nested under `/users/{userId}`. This structure allows for simple and performant
+ *    path-based security rules.
+ * 2. Global Data: Collections like `/brokers` and `/fx_rates` contain public, read-only
+ *    information accessible to all authenticated users.
+ *
+ * Key Security Decisions:
+ * - Strict Ownership: A user can only access data within their own `/users/{userId}` tree.
+ * - No User Enumeration: Listing documents in the top-level `/users` collection is explicitly
+ *   disallowed to protect user privacy.
+ * - Read-Only Global Data: Shared data like brokers and FX rates are read-only for clients.
+ *   Writes to these collections must be performed by a trusted backend or admin, not directly
+ *   by users.
+ * - Admin Roles: An admin role is defined by the existence of a document in the `/roles_admin`
+ *   collection. This collection is not readable or writable by any client to protect the
+ *   identity of administrators.
+ *
+ * Denormalization for Authorization: The rules rely on path-based security, where the
+ * `{userId}` in the path is the source of truth for ownership. For all user-owned documents, a
+ * `userId` field is also required within the document itself to ensure relational integrity on
+ * creation and immutability on update, preventing documents from being moved between users.
+ * This avoids any slow or costly `get()` calls for authorization checks.
+ *
+ * Structural Segregation: User-private data (`/users/{userId}/*`) is structurally separated
+ * from globally-readable data (`/brokers`, `/fx_rates`). This provides a clear, secure, and
+ * performant boundary for access control, especially for list operations.
+ */
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // --------------------------------------------------------------------
+    // Helper Functions
+    // --------------------------------------------------------------------
+
+    /**
+     * Checks if the user is authenticated.
+     */
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    /**
+     * Checks if the authenticated user's UID matches the provided userId.
+     * This is the primary function for enforcing user ownership.
+     */
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    /**
+     * Checks for ownership on an existing document. Used for update and delete
+     * operations to ensure the document exists before the operation is allowed.
+     */
+    function isExistingOwner(userId) {
+      return isOwner(userId) && resource != null;
+    }
+
+    // --------------------------------------------------------------------
+    // User Data Rules
+    // --------------------------------------------------------------------
+
+    /**
+     * @description Manages user profile documents.
+     * @path /users/{userId}
+     * @allow (create) An authenticated user creating their own profile document.
+     * @deny (get) A user trying to read another user's profile.
+     * @deny (list) Any user trying to list all user profiles.
+     * @principle Restricts access to a user's own data tree and prevents user enumeration.
+     */
+    match /users/{userId} {
+      allow get: if isOwner(userId);
+      allow list: if false;
+      allow create: if isOwner(userId) && request.resource.data.id == userId;
+      allow update: if isExistingOwner(userId) && request.resource.data.id == resource.data.id;
+      allow delete: if isExistingOwner(userId);
+    }
+
+    /**
+     * @description Manages user-specific trading accounts.
+     * @path /users/{userId}/accounts/{accountId}
+     * @allow (create) An authenticated user creating a new account under their own profile.
+     * @deny (get) A user trying to read an account belonging to another user.
+     * @principle Enforces strict document ownership within a user's private data.
+     */
+    match /users/{userId}/accounts/{accountId} {
+      allow get: if isOwner(userId);
+      allow list: if isOwner(userId);
+      allow create: if isOwner(userId) && request.resource.data.userId == userId;
+      allow update: if isExistingOwner(userId) && request.resource.data.userId == resource.data.userId;
+      allow delete: if isExistingOwner(userId);
+    }
+
+    /**
+     * @description Manages user-specific trade records.
+     * @path /users/{userId}/trades/{tradeId}
+     * @allow (create) An authenticated user creating a new trade under their own profile.
+     * @deny (update) A user trying to modify a trade belonging to another user.
+     * @principle Enforces strict document ownership and validates relational integrity.
+     */
+    match /users/{userId}/trades/{tradeId} {
+      allow get: if isOwner(userId);
+      allow list: if isOwner(userId);
+      allow create: if isOwner(userId) && request.resource.data.userId == userId;
+      allow update: if isExistingOwner(userId) && request.resource.data.userId == resource.data.userId;
+      allow delete: if isExistingOwner(userId);
+
+      /**
+       * @description Manages historical versions of a trade for audit purposes.
+       * @path /users/{userId}/trades/{tradeId}/versions/{versionId}
+       * @allow (get) The owner of the trade reading a version history record.
+       * @deny (create) A different user trying to add a version to someone else's trade.
+       * @principle Inherits ownership from the parent document path.
+       */
+      match /versions/{versionId} {
+        allow get: if isOwner(userId);
+        allow list: if isOwner(userId);
+        allow create: if isOwner(userId);
+        allow update: if isExistingOwner(userId);
+        allow delete: if isExistingOwner(userId);
+      }
+    }
+
+    /**
+     * @description Manages user-created trading strategies.
+     * @path /users/{userId}/strategies/{strategyId}
+     * @allow (list) An authenticated user listing their own strategies.
+     * @deny (get) A user trying to read a strategy belonging to another user.
+     * @principle Enforces strict document ownership within a user's private data.
+     */
+    match /users/{userId}/strategies/{strategyId} {
+      allow get: if isOwner(userId);
+      allow list: if isOwner(userId);
+      allow create: if isOwner(userId) && request.resource.data.userId == userId;
+      allow update: if isExistingOwner(userId) && request.resource.data.userId == resource.data.userId;
+      allow delete: if isExistingOwner(userId);
+    }
+
+    /**
+     * @description Manages user-uploaded attachments like screenshots.
+     * @path /users/{userId}/attachments/{attachmentId}
+     * @allow (create) An authenticated user creating a new attachment under their own profile.
+     * @deny (delete) A user trying to delete an attachment belonging to another user.
+     * @principle Enforces strict document ownership within a user's private data.
+     */
+    match /users/{userId}/attachments/{attachmentId} {
+      allow get: if isOwner(userId);
+      allow list: if isOwner(userId);
+      allow create: if isOwner(userId) && request.resource.data.userId == userId;
+      allow update: if isExistingOwner(userId) && request.resource.data.userId == resource.data.userId;
+      allow delete: if isExistingOwner(userId);
+    }
+
+    /**
+     * @description Manages cached metrics for performance.
+     * @path /users/{userId}/metrics_cache/{metricsCacheId}
+     * @allow (create) An authenticated user creating a cache entry for their own data.
+     * @deny (update) A user trying to modify a cache entry for another user.
+     * @principle Enforces strict document ownership for user-specific performance data.
+     */
+    match /users/{userId}/metrics_cache/{metricsCacheId} {
+      allow get: if isOwner(userId);
+      allow list: if isOwner(userId);
+      allow create: if isOwner(userId) && request.resource.data.userId == userId;
+      allow update: if isExistingOwner(userId) && request.resource.data.userId == resource.data.userId;
+      allow delete: if isExistingOwner(userId);
+    }
+
+
+    // --------------------------------------------------------------------
+    // Global & Admin Rules
+    // --------------------------------------------------------------------
+
+    /**
+     * @description Stores information about brokerage firms. Read-only for all clients.
+     * @path /brokers/{brokerId}
+     * @allow (get) Any authenticated user reading broker information.
+     * @deny (create) Any client trying to add a new broker.
+     * @principle Secures global, shared data by making it read-only for clients. Writes must be handled by a trusted backend process.
+     */
+    match /brokers/{brokerId} {
+      allow get: if isSignedIn();
+      allow list: if isSignedIn();
+    }
+
+    /**
+     * @description Stores historical foreign exchange rates. Read-only for all clients.
+     * @path /fx_rates/{fxRateId}
+     * @allow (list) Any authenticated user listing FX rates.
+     * @deny (update) Any client trying to modify an FX rate.
+     * @principle Secures global, shared data by making it read-only for clients. Writes must be handled by a trusted backend process.
+     */
+    match /fx_rates/{fxRateId} {
+      allow get: if isSignedIn();
+      allow list: if isSignedIn();
+    }
+
+    /**
+     * @description Defines user roles for administrative access. Not client-accessible.
+     * @path /roles_admin/{userId}
+     * @allow (n/a) No operations are permitted from the client.
+     * @deny (get) A user trying to check if another user is an admin.
+     * @principle Prevents any client from reading or writing admin roles, protecting the system's integrity and admin identities.
+     */
+    match /roles_admin/{userId} {
+       allow read, write: if false;
+    }
+
+  }
+}
