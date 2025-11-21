@@ -114,8 +114,7 @@ export default function LoginPage() {
             <Button useAnimation className="w-full">
                 Login
             </Button>
-            <Button variant="secondary" useAnimation className="w-full" onClick={handleGoogleSignIn}>
-                <GoogleIcon className="mr-2" />
+            <Button variant="secondary" className="w-full" onClick={handleGoogleSignIn}>
                 Login with Google
             </Button>
           </div>
