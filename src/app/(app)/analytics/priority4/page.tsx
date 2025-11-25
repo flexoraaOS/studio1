@@ -37,7 +37,6 @@ export default function Priority4AnalyticsPage() {
                     <p>Stay tuned for more institutional-grade analytics to further refine your trading edge.</p>
                 </CardContent>
             </Card>
-
         </div>
     )
 }
