@@ -1,6 +1,6 @@
 'use client'
 import React, {useState, useMemo} from 'react';
-import { TrendingUp, Scale, Hash, HeartPulse, AreaChart, BarChart, LineChart, TestTube } from 'lucide-react';
+import { TrendingUp, TrendingDown, Target, Scale, Hash, HeartPulse, AreaChart, BarChart, LineChart, TestTube } from 'lucide-react';
 import { mockKpis, mockEquityCurve, mockTrades, mockPnlCalendar, mockPerformanceData } from '@/lib/data';
 import KpiCard from '@/components/dashboard/kpi-card';
 import EquityChart from '@/components/dashboard/equity-chart';
@@ -14,13 +14,21 @@ import PnlCalendar from '@/components/analytics/pnl-calendar';
 import PerformanceChart from '@/components/dashboard/performance-chart';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { Kpi } from '@/lib/types';
 
 const kpiIcons = {
-    "Profit Factor": <TrendingUp className="text-green-500" />,
-    "Avg P&L / Trade": <Scale className="text-blue-500" />,
-    "Total Trades": <Hash className="text-purple-500" />,
-    "Behavioral Score": <HeartPulse className="text-amber-500" />,
+    "Realized P&L": <TrendingUp className="text-green-500" />,
+    "Win Rate": <Target className="text-blue-500" />,
+    "Sharpe Ratio": <TrendingUp className="text-purple-500" />,
+    "Max Drawdown": <TrendingDown className="text-red-500" />,
 };
+
+const dashboardKpis: Kpi[] = [
+  { title: 'Realized P&L', value: '₹1,24,845.72', change: '+2.1%', changeType: 'positive', description: 'Past 30 days' },
+  { title: 'Win Rate', value: '62.5%', change: '-1.5%', changeType: 'negative', description: 'All time' },
+  { title: 'Sharpe Ratio', value: '1.78', description: 'Annualized' },
+  { title: 'Max Drawdown', value: '₹-42,108.30', description: 'All time' },
+];
 
 const analyticsSections = [
     {
@@ -78,7 +86,7 @@ export default function DashboardPage() {
             </div>
 
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                {mockKpis.map((kpi) => (
+                {dashboardKpis.map((kpi) => (
                     <KpiCard
                         key={kpi.title}
                         kpi={kpi}
