@@ -31,22 +31,22 @@ export type ChartData = {
   [key: string]: number | string | undefined;
 };
 
-export type RollingMetric = {
+export type RollingMetric<T extends string> = {
     date: string;
-    sharpe: number;
-    volatility: number;
-}
+} & {
+    [key in T]: number;
+};
 
 export type StrategyContribution = {
     name: string;
     value: number;
     isTotal?: boolean;
-}
+};
 
 export type PnlCalendarData = {
     date: string;
     pnl: number;
-}
+};
 
 export type ExpectancyData = {
     strategy: string;
@@ -119,12 +119,6 @@ export type RollingBeta = {
        'SMB'?: { lower: number; upper: number };
        'HML'?: { lower: number; upper: number };
     }
-};
-
-export type RollingMetric<T extends string> = {
-    date: string;
-} & {
-    [key in T]: number;
 };
 
 // --- Priority 3 Analytics Types ---

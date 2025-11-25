@@ -24,6 +24,7 @@ export default function VarCvarPanel({ dailyReturns }: VarCvarPanelProps) {
     const returns = useMemo(() => dailyReturns.map(d => d.return), [dailyReturns]);
 
     const { var: varValue, cvar } = useMemo(() => {
+        if (returns.length === 0) return { var: 0, cvar: 0 };
         if (method === 'historical') {
             return calculateHistoricalVaR(returns, confidence, horizon);
         } else {

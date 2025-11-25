@@ -14,6 +14,9 @@ interface Priority2OverviewCardProps {
 export default function Priority2OverviewCard({ dailyReturns, simulations }: Priority2OverviewCardProps) {
     
     const overviewData = useMemo(() => {
+        if (!dailyReturns || dailyReturns.length === 0) {
+            return { latestSharpe: 0, var95: 0, medianOutcome: 0, initialEquity: 0 };
+        }
         const last30DayReturns = dailyReturns.slice(-30);
         const rollingSharpe = calculateRollingSharpe(dailyReturns, 30);
         const latestSharpe = rollingSharpe[rollingSharpe.length - 1]?.sharpe;

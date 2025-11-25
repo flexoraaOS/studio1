@@ -12,6 +12,7 @@ const mean = (arr: number[]): number => arr.reduce((acc, val) => acc + val, 0) /
 
 /** Calculates the standard deviation of a number array. */
 const stdDev = (arr: number[]): number => {
+    if (arr.length < 2) return 0;
     const arrMean = mean(arr);
     const variance = arr.reduce((acc, val) => acc + Math.pow(val - arrMean, 2), 0) / (arr.length - 1);
     return Math.sqrt(variance);
@@ -158,6 +159,7 @@ export function calculateRollingVolatility(returns: number[], windowSize: number
  * @returns An array of rolling win rate metrics.
  */
 export function calculateRollingWinRate(dailyReturns: DailyReturn[], windowSize: number): RollingMetric<'winRate'>[] {
+    if (!dailyReturns || dailyReturns.length === 0) return [];
     const results: RollingMetric<'winRate'>[] = [];
     for (let i = windowSize - 1; i < dailyReturns.length; i++) {
         const window = dailyReturns.slice(i - windowSize + 1, i + 1);
@@ -234,6 +236,7 @@ export type Factor = 'Mkt_RF' | 'SMB' | 'HML';
  */
 function ols(y: number[], x: number[]): { beta: number; alpha: number, stdErr: number } {
     const n = y.length;
+    if (n < 2) return { beta: 0, alpha: 0, stdErr: 0 };
     const meanX = mean(x);
     const meanY = mean(y);
     
@@ -272,6 +275,8 @@ export function calculateRollingBetas(
     const results: RollingBeta[] = [];
     const factors: Factor[] = ['Mkt_RF', 'SMB', 'HML'];
     const z_critical = 1.96; // for 95% confidence interval
+
+    if (!strategyReturns || !factorReturns || strategyReturns.length === 0 || factorReturns.dates.length === 0) return [];
 
     // Align data by date
     const returnsMap = new Map(strategyReturns.map(r => [new Date(r.date).toDateString(), r.return]));
