@@ -1,3 +1,4 @@
+
 // @/app/(app)/live-trades/page.tsx
 'use client';
 
@@ -22,26 +23,26 @@ export default function LiveTradingCockpitPage() {
   // selected strategy, instrument, and completed trades.
 
   return (
-    <div className="flex h-[calc(100vh-4rem)] flex-col bg-[#0B0B0C] text-gray-300 font-code">
+    <div className="flex h-full flex-col bg-[#0B0B0C] text-gray-300 font-code">
       
       {/* --- Sticky Control Bar --- */}
       <LiveControlBar />
 
       {/* --- Main Content Grid --- */}
-      <div className="flex-1 grid grid-cols-1 lg:grid-cols-[3fr_2fr_3fr] gap-2 p-2 overflow-hidden">
+      <div className="flex-1 grid grid-cols-1 lg:grid-cols-[1fr_1.5fr_1fr] gap-2 p-2 overflow-hidden">
         
         {/* --- Left Column: Pre-Trade --- */}
-        <div className="flex flex-col gap-2 overflow-hidden">
+        <div className="flex flex-col gap-2 overflow-y-auto">
           <PreTradePanel />
         </div>
 
         {/* --- Center Column: Live Tape --- */}
-        <div className="flex flex-col gap-2 overflow-hidden">
+        <div className="flex flex-col gap-2 overflow-y-auto">
           <LiveTape />
         </div>
         
         {/* --- Right Column: Blotter --- */}
-        <div className="flex flex-col gap-2 overflow-hidden">
+        <div className="flex flex-col gap-2 overflow-y-auto">
           <TradeBlotter />
         </div>
 

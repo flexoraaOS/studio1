@@ -1,7 +1,8 @@
 
+
 'use client';
 import React, { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { useUser, useAuth } from '@/firebase';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -30,6 +31,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     const { user, isUserLoading } = useUser();
     const auth = useAuth();
     const router = useRouter();
+    const pathname = usePathname();
 
     // useEffect(() => {
     //     if (!isUserLoading && !user) {
@@ -62,6 +64,78 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         // which might have their own logic, or just appear broken without user data.
         // For the dev button, this is what we want.
     }
+    
+    // Custom layout for the live trading cockpit
+    if (pathname === '/live-trades') {
+        return (
+             <div className="flex flex-col min-h-screen bg-[#0A0A0B]">
+                <header className="sticky top-0 z-50 flex h-16 items-center gap-4 border-b border-white/10 bg-gradient-to-b from-[#1a0206] to-[#0A0A0B] px-4 md:px-6">
+                    <nav className="hidden flex-col gap-6 text-lg font-medium md:flex md:flex-row md:items-center md:gap-5 lg:gap-6">
+                        <Link
+                            href="/dashboard"
+                            className="flex items-center gap-2 text-lg font-semibold md:text-base"
+                        >
+                            <FlexoraaTraderOSLogo className="h-6 w-6" />
+                            <span className="sr-only">Flexoraa TraderOS</span>
+                        </Link>
+                         {navItems.map((item) => {
+                            if (item.href === 'reminders') {
+                                return (
+                                    <RemindersDialog key={item.href}>
+                                        <button className="text-muted-foreground transition-colors hover:text-primary font-medium">
+                                            {item.label}
+                                        </button>
+                                    </RemindersDialog>
+                                );
+                            }
+                            return (
+                                <Link
+                                    key={item.href}
+                                    href={item.href}
+                                    className="text-muted-foreground transition-colors hover:text-primary font-medium"
+                                >
+                                    {item.label}
+                                </Link>
+                            );
+                        })}
+                    </nav>
+                     <div className="flex w-full items-center gap-4 md:ml-auto md:gap-2 lg:gap-4">
+                        <div className="ml-auto flex-1 sm:flex-initial">
+                            <SearchBar />
+                        </div>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="secondary" size="icon" className="rounded-full">
+                                   <Avatar>
+                                        <AvatarImage src={user?.photoURL || ''} alt={user?.displayName || 'User'} />
+                                        <AvatarFallback>{getInitials(user?.displayName)}</AvatarFallback>
+                                    </Avatar>
+                                    <span className="sr-only">Toggle user menu</span>
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                                <DropdownMenuLabel>{user?.displayName || 'Guest'}</DropdownMenuLabel>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem asChild>
+                                    <Link href="/settings" className="flex items-center w-full">
+                                        <Settings className="mr-2" /> Settings
+                                    </Link>
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem onClick={handleLogout}>
+                                    <LogOut className="mr-2" /> Logout
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </div>
+                </header>
+                <main className="flex-1 overflow-hidden">
+                    {children}
+                </main>
+            </div>
+        );
+    }
+
 
     return (
        <div className={cn("flex min-h-screen w-full flex-col", "animated-background")}>
