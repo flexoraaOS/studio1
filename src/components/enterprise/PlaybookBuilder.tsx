@@ -11,6 +11,8 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { BookCopy, PlusCircle, Save } from 'lucide-react';
 import type { PlaybookTemplate, PlaybookRule } from '@/lib/enterprise/types';
 import { mockPlaybookTemplates } from '@/lib/enterprise/mock-data';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import CreatePlaybookForm from './CreatePlaybookForm';
 
 /**
  * PlaybookBuilder Component
@@ -93,10 +95,20 @@ export default function PlaybookBuilder({ templates = mockPlaybookTemplates }: {
                 )}
             </CardContent>
             <CardFooter className="flex justify-between">
-                <Button variant="outline">
-                    <PlusCircle className="mr-2 h-4 w-4" />
-                    New Playbook
-                </Button>
+                <Dialog>
+                    <DialogTrigger asChild>
+                        <Button variant="outline">
+                            <PlusCircle className="mr-2 h-4 w-4" />
+                            New Playbook
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-2xl">
+                         <DialogHeader>
+                            <DialogTitle>Create New Playbook</DialogTitle>
+                        </DialogHeader>
+                        <CreatePlaybookForm />
+                    </DialogContent>
+                </Dialog>
                 <Button>
                     <Save className="mr-2 h-4 w-4" />
                     Save Template
