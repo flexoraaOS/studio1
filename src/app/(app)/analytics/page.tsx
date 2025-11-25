@@ -28,6 +28,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/com
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { Kpi } from '@/lib/types';
+import PerformanceMatrix from '@/components/enterprise/PerformanceMatrix';
 
 const kpiIcons = {
     "Profit Factor": <TrendingUp className="text-green-500" />,
@@ -93,15 +94,7 @@ export default function AnalyticsPage() {
 
             <div className="grid gap-4 lg:grid-cols-2">
                 <PerformanceChart data={mockPerformanceData} />
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Rolling Metrics Suite</CardTitle>
-                        <CardDescription>Select a metric to see its rolling performance over time.</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <RollingMetricsChart dailyReturns={mockDailyReturns} />
-                    </CardContent>
-                </Card>
+                <PerformanceMatrix />
             </div>
             
              <div className="grid gap-4 lg:grid-cols-1">
