@@ -14,6 +14,8 @@ export type Trade = {
   status: 'Closed' | 'Open';
   entryDate?: string;
   exitDate?: string;
+  slippage?: number; // Added for anomaly detection
+  durationSeconds?: number; // Added for anomaly detection
 };
 
 export type Kpi = {
@@ -129,4 +131,12 @@ export type RollingMetric<T extends string> = {
 export type CohortDataPoint = {
     day: number;
     [cohortName: string]: number; // cohortName will be e.g., "2023-01", value is cumulative PnL
+};
+
+export type Anomaly = {
+  tradeId: string;
+  symbol: string;
+  reason: string;
+  severity: 'high' | 'medium' | 'low';
+  value: string;
 };

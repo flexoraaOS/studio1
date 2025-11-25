@@ -2,7 +2,8 @@
 import React from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import CohortAnalysisChart from '@/components/analytics/cohort-analysis-chart';
-import { mockCohortData } from '@/lib/data';
+import AnomalyDetector from '@/components/analytics/anomaly-detector';
+import { mockCohortData, mockTrades } from '@/lib/data';
 
 export default function Priority3AnalyticsPage() {
     return (
@@ -14,7 +15,15 @@ export default function Priority3AnalyticsPage() {
                 </div>
             </div>
 
-            <CohortAnalysisChart cohortData={mockCohortData} />
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="lg:col-span-2">
+                    <CohortAnalysisChart cohortData={mockCohortData} />
+                </div>
+                <div className="lg:col-span-1">
+                    <AnomalyDetector trades={mockTrades} />
+                </div>
+            </div>
+
 
             <Card>
                 <CardHeader>
