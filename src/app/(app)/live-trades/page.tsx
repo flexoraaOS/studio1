@@ -7,7 +7,7 @@ import PreTradePanel from '@/components/live/PreTradePanel';
 import TradeBlotter from '@/components/live/TradeBlotter';
 import PostTradeModal from '@/components/live/PostTradeModal';
 import { PlaybookTemplate, TradeDraft, CompletedTrade, LiveTradeSession } from '@/lib/live-trading/types';
-import { mockPlaybookTemplates as loadPlaybooks } from '@/lib/live-trading/mock-data';
+import { loadPlaybooks } from '@/lib/live-trading/mock-data';
 import { loadDrafts, saveDrafts, loadTrades, saveTrade } from '@/lib/live-trading/storage';
 
 /**
