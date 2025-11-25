@@ -27,15 +27,9 @@ import ChecklistPanel from '@/components/live/ChecklistPanel';
  * trade blotter on the right.
  */
 export default function LiveTradingPage() {
-  const [drafts, setDrafts] = useState<TradeDraft[]>([]);
   const [todaysTrades, setTodaysTrades] = useState<Trade[]>([]);
   const [selectedPlaybook, setSelectedPlaybook] = useState<PlaybookTemplate | null>(mockPlaybookTemplates[0] || null);
   const [checklistState, setChecklistState] = useState<Record<string, boolean>>({});
-
-  useEffect(() => {
-    // Load existing drafts from local storage on component mount
-    setDrafts(getDrafts());
-  }, []);
 
   useEffect(() => {
     // Reset checklist when playbook changes
@@ -48,28 +42,6 @@ export default function LiveTradingPage() {
     setChecklistState(newChecklistState);
   }, [selectedPlaybook]);
 
-  const handleCreateNewDraft = () => {
-    const newDraft: TradeDraft = {
-      id: `draft_${Date.now()}`,
-      createdAt: new Date().toISOString(),
-      playbookId: selectedPlaybook?.id || '',
-      params: {
-          instrument: '',
-          side: 'Long',
-          size: 0,
-          riskPercent: selectedPlaybook?.defaultParams.riskPercent || 1,
-      },
-      checklistState: {},
-      notes: selectedPlaybook?.notesTemplate || '',
-    };
-    saveDraft(newDraft);
-    setDrafts(getDrafts());
-  };
-  
-  const handleDeleteDraft = (draftId: string) => {
-    deleteDraft(draftId);
-    setDrafts(getDrafts());
-  };
 
   const handleChecklistChange = (itemId: string, isChecked: boolean) => {
     setChecklistState(prev => ({...prev, [itemId]: isChecked}));
@@ -115,7 +87,7 @@ export default function LiveTradingPage() {
                   <BookOpen className="w-5 h-5 text-primary"/>
                   2. Playbook Rules
                 </CardTitle>
-                <CardDescription>Mandatory conditions for this playbook.</CardDescription>
+                <CardDescription className="text-sm">Mandatory conditions for this playbook.</CardDescription>
              </CardHeader>
              <CardContent>
                 {selectedPlaybook ? (
@@ -134,7 +106,7 @@ export default function LiveTradingPage() {
                   <ListChecks className="w-5 h-5 text-primary"/>
                   3. Pre-Flight Checklist
                 </CardTitle>
-                <CardDescription>Confirm your personal and market checks.</CardDescription>
+                <CardDescription className="text-sm">Confirm your personal and market checks.</CardDescription>
              </CardHeader>
              <CardContent>
                  {selectedPlaybook ? (
@@ -200,45 +172,6 @@ export default function LiveTradingPage() {
           </Card>
         </div>
 
-      </div>
-
-      <Separator className="my-8" />
-
-      {/* Drafts Section */}
-      <div className="mt-8">
-        <h2 className="text-xl font-semibold tracking-tight mb-4">Drafts</h2>
-         <Card>
-            <CardContent className="p-4">
-                <ScrollArea className="h-48">
-                    <div className="space-y-2">
-                        {drafts.length > 0 ? drafts.map(draft => (
-                            <div key={draft.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-md">
-                                <div>
-                                    <p className="font-semibold text-sm">{mockPlaybookTemplates.find(p => p.id === draft.playbookId)?.name || 'Untitled Draft'}</p>
-                                    <p className="text-xs text-muted-foreground">
-                                      Saved: {new Date(draft.createdAt).toLocaleString()}
-                                    </p>
-                                </div>
-                                <div className="flex gap-1">
-                                    <Button size="icon" variant="ghost" className="h-8 w-8"><Edit className="w-4 h-4" /></Button>
-                                    <Button size="icon" variant="ghost" className="h-8 w-8"><Copy className="w-4 h-4" /></Button>
-                                    <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => handleDeleteDraft(draft.id)}><Trash2 className="w-4 h-4 text-destructive" /></Button>
-                                </div>
-                            </div>
-                        )) : (
-                           <div className="flex items-center justify-center h-full min-h-[100px]">
-                              <p className="text-muted-foreground text-sm">No drafts saved.</p>
-                           </div>
-                        )}
-                    </div>
-                </ScrollArea>
-            </CardContent>
-            <CardFooter className="border-t p-4">
-                 <Button onClick={handleCreateNewDraft} variant="outline" className="w-full">
-                    <PlusCircle className="mr-2"/> New Draft
-                </Button>
-            </CardFooter>
-          </Card>
       </div>
 
     </div>
