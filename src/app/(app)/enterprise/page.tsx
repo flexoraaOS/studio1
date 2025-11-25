@@ -9,7 +9,6 @@ import { DateRange } from 'react-day-picker';
 import { addDays, subYears } from 'date-fns';
 import { Filter } from 'lucide-react';
 import PerformanceMatrix from '@/components/enterprise/PerformanceMatrix';
-import RiskMatrix from '@/components/enterprise/RiskMatrix';
 
 // export const metadata: Metadata = {
 //     title: 'Enterprise Analytics | TradeSight Pro',
@@ -64,7 +63,6 @@ export default function EnterpriseDashboardPage() {
             {/* Main Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                  <PerformanceMatrix />
-                 <RiskMatrix />
             </div>
 
         </div>
