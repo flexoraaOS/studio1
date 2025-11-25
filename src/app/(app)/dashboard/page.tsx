@@ -1,14 +1,19 @@
 'use client'
 import React, {useState, useMemo} from 'react';
-import { TrendingUp, Scale, Hash, HeartPulse } from 'lucide-react';
-import { mockKpis, mockEquityCurve, mockPerformanceData, mockTrades } from '@/lib/data';
+import { TrendingUp, Scale, Hash, HeartPulse, AreaChart, BarChart, LineChart, TestTube } from 'lucide-react';
+import { mockKpis, mockEquityCurve, mockTrades, mockPnlCalendar, mockPerformanceData } from '@/lib/data';
 import KpiCard from '@/components/dashboard/kpi-card';
 import EquityChart from '@/components/dashboard/equity-chart';
-import PerformanceChart from '@/components/dashboard/performance-chart';
+import DrawdownChart from '@/components/analytics/drawdown-chart';
 import RecentTradesTable from '@/components/dashboard/recent-trades-table';
 import { DateRangePicker } from '@/components/date-range-picker';
 import { DateRange } from 'react-day-picker';
 import { addDays } from 'date-fns';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
+import PnlCalendar from '@/components/analytics/pnl-calendar';
+import PerformanceChart from '@/components/dashboard/performance-chart';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 
 const kpiIcons = {
     "Profit Factor": <TrendingUp className="text-green-500" />,
@@ -16,6 +21,28 @@ const kpiIcons = {
     "Total Trades": <Hash className="text-purple-500" />,
     "Behavioral Score": <HeartPulse className="text-amber-500" />,
 };
+
+const analyticsSections = [
+    {
+        title: 'Quantitative Analytics',
+        description: 'Monte Carlo, VaR/CVaR, Factor Exposure',
+        href: '/analytics/priority2',
+        icon: AreaChart
+    },
+    {
+        title: 'Behavioral & Edge Analysis',
+        description: 'Cohort Analysis, Anomaly Detection',
+        href: '/analytics/priority3',
+        icon: BarChart
+    },
+    {
+        title: 'Risk & Attribution Models',
+        description: 'Stress Testing, Factor Attribution',
+        href: '/analytics/priority4',
+        icon: TestTube
+    }
+];
+
 
 export default function DashboardPage() {
     const [date, setDate] = useState<DateRange | undefined>({
@@ -62,12 +89,52 @@ export default function DashboardPage() {
 
             <div className="grid gap-4 lg:grid-cols-2">
                 <EquityChart data={filteredEquityCurve} />
-                <PerformanceChart data={mockPerformanceData} />
+                <DrawdownChart data={filteredEquityCurve} />
             </div>
+            
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="lg:col-span-2">
+                    <PnlCalendar data={mockPnlCalendar} />
+                </div>
+                <div className="lg:col-span-1">
+                    <PerformanceChart data={mockPerformanceData} />
+                </div>
+            </div>
+
+            <div>
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Advanced Analytics</CardTitle>
+                        <CardDescription>Explore deeper insights into your trading performance.</CardDescription>
+                    </CardHeader>
+                    <CardContent className="grid gap-4 md:grid-cols-3">
+                         {analyticsSections.map(section => (
+                            <Card key={section.title} className="flex flex-col">
+                                <CardHeader>
+                                    <div className="flex items-start gap-4">
+                                        <section.icon className="w-8 h-8 text-primary" />
+                                        <div>
+                                            <CardTitle className="text-lg">{section.title}</CardTitle>
+                                            <CardDescription className="text-xs">{section.description}</CardDescription>
+                                        </div>
+                                    </div>
+                                </CardHeader>
+                                <CardFooter className="mt-auto">
+                                    <Button asChild className="w-full" variant="secondary">
+                                        <Link href={section.href}>
+                                            Explore
+                                        </Link>
+                                    </Button>
+                                </CardFooter>
+                            </Card>
+                         ))}
+                    </CardContent>
+                </Card>
+            </div>
+
 
             <div>
                 <RecentTradesTable trades={filteredTrades.slice(0, 5)} />
             </div>
         </div>
     );
-}
