@@ -4,19 +4,17 @@
  * =================================================================
  * MOCK STORAGE UTILS for Live Trading Workspace
  * =================================================================
- * Provides an interface to localStorage for storing drafts, trades,
- * and audit logs. This simulates a backend and allows for state
- * persistence during development.
+ * Provides an interface to localStorage for storing drafts and closed trades.
+ * This simulates a backend and allows for state persistence during development.
  * 
  * TODO: Replace all functions in this file with actual API calls
  * to a Firestore backend.
  */
 
-import type { TradeDraft, CompletedTrade, AuditLogEntry } from './types';
+import type { TradeDraft, CompletedTrade } from './types';
 
-const DRAFTS_KEY = 'live_trading_drafts';
-const TRADES_KEY = 'live_trading_trades';
-const AUDIT_LOG_KEY = 'live_trading_audit_log';
+const DRAFTS_KEY = 'ts_drafts';
+const TRADES_KEY = 'ts_closed_trades';
 
 // --- Generic Helpers ---
 
@@ -42,66 +40,62 @@ function saveToStorage<T>(key: string, data: T[]): void {
 
 // --- Drafts ---
 
-export function getDrafts(): TradeDraft[] {
+/**
+ * Loads all trade drafts from localStorage.
+ * TODO: Replace with `getDocs(collection(db, 'users', userId, 'drafts'))`.
+ */
+export function loadDrafts(): TradeDraft[] {
   return getFromStorage<TradeDraft>(DRAFTS_KEY);
 }
 
-export function saveDraft(draft: TradeDraft): void {
-  const drafts = getDrafts();
-  const existingIndex = drafts.findIndex(d => d.id === draft.id);
-  if (existingIndex > -1) {
-    drafts[existingIndex] = draft;
-  } else {
-    drafts.unshift(draft); // Add new drafts to the top
-  }
-  saveToStorage(DRAFTS_KEY, drafts);
+/**
+ * Saves an array of trade drafts to localStorage.
+ * TODO: Replace with batched writes or individual `setDoc` calls to Firestore.
+ */
+export function saveDrafts(drafts: TradeDraft[]): void {
+  saveToStorage<TradeDraft>(DRAFTS_KEY, drafts);
 }
 
-export function deleteDraft(draftId: string): void {
-  let drafts = getDrafts();
-  drafts = drafts.filter(d => d.id !== draftId);
-  saveToStorage(DRAFTS_KEY, drafts);
+/**
+ * Deletes all drafts from localStorage.
+ * TODO: Replace with a batched delete operation in Firestore.
+ */
+export function clearDrafts(): void {
+    if (typeof window === 'undefined') return;
+    window.localStorage.removeItem(DRAFTS_KEY);
 }
 
-// --- Trades ---
 
-export function getTrades(): CompletedTrade[] {
+// --- Completed Trades ---
+
+/**
+ * Loads all completed trades from localStorage.
+ * TODO: Replace with `getDocs(collection(db, 'users', userId, 'trades'))`.
+ */
+export function loadTrades(): CompletedTrade[] {
   return getFromStorage<CompletedTrade>(TRADES_KEY);
 }
 
+/**
+ * Saves a single completed trade to the list in localStorage.
+ * TODO: Replace with `addDoc(collection(db, 'users', userId, 'trades'), trade)`.
+ */
 export function saveTrade(trade: CompletedTrade): void {
-  const trades = getTrades();
+  const trades = loadTrades();
   const existingIndex = trades.findIndex(t => t.id === trade.id);
   if (existingIndex > -1) {
     trades[existingIndex] = trade;
   } else {
     trades.unshift(trade);
   }
-  saveToStorage(TRADES_KEY, trades);
+  saveToStorage<CompletedTrade>(TRADES_KEY, trades);
 }
 
-// --- Audit Log ---
-
-export function getAuditLog(): AuditLogEntry[] {
-    return getFromStorage<AuditLogEntry>(AUDIT_LOG_KEY);
-}
-
-export function addAuditLog(entry: Omit<AuditLogEntry, 'id' | 'timestamp'>): void {
-    const logs = getAuditLog();
-    const newEntry: AuditLogEntry = {
-        ...entry,
-        id: `log_${Date.now()}`,
-        timestamp: new Date().toISOString(),
-    };
-    logs.unshift(newEntry);
-    saveToStorage(AUDIT_LOG_KEY, logs);
-}
-
-// --- Utility ---
-
-export function clearAll(): void {
+/**
+ * Deletes all completed trades from localStorage.
+ * TODO: Replace with a batched delete operation in Firestore.
+ */
+export function clearTrades(): void {
     if (typeof window === 'undefined') return;
-    window.localStorage.removeItem(DRAFTS_KEY);
     window.localStorage.removeItem(TRADES_KEY);
-    window.localStorage.removeItem(AUDIT_LOG_KEY);
 }

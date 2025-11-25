@@ -8,7 +8,7 @@
  * common trade calculations like P&L, slippage, and R-multiple.
  */
 
-import type { QuickParams, CompletedTrade } from './types';
+import type { CompletedTrade, TradeSide } from './types';
 
 /**
  * Calculates the realized Profit and Loss (P&L) for a trade.
@@ -20,13 +20,13 @@ import type { QuickParams, CompletedTrade } from './types';
  * @returns The realized P&L.
  */
 export function calculateRealizedPnl(
-  side: 'Long' | 'Short',
+  side: TradeSide,
   entryPrice: number,
   exitPrice: number,
   size: number,
   fees: number
 ): number {
-  if (entryPrice <= 0 || exitPrice <= 0 || size <= 0) return 0;
+  if (entryPrice <= 0 || exitPrice <= 0 || size <= 0) return -fees;
 
   const pnl = side === 'Long'
     ? (exitPrice - entryPrice) * size
@@ -43,7 +43,7 @@ export function calculateRealizedPnl(
  * @returns The slippage amount per share/contract. Positive is bad slippage.
  */
 export function calculateSlippage(
-  side: 'Long' | 'Short',
+  side: TradeSide,
   filledPrice: number,
   expectedPrice: number
 ): number {
@@ -66,9 +66,9 @@ export function calculateRMultiple(
   entryPrice: number,
   exitPrice: number,
   stopLossPrice: number,
-  side: 'Long' | 'Short'
+  side: TradeSide
 ): number {
-  if (entryPrice <= 0 || exitPrice <= 0 || stopLossPrice <= 0) return 0;
+  if (entryPrice <= 0 || stopLossPrice <= 0) return 0;
 
   const riskPerShare = side === 'Long'
     ? entryPrice - stopLossPrice
