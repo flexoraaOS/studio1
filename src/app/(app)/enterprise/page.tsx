@@ -14,10 +14,8 @@ import NLPCompanionPanel from '@/components/enterprise/NLPCompanionPanel';
 import RiskMatrix from '@/components/enterprise/RiskMatrix';
 import TradeBookQualityScore from '@/components/enterprise/TradeBookQualityScore';
 import CrossStrategyConflict from '@/components/enterprise/CrossStrategyConflict';
-import ExposurePyramid from '@/components/enterprise/ExposurePyramid';
 import PlaybookAdherenceScore from '@/components/enterprise/PlaybookAdherenceScore';
 import HotspotDetection from '@/components/enterprise/HotspotDetection';
-import ImprovementPlanner from '@/components/enterprise/ImprovementPlanner';
 
 
 // export const metadata: Metadata = {
@@ -85,14 +83,13 @@ export default function EnterpriseDashboardPage() {
                 
                 {/* Column 3: Playbooks & Quality */}
                 <div className="flex flex-col gap-6">
-                    <ImprovementPlanner />
+                    <HotspotDetection />
                 </div>
             </div>
 
             {/* Second Row: Deep Dive Matrices */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 gap-6">
                 <RiskMatrix />
-                <ExposurePyramid />
             </div>
 
         </div>
