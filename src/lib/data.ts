@@ -1,4 +1,4 @@
-import type { Trade, Kpi, ChartData, RollingMetric, StrategyContribution, PnlCalendarData, ExpectancyData, TimeOfDayData, DailyReturn, FactorReturns, MonteCarloData, RollingBeta, CohortDataPoint, HistoricalEquityPoint, Anomaly } from './types';
+import type { Trade, Kpi, ChartData, RollingMetric, StrategyContribution, PnlCalendarData, ExpectancyData, TimeOfDayData, DailyReturn, FactorReturns, MonteCarloData, RollingBeta, CohortDataPoint, HistoricalEquityPoint, Anomaly, FactorAttribution } from './types';
 
 export const mockTrades: Trade[] = [
   { id: 'T001', entryTime: '2023-10-26 09:30', exitTime: '2023-10-26 10:00', symbol: 'RELIANCE', direction: 'Long', size: 100, entryPrice: 2300.50, exitPrice: 2315.75, realizedPnl: 1525.00, pnlPercent: 0.66, currency: 'INR', strategy: 'Breakout', status: 'Closed', entryDate: '2023-10-26T09:30:00Z', exitDate: '2023-10-26T10:00:00Z', slippage: 0.05, durationSeconds: 1800 },
@@ -161,3 +161,19 @@ export const mockCohortData: { cohorts: Record<string, number[]>, cohortNames: s
     "2023-06": [0, -50, -40, -30],
   },
 };
+
+// --- Priority 4 Mock Data ---
+export const mockFactorAttribution: FactorAttribution[] = mockDailyReturns.slice(-180).map((dr, i) => {
+    const mkt_contrib = mockFactorReturns.Mkt_RF[i] * (0.8 + (Math.random() - 0.5) * 0.2);
+    const smb_contrib = mockFactorReturns.SMB[i] * (0.2 + (Math.random() - 0.5) * 0.1);
+    const hml_contrib = mockFactorReturns.HML[i] * (-0.1 + (Math.random() - 0.5) * 0.1);
+    const alpha = dr.return - mkt_contrib - smb_contrib - hml_contrib;
+    return {
+        date: dr.date,
+        totalReturn: dr.return,
+        mkt_rf_contrib: mkt_contrib,
+        smb_contrib: smb_contrib,
+        hml_contrib: hml_contrib,
+        alpha_contrib: alpha
+    };
+});

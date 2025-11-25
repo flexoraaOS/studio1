@@ -134,3 +134,20 @@ export type Anomaly = {
   severity: 'high' | 'medium' | 'low';
   value: string;
 };
+
+// --- Priority 4 Analytics Types ---
+export type FactorAttribution = {
+    date: string;
+    totalReturn: number;
+    mkt_rf_contrib: number;
+    smb_contrib: number;
+    hml_contrib: number;
+    alpha_contrib: number;
+};
+
+export type Scenario = {
+    name: string;
+    marketShock: number; // as a percentage, e.g., -0.2 for -20%
+    interestRateShock: number; // absolute change, e.g., 0.01 for +1%
+    volatilityShock: number; // relative change, e.g., 0.5 for +50%
+};

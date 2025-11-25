@@ -3,7 +3,7 @@
  * This includes functions for VaR, CVaR, Monte Carlo simulations, rolling metrics, and factor analysis.
  */
 
-import { DailyReturn, FactorReturns, MonteCarloData, RollingBeta, RollingMetric, HistoricalEquityPoint } from './types';
+import { DailyReturn, FactorReturns, MonteCarloData, RollingBeta, RollingMetric, HistoricalEquityPoint, Scenario, FactorAttribution } from './types';
 
 // --- Statistical Helpers ---
 
@@ -314,4 +314,77 @@ export function calculateRollingBetas(
         });
     }
     return results;
+}
+
+
+/**
+ * Applies a scenario shock to an equity curve.
+ * @param equityCurve - The original historical equity points.
+ * @param scenario - The shock scenario to apply.
+ * @param factorReturns - The historical factor returns for market-based shocks.
+ * @returns A new, shocked equity curve.
+ */
+export function applyScenarioShock(
+    equityCurve: HistoricalEquityPoint[],
+    scenario: Scenario,
+    factorReturns: FactorReturns
+): HistoricalEquityPoint[] {
+    if (!equityCurve || equityCurve.length < 2) return [];
+
+    const dailyReturns: DailyReturn[] = equityCurve.slice(1).map((current, i) => {
+        const previous = equityCurve[i];
+        return {
+            date: current.date,
+            return: (current.equity - previous.equity) / previous.equity,
+            isWin: current.equity > previous.equity,
+        };
+    });
+
+    const marketReturnsMap = new Map(factorReturns.dates.map((date, i) => [new Date(date).toDateString(), factorReturns.Mkt_RF[i]]));
+
+    const shockedReturns = dailyReturns.map(dr => {
+        const marketReturn = marketReturnsMap.get(new Date(dr.date).toDateString()) || 0;
+        // Simplified shock application: assume beta of 1 to the market shock
+        const shockedReturn = dr.return + (marketReturn * scenario.marketShock);
+        return shockedReturn;
+    });
+
+    const shockedEquityCurve: HistoricalEquityPoint[] = [equityCurve[0]];
+    let lastEquity = equityCurve[0].equity;
+
+    for (let i = 0; i < shockedReturns.length; i++) {
+        lastEquity *= (1 + shockedReturns[i]);
+        shockedEquityCurve.push({
+            date: dailyReturns[i].date,
+            equity: lastEquity,
+        });
+    }
+
+    return shockedEquityCurve;
+}
+
+/**
+ * Calculates cumulative factor contributions.
+ * @param factorAttributionData - The daily attribution data.
+ * @returns Data formatted for a stacked area chart.
+ */
+export function calculateCumulativeAttribution(factorAttributionData: FactorAttribution[]): any[] {
+    let cumulativeMkt = 0;
+    let cumulativeSmb = 0;
+    let cumulativeHml = 0;
+    let cumulativeAlpha = 0;
+
+    return factorAttributionData.map(d => {
+        cumulativeMkt += d.mkt_rf_contrib;
+        cumulativeSmb += d.smb_contrib;
+        cumulativeHml += d.hml_contrib;
+        cumulativeAlpha += d.alpha_contrib;
+        return {
+            date: d.date,
+            mkt_rf: cumulativeMkt * 100, // as percentage
+            smb: cumulativeSmb * 100,
+            hml: cumulativeHml * 100,
+            alpha: cumulativeAlpha * 100,
+        };
+    });
 }

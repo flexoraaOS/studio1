@@ -93,6 +93,23 @@ export default function AnalyticsPage() {
                     </Button>
                 </CardContent>
             </Card>
+            
+            <Card className="bg-card/30">
+                <CardHeader>
+                    <CardTitle>Priority-4 Advanced Analytics</CardTitle>
+                    <CardDescription>Explore Stress Testing and Performance Attribution.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <p className="mb-4 text-sm">
+                        This section contains advanced risk and attribution models.
+                    </p>
+                    <Button asChild>
+                        <Link href="/analytics/priority4">
+                            Go to Risk & Attribution
+                        </Link>
+                    </Button>
+                </CardContent>
+            </Card>
 
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                 {mockKpis.map((kpi) => (
