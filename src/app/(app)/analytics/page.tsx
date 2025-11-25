@@ -27,6 +27,7 @@ import TimeOfDayMatrix from '@/components/analytics/time-of-day-matrix';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import { Kpi } from '@/lib/types';
 
 const kpiIcons = {
     "Realized P&L": <TrendingUp className="text-green-500" />,
@@ -34,6 +35,13 @@ const kpiIcons = {
     "Sharpe Ratio": <TrendingUp className="text-purple-500" />,
     "Max Drawdown": <TrendingDown className="text-red-500" />,
 };
+
+const analyticsKpis: Kpi[] = [
+  { title: 'Realized P&L', value: '₹1,24,845.72', change: '+2.1%', changeType: 'positive', description: 'Past 30 days' },
+  { title: 'Win Rate', value: '62.5%', change: '-1.5%', changeType: 'negative', description: 'All time' },
+  { title: 'Sharpe Ratio', value: '1.78', description: 'Annualized' },
+  { title: 'Max Drawdown', value: '₹-42,108.30', description: 'All time' },
+];
 
 export default function AnalyticsPage() {
     const [date, setDate] = useState<DateRange | undefined>({
@@ -60,59 +68,8 @@ export default function AnalyticsPage() {
                  <DateRangePicker date={date} setDate={setDate} />
             </div>
 
-            <Card className="bg-card/30">
-                <CardHeader>
-                    <CardTitle>Priority-2 Advanced Analytics</CardTitle>
-                    <CardDescription>Explore advanced quantitative metrics including Monte Carlo simulations, VaR, and factor analysis.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <p className="mb-4 text-sm">
-                        This section contains institutional-grade analytics for deeper risk and performance analysis. Click below to explore these advanced modules.
-                    </p>
-                    <Button asChild>
-                        <Link href="/analytics/priority2">
-                            Go to Advanced Analytics
-                        </Link>
-                    </Button>
-                </CardContent>
-            </Card>
-
-            <Card className="bg-card/30">
-                <CardHeader>
-                    <CardTitle>Priority-3 Advanced Analytics</CardTitle>
-                    <CardDescription>Explore advanced analytics including Cohort Analysis and more.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <p className="mb-4 text-sm">
-                        This section contains institutional-grade analytics for deeper behavioral and edge-decay analysis.
-                    </p>
-                    <Button asChild>
-                        <Link href="/analytics/priority3">
-                            Go to Cohort Analysis
-                        </Link>
-                    </Button>
-                </CardContent>
-            </Card>
-            
-            <Card className="bg-card/30">
-                <CardHeader>
-                    <CardTitle>Priority-4 Advanced Analytics</CardTitle>
-                    <CardDescription>Explore Stress Testing and Performance Attribution.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <p className="mb-4 text-sm">
-                        This section contains advanced risk and attribution models.
-                    </p>
-                    <Button asChild>
-                        <Link href="/analytics/priority4">
-                            Go to Risk & Attribution
-                        </Link>
-                    </Button>
-                </CardContent>
-            </Card>
-
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                {mockKpis.map((kpi) => (
+                {analyticsKpis.map((kpi) => (
                     <KpiCard
                         key={kpi.title}
                         kpi={kpi}
@@ -121,17 +78,17 @@ export default function AnalyticsPage() {
                 ))}
             </div>
 
+            <div className="grid gap-4 lg:grid-cols-2">
+                <EquityChart data={filteredEquityCurve} />
+                <DrawdownChart data={filteredEquityCurve} />
+            </div>
+
             <div className="grid gap-4 lg:grid-cols-1">
                 <ExpectancyTable data={mockExpectancyData} />
             </div>
             
             <div className="grid gap-4 lg:grid-cols-1">
                 <TimeOfDayMatrix data={mockTimeOfDayData} />
-            </div>
-
-            <div className="grid gap-4 lg:grid-cols-2">
-                <EquityChart data={filteredEquityCurve} />
-                <DrawdownChart data={filteredEquityCurve} />
             </div>
 
             <div className="grid gap-4 lg:grid-cols-2">
@@ -153,6 +110,50 @@ export default function AnalyticsPage() {
             
             <div className="grid gap-4 lg:grid-cols-1">
                 <PnlCalendar data={mockPnlCalendar} />
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <Card className="bg-card/30">
+                    <CardHeader>
+                        <CardTitle>Priority-2 Analytics</CardTitle>
+                        <CardDescription>Monte Carlo, VaR, and factor analysis.</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <Button asChild>
+                            <Link href="/analytics/priority2">
+                                Go to Advanced Analytics
+                            </Link>
+                        </Button>
+                    </CardContent>
+                </Card>
+
+                <Card className="bg-card/30">
+                    <CardHeader>
+                        <CardTitle>Priority-3 Analytics</CardTitle>
+                        <CardDescription>Cohort Analysis and anomaly detection.</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <Button asChild>
+                            <Link href="/analytics/priority3">
+                                Go to Cohort Analysis
+                            </Link>
+                        </Button>
+                    </CardContent>
+                </Card>
+                
+                <Card className="bg-card/30">
+                    <CardHeader>
+                        <CardTitle>Priority-4 Analytics</CardTitle>
+                        <CardDescription>Stress Testing and Performance Attribution.</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <Button asChild>
+                            <Link href="/analytics/priority4">
+                                Go to Risk & Attribution
+                            </Link>
+                        </Button>
+                    </CardContent>
+                </Card>
             </div>
 
         </div>
