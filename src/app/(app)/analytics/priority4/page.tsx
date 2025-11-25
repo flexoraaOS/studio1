@@ -34,17 +34,6 @@ export default function Priority4AnalyticsPage() {
                  <SlippageAttribution data={mockSlippageData} />
             </div>
 
-            <Card>
-                <CardHeader>
-                    <CardTitle>More Analytics Coming Soon</CardTitle>
-                    <CardDescription>
-                       More advanced features will be added here.
-                    </CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <p>Stay tuned for more institutional-grade analytics to further refine your trading edge.</p>
-                </CardContent>
-            </Card>
         </div>
     )
 }
