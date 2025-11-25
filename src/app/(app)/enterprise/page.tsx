@@ -16,9 +16,7 @@ import TradeBookQualityScore from '@/components/enterprise/TradeBookQualityScore
 import CrossStrategyConflict from '@/components/enterprise/CrossStrategyConflict';
 import ExposurePyramid from '@/components/enterprise/ExposurePyramid';
 import PlaybookAdherenceScore from '@/components/enterprise/PlaybookAdherenceScore';
-import TraderDNAReport from '@/components/enterprise/TraderDNAReport';
 import HotspotDetection from '@/components/enterprise/HotspotDetection';
-import ImprovementPlanner from '@/components/enterprise/ImprovementPlanner';
 
 
 // export const metadata: Metadata = {
@@ -77,7 +75,6 @@ export default function EnterpriseDashboardPage() {
                 {/* Column 1: Interaction & Psychology */}
                 <div className="flex flex-col gap-6">
                     <NLPCompanionPanel />
-                    <TraderDNAReport />
                 </div>
 
                 {/* Column 2: Core Analytics & Risk */}
