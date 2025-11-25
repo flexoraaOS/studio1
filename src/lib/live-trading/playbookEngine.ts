@@ -1,9 +1,7 @@
 // This file contains the logic for the playbook rule engine.
 
 import { 
-    PlaybookRule, 
-    ChecklistItem,
-    LiveTradeSession,
+    PlaybookTemplate,
     CompletedTrade,
     RuleEvaluationResult, 
     PlaybookResult 
@@ -21,7 +19,7 @@ import {
 
 // --- Rule Evaluation ---
 
-function evaluateRule(rule: PlaybookRule, trade: CompletedTrade): RuleEvaluationResult {
+function evaluateRule(rule: any, trade: CompletedTrade): RuleEvaluationResult {
     const { condition } = rule;
     let passed = false;
     let actualValue: any = 'N/A';
