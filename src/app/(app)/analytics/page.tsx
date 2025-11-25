@@ -10,6 +10,7 @@ import {
     mockPnlCalendar,
     mockExpectancyData,
     mockTimeOfDayData,
+    mockDailyReturns
 } from '@/lib/data';
 import KpiCard from '@/components/dashboard/kpi-card';
 import EquityChart from '@/components/dashboard/equity-chart';
@@ -44,15 +45,6 @@ export default function AnalyticsPage() {
         if (!date?.from) return mockEquityCurve;
         const to = date.to || new Date();
         return mockEquityCurve.filter(d => {
-            const dDate = new Date(d.date as string);
-            return dDate >= date.from! && dDate <= to;
-        });
-    }, [date]);
-
-     const filteredRollingMetrics = useMemo(() => {
-        if (!date?.from) return mockRollingMetrics;
-        const to = date.to || new Date();
-        return mockRollingMetrics.filter(d => {
             const dDate = new Date(d.date as string);
             return dDate >= date.from! && dDate <= to;
         });
@@ -110,7 +102,15 @@ export default function AnalyticsPage() {
 
             <div className="grid gap-4 lg:grid-cols-2">
                 <PerformanceChart data={mockPerformanceData} />
-                <RollingMetricsChart data={filteredRollingMetrics} />
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Rolling Metrics Suite</CardTitle>
+                        <CardDescription>Select a metric to see its rolling performance over time.</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <RollingMetricsChart dailyReturns={mockDailyReturns} />
+                    </CardContent>
+                </Card>
             </div>
             
              <div className="grid gap-4 lg:grid-cols-1">

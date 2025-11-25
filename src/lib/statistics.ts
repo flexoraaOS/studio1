@@ -112,6 +112,7 @@ export function calculateParametricVaR(returns: number[], confidence: number, ho
  * @returns An array of rolling Sharpe ratio metrics.
  */
 export function calculateRollingSharpe(dailyReturns: DailyReturn[], windowSize: number, riskFreeRate: number = 0): RollingMetric<'sharpe'>[] {
+    if (!dailyReturns || dailyReturns.length === 0) return [];
     const results: RollingMetric<'sharpe'>[] = [];
     const dailyRiskFree = Math.pow(1 + riskFreeRate, 1 / 252) - 1;
 
