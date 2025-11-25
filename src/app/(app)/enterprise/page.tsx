@@ -10,8 +10,6 @@ import { addDays, subYears } from 'date-fns';
 import { Filter } from 'lucide-react';
 import PlaybookBuilder from '@/components/enterprise/PlaybookBuilder';
 import PerformanceMatrix from '@/components/enterprise/PerformanceMatrix';
-import RiskOfRuin from '@/components/enterprise/RiskOfRuin';
-import MultiPathMonteCarlo from '@/components/enterprise/MultiPathMonteCarlo';
 import NLPCompanionPanel from '@/components/enterprise/NLPCompanionPanel';
 import RiskMatrix from '@/components/enterprise/RiskMatrix';
 import TradeBookQualityScore from '@/components/enterprise/TradeBookQualityScore';
@@ -84,7 +82,7 @@ export default function EnterpriseDashboardPage() {
 
                 {/* Column 2: Core Analytics & Risk */}
                 <div className="flex flex-col gap-6">
-                    <RiskOfRuin />
+                    
                 </div>
                 
                 {/* Column 3: Playbooks & Quality */}
