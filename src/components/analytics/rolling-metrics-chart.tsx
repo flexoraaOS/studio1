@@ -25,6 +25,7 @@ export default function RollingMetricsChart({ dailyReturns }: RollingMetricsChar
     const [selectedMetric, setSelectedMetric] = useState<MetricType>('sharpe');
 
     const chartData = useMemo(() => {
+        if (!dailyReturns) return [];
         switch (selectedMetric) {
             case 'sharpe':
                 return calculateRollingSharpe(dailyReturns, windowSize);
