@@ -16,6 +16,7 @@ export type Trade = {
   exitDate?: string;
   slippage?: number; // Added for anomaly detection
   durationSeconds?: number; // Added for anomaly detection
+  broker?: string;
 };
 
 export type Kpi = {
@@ -150,4 +151,25 @@ export type Scenario = {
     marketShock: number; // as a percentage, e.g., -0.2 for -20%
     interestRateShock: number; // absolute change, e.g., 0.01 for +1%
     volatilityShock: number; // relative change, e.g., 0.5 for +50%
+};
+
+export type RegimePerformance = {
+    regime: string;
+    pnl: number;
+    winRate: number;
+    tradeCount: number;
+    avgWin: number;
+    avgLoss: number;
+};
+
+export type EdgeDecayDataPoint = {
+    day: number;
+    survival: number; // Probability from 1 to 0
+};
+
+export type SlippageData = {
+    broker: string;
+    instrument: string;
+    avgSlippage: number;
+    tradeCount: number;
 };

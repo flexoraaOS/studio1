@@ -1,17 +1,17 @@
-import type { Trade, Kpi, ChartData, RollingMetric, StrategyContribution, PnlCalendarData, ExpectancyData, TimeOfDayData, DailyReturn, FactorReturns, MonteCarloData, RollingBeta, CohortDataPoint, HistoricalEquityPoint, Anomaly, FactorAttribution } from './types';
+import type { Trade, Kpi, ChartData, RollingMetric, StrategyContribution, PnlCalendarData, ExpectancyData, TimeOfDayData, DailyReturn, FactorReturns, MonteCarloData, RollingBeta, CohortDataPoint, HistoricalEquityPoint, Anomaly, FactorAttribution, RegimePerformance, EdgeDecayDataPoint, SlippageData } from './types';
 
 export const mockTrades: Trade[] = [
-  { id: 'T001', entryTime: '2023-10-26 09:30', exitTime: '2023-10-26 10:00', symbol: 'RELIANCE', direction: 'Long', size: 100, entryPrice: 2300.50, exitPrice: 2315.75, realizedPnl: 1525.00, pnlPercent: 0.66, currency: 'INR', strategy: 'Breakout', status: 'Closed', entryDate: '2023-10-26T09:30:00Z', exitDate: '2023-10-26T10:00:00Z', slippage: 0.05, durationSeconds: 1800 },
-  { id: 'T002', entryTime: '2023-10-26 11:05', exitTime: '2023-10-26 11:45', symbol: 'TSLA', direction: 'Short', size: 10, entryPrice: 215.20, exitPrice: 212.10, realizedPnl: 31.00, pnlPercent: 1.44, currency: 'USD', strategy: 'Momentum', status: 'Closed', entryDate: '2023-10-26T11:05:00Z', exitDate: '2023-10-26T11:45:00Z', slippage: 0.10, durationSeconds: 2400 },
-  { id: 'T003', entryTime: '2023-10-27 14:10', exitTime: '2023-10-27 15:00', symbol: 'EUR/USD', direction: 'Long', size: 10000, entryPrice: 1.0560, exitPrice: 1.0540, realizedPnl: -20.00, pnlPercent: -0.19, currency: 'EUR', strategy: 'Scalping', status: 'Closed', entryDate: '2023-10-27T14:10:00Z', exitDate: '2023-10-27T15:00:00Z', slippage: 0.0001, durationSeconds: 3000 },
-  { id: 'T004', entryTime: '2023-10-28 10:00', exitTime: '2023-10-28 12:30', symbol: 'INFY', direction: 'Long', size: 200, entryPrice: 1450.00, exitPrice: 1435.50, realizedPnl: -2900.00, pnlPercent: -1.00, currency: 'INR', strategy: 'Mean Reversion', status: 'Closed', entryDate: '2023-10-28T10:00:00Z', exitDate: '2023-10-28T12:30:00Z', slippage: 0.15, durationSeconds: 9000 },
-  { id: 'T005', entryTime: '2023-10-29 09:45', exitTime: '2023-10-29 10:15', symbol: 'AAPL', direction: 'Long', size: 50, entryPrice: 170.10, exitPrice: 172.30, realizedPnl: 110.00, pnlPercent: 1.29, currency: 'USD', strategy: 'Breakout', status: 'Closed', entryDate: '2023-10-29T09:45:00Z', exitDate: '2023-10-29T10:15:00Z', slippage: 0.08, durationSeconds: 1800 },
-  { id: 'T006', entryTime: '2023-11-01 20:30', exitTime: '2023-11-01 21:00', symbol: 'BTC/USD', direction: 'Short', size: 0.5, entryPrice: 34500, exitPrice: 34800, realizedPnl: -150.00, pnlPercent: -0.87, currency: 'USD', strategy: 'Momentum', status: 'Closed', entryDate: '2023-11-01T20:30:00Z', exitDate: '2023-11-01T21:00:00Z', slippage: 15.0, durationSeconds: 1800 },
-  { id: 'T007', entryTime: '2023-11-02 11:00', exitTime: '2023-11-02 11:00', symbol: 'HDFCBANK', direction: 'Long', size: 150, entryPrice: 1490.25, exitPrice: 0, realizedPnl: 0, pnlPercent: 0, currency: 'INR', strategy: 'Breakout', status: 'Open', entryDate: '2023-11-02T11:00:00Z', slippage: 0.0, durationSeconds: 0 },
+  { id: 'T001', entryTime: '2023-10-26 09:30', exitTime: '2023-10-26 10:00', symbol: 'RELIANCE', direction: 'Long', size: 100, entryPrice: 2300.50, exitPrice: 2315.75, realizedPnl: 1525.00, pnlPercent: 0.66, currency: 'INR', strategy: 'Breakout', status: 'Closed', entryDate: '2023-10-26T09:30:00Z', exitDate: '2023-10-26T10:00:00Z', slippage: 0.05, durationSeconds: 1800, broker: 'Zerodha' },
+  { id: 'T002', entryTime: '2023-10-26 11:05', exitTime: '2023-10-26 11:45', symbol: 'TSLA', direction: 'Short', size: 10, entryPrice: 215.20, exitPrice: 212.10, realizedPnl: 31.00, pnlPercent: 1.44, currency: 'USD', strategy: 'Momentum', status: 'Closed', entryDate: '2023-10-26T11:05:00Z', exitDate: '2023-10-26T11:45:00Z', slippage: 0.10, durationSeconds: 2400, broker: 'Interactive Brokers' },
+  { id: 'T003', entryTime: '2023-10-27 14:10', exitTime: '2023-10-27 15:00', symbol: 'EUR/USD', direction: 'Long', size: 10000, entryPrice: 1.0560, exitPrice: 1.0540, realizedPnl: -20.00, pnlPercent: -0.19, currency: 'EUR', strategy: 'Scalping', status: 'Closed', entryDate: '2023-10-27T14:10:00Z', exitDate: '2023-10-27T15:00:00Z', slippage: 0.0001, durationSeconds: 3000, broker: 'OANDA' },
+  { id: 'T004', entryTime: '2023-10-28 10:00', exitTime: '2023-10-28 12:30', symbol: 'INFY', direction: 'Long', size: 200, entryPrice: 1450.00, exitPrice: 1435.50, realizedPnl: -2900.00, pnlPercent: -1.00, currency: 'INR', strategy: 'Mean Reversion', status: 'Closed', entryDate: '2023-10-28T10:00:00Z', exitDate: '2023-10-28T12:30:00Z', slippage: 0.15, durationSeconds: 9000, broker: 'Zerodha' },
+  { id: 'T005', entryTime: '2023-10-29 09:45', exitTime: '2023-10-29 10:15', symbol: 'AAPL', direction: 'Long', size: 50, entryPrice: 170.10, exitPrice: 172.30, realizedPnl: 110.00, pnlPercent: 1.29, currency: 'USD', strategy: 'Breakout', status: 'Closed', entryDate: '2023-10-29T09:45:00Z', exitDate: '2023-10-29T10:15:00Z', slippage: 0.08, durationSeconds: 1800, broker: 'Interactive Brokers' },
+  { id: 'T006', entryTime: '2023-11-01 20:30', exitTime: '2023-11-01 21:00', symbol: 'BTC/USD', direction: 'Short', size: 0.5, entryPrice: 34500, exitPrice: 34800, realizedPnl: -150.00, pnlPercent: -0.87, currency: 'USD', strategy: 'Momentum', status: 'Closed', entryDate: '2023-11-01T20:30:00Z', exitDate: '2023-11-01T21:00:00Z', slippage: 15.0, durationSeconds: 1800, broker: 'Coinbase' },
+  { id: 'T007', entryTime: '2023-11-02 11:00', exitTime: '2023-11-02 11:00', symbol: 'HDFCBANK', direction: 'Long', size: 150, entryPrice: 1490.25, exitPrice: 0, realizedPnl: 0, pnlPercent: 0, currency: 'INR', strategy: 'Breakout', status: 'Open', entryDate: '2023-11-02T11:00:00Z', slippage: 0.0, durationSeconds: 0, broker: 'Zerodha' },
   // Anomalous Trades for Detector
-  { id: 'A001', entryTime: '2023-11-03 09:30', exitTime: '2023-11-03 09:31', symbol: 'NIFTY50', direction: 'Long', size: 500, entryPrice: 19200, exitPrice: 19100, realizedPnl: -50000.00, pnlPercent: -6.52, currency: 'INR', strategy: 'Scalping', status: 'Closed', entryDate: '2023-11-03T09:30:00Z', exitDate: '2023-11-03T09:31:00Z', slippage: 2.5, durationSeconds: 60 },
-  { id: 'A002', entryTime: '2023-11-03 10:00', exitTime: '2023-11-03 15:00', symbol: 'AMZN', direction: 'Long', size: 1000, entryPrice: 140.00, exitPrice: 160.50, realizedPnl: 20500, pnlPercent: 14.64, currency: 'USD', strategy: 'Day-Trade', status: 'Closed', entryDate: '2023-11-03T10:00:00Z', exitDate: '2023-11-03T15:00:00Z', slippage: 0.50, durationSeconds: 18000 },
-  { id: 'A003', entryTime: '2023-11-04 14:00', exitTime: '2023-11-04 14:00', symbol: 'MSFT', direction: 'Short', size: 5, entryPrice: 350, exitPrice: 340, realizedPnl: 50.00, pnlPercent: 2.85, currency: 'USD', strategy: 'Momentum', status: 'Closed', entryDate: '2023-11-04T14:00:00Z', exitDate: '2023-11-04T14:00:00Z', slippage: 1.1, durationSeconds: 1 },
+  { id: 'A001', entryTime: '2023-11-03 09:30', exitTime: '2023-11-03 09:31', symbol: 'NIFTY50', direction: 'Long', size: 500, entryPrice: 19200, exitPrice: 19100, realizedPnl: -50000.00, pnlPercent: -6.52, currency: 'INR', strategy: 'Scalping', status: 'Closed', entryDate: '2023-11-03T09:30:00Z', exitDate: '2023-11-03T09:31:00Z', slippage: 2.5, durationSeconds: 60, broker: 'Zerodha' },
+  { id: 'A002', entryTime: '2023-11-03 10:00', exitTime: '2023-11-03 15:00', symbol: 'AMZN', direction: 'Long', size: 1000, entryPrice: 140.00, exitPrice: 160.50, realizedPnl: 20500, pnlPercent: 14.64, currency: 'USD', strategy: 'Day-Trade', status: 'Closed', entryDate: '2023-11-03T10:00:00Z', exitDate: '2023-11-03T15:00:00Z', slippage: 0.50, durationSeconds: 18000, broker: 'Interactive Brokers' },
+  { id: 'A003', entryTime: '2023-11-04 14:00', exitTime: '2023-11-04 14:00', symbol: 'MSFT', direction: 'Short', size: 5, entryPrice: 350, exitPrice: 340, realizedPnl: 50.00, pnlPercent: 2.85, currency: 'USD', strategy: 'Momentum', status: 'Closed', entryDate: '2023-11-04T14:00:00Z', exitDate: '2023-11-04T14:00:00Z', slippage: 1.1, durationSeconds: 1, broker: 'Interactive Brokers' },
 ];
 
 export const mockKpis: Kpi[] = [
@@ -177,3 +177,24 @@ export const mockFactorAttribution: FactorAttribution[] = mockDailyReturns.slice
         alpha_contrib: alpha
     };
 });
+
+export const mockRegimePerformance: RegimePerformance[] = [
+    { regime: 'High Volatility', pnl: 45000, winRate: 0.55, tradeCount: 150, avgWin: 600, avgLoss: 400 },
+    { regime: 'Low Volatility', pnl: 75000, winRate: 0.68, tradeCount: 250, avgWin: 450, avgLoss: 200 },
+    { regime: 'Trending', pnl: 95000, winRate: 0.62, tradeCount: 200, avgWin: 800, avgLoss: 550 },
+    { regime: 'Mean-Reverting', pnl: 25000, winRate: 0.75, tradeCount: 180, avgWin: 300, avgLoss: 350 },
+];
+
+export const mockEdgeDecayData: EdgeDecayDataPoint[] = Array.from({ length: 100 }, (_, i) => ({
+    day: i,
+    survival: Math.exp(-i * 0.025) * (0.98 + Math.random() * 0.04), // Exponential decay with noise
+}));
+
+export const mockSlippageData: SlippageData[] = [
+    { broker: 'Zerodha', instrument: 'RELIANCE', avgSlippage: 0.08, tradeCount: 50 },
+    { broker: 'Zerodha', instrument: 'NIFTY50', avgSlippage: 1.25, tradeCount: 120 },
+    { broker: 'Interactive Brokers', instrument: 'TSLA', avgSlippage: 0.12, tradeCount: 30 },
+    { broker: 'Interactive Brokers', instrument: 'AAPL', avgSlippage: 0.09, tradeCount: 45 },
+    { broker: 'OANDA', instrument: 'EUR/USD', avgSlippage: 0.00015, tradeCount: 200 },
+    { broker: 'Coinbase', instrument: 'BTC/USD', avgSlippage: 12.50, tradeCount: 80 },
+];
