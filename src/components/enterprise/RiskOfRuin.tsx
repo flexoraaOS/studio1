@@ -38,14 +38,7 @@ export default function RiskOfRuin() {
 
     return (
         <Card className="h-full flex flex-col">
-            <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                    <AlertCircle className="w-5 h-5 text-red-500" />
-                    Risk-of-Ruin
-                </CardTitle>
-                <CardDescription>Estimate the probability of losing a significant portion of your capital.</CardDescription>
-            </CardHeader>
-            <CardContent className="flex-grow space-y-4">
+            <CardContent className="flex-grow space-y-4 pt-6">
                 <div className="space-y-2">
                     <div className="flex justify-between text-sm">
                         <Label>Risk per Trade</Label>
