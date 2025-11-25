@@ -81,11 +81,8 @@ export default function MultiPathMonteCarlo() {
 
     return (
         <Card>
-            <CardHeader>
-                <CardTitle>Multi-Path Scenario Monte Carlo</CardTitle>
-                <CardDescription>Simulate future equity paths under different market scenarios (client-side prototype).</CardDescription>
-            </CardHeader>
-            <CardContent>
+            
+            <CardContent className="pt-6">
                 <div className="h-[300px]">
                     <ResponsiveContainer width="100%" height="100%">
                         <LineChart data={chartData} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
