@@ -5,6 +5,7 @@ import TradeBookQualityScore from '@/components/enterprise/TradeBookQualityScore
 import PlaybookAdherenceScore from '@/components/enterprise/PlaybookAdherenceScore';
 import CrossStrategyConflict from '@/components/enterprise/CrossStrategyConflict';
 import HotspotDetection from '@/components/enterprise/HotspotDetection';
+import RiskMatrix from '@/components/enterprise/RiskMatrix';
 
 export default function StrategyPage() {
     return (
@@ -27,8 +28,9 @@ export default function StrategyPage() {
                 </div>
             </div>
             
-            <div className="grid grid-cols-1 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <CrossStrategyConflict />
+                <RiskMatrix />
             </div>
 
         </div>
