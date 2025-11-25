@@ -1,6 +1,6 @@
 'use client';
 import React, {useState, useMemo} from 'react';
-import { TrendingUp, Scale, Hash, HeartPulse, HelpCircle } from 'lucide-react';
+import { TrendingUp, Scale, Hash, HeartPulse, HelpCircle, Target, TrendingDown } from 'lucide-react';
 import {
     mockKpis,
     mockEquityCurve,
@@ -31,17 +31,17 @@ import { Kpi } from '@/lib/types';
 import PerformanceMatrix from '@/components/enterprise/PerformanceMatrix';
 
 const kpiIcons = {
-    "Profit Factor": <TrendingUp className="text-green-500" />,
-    "Avg P&L / Trade": <Scale className="text-blue-500" />,
-    "Total Trades": <Hash className="text-purple-500" />,
-    "Behavioral Score": <HeartPulse className="text-amber-500" />,
+    "Realized P&L": <TrendingUp className="text-green-500" />,
+    "Win Rate": <Target className="text-blue-500" />,
+    "Sharpe Ratio": <TrendingUp className="text-purple-500" />,
+    "Max Drawdown": <TrendingDown className="text-red-500" />,
 };
 
 const analyticsKpis: Kpi[] = [
-  { title: 'Profit Factor', value: '2.41', change: '+0.12', changeType: 'positive', description: 'Gross Win / Gross Loss' },
-  { title: 'Avg P&L / Trade', value: '₹1,245.80', change: '-₹80.10', changeType: 'negative', description: 'Past 30 days' },
-  { title: 'Total Trades', value: '112', description: 'Past 30 days' },
-  { title: 'Behavioral Score', value: '88/100', change: '+5 pts', changeType: 'positive', description: 'Recent discipline' },
+    { title: 'Realized P&L', value: '₹1,24,845.72', change: '+2.1%', changeType: 'positive', description: 'Past 30 days' },
+    { title: 'Win Rate', value: '62.5%', change: '-1.5%', changeType: 'negative', description: 'All time' },
+    { title: 'Sharpe Ratio', value: '1.78', description: 'Annualized' },
+    { title: 'Max Drawdown', value: '₹-42,108.30', description: 'All time' },
 ];
 
 export default function AnalyticsPage() {
@@ -92,9 +92,8 @@ export default function AnalyticsPage() {
                 <TimeOfDayMatrix data={mockTimeOfDayData} />
             </div>
 
-            <div className="grid gap-4 lg:grid-cols-2">
+            <div className="grid gap-4 lg:grid-cols-1">
                 <PerformanceChart data={mockPerformanceData} />
-                <PerformanceMatrix />
             </div>
             
              <div className="grid gap-4 lg:grid-cols-1">
