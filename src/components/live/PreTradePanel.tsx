@@ -5,6 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Badge } from '@/components/ui/badge';
 import DraftsList from './DraftsList';
 import { PlaybookTemplate, TradeDraft } from '@/lib/live-trading/types';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
 
 interface PreTradePanelProps {
     playbook: PlaybookTemplate;
@@ -28,10 +30,16 @@ export default function PreTradePanel({ playbook, onOpenDraft }: PreTradePanelPr
                 </CardHeader>
                 <CardContent className="p-3 flex-1 overflow-y-auto space-y-3">
                      <h4 className="text-xs font-semibold text-gray-400">Key Rules</h4>
-                     <ul className="space-y-2">
+                     <ul className="space-y-3">
                         {playbook.rules.map(rule => (
-                             <li key={rule.id} className="text-xs p-2 rounded-sm bg-black/20 border-l-2 border-amber-500/50">
-                                <p className="font-medium text-gray-300">{rule.category}: <span className="font-normal text-gray-400">{rule.description}</span></p>
+                             <li key={rule.id} className="text-xs p-2 rounded-sm bg-black/20">
+                                <div className="flex items-center gap-3">
+                                    <Checkbox id={rule.id} />
+                                    <Label htmlFor={rule.id} className="flex-1 text-gray-300">
+                                        <span className="font-semibold text-gray-400">{rule.category}:</span> {rule.description}
+                                        {rule.isMandatory && <span className="text-red-400 ml-1">*</span>}
+                                    </Label>
+                                </div>
                             </li>
                         ))}
                      </ul>
