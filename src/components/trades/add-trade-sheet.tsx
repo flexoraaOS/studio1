@@ -11,7 +11,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { addTradeAction, type FormState } from '@/app/actions';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Terminal } from 'lucide-react';
+import { Terminal, Wand2 } from 'lucide-react';
 
 function SubmitButton() {
     const { pending } = useFormStatus();
@@ -60,15 +60,14 @@ export default function AddTradeSheet({ children }: { children: React.ReactNode 
                 </SheetHeader>
                 <form ref={formRef} action={formAction}>
                     <ScrollArea className="h-[calc(100vh-12rem)] pr-6">
-                        <div className="space-y-4 py-4">
-                            <div className="grid grid-cols-1 gap-4">
-                                <div>
-                                    <Label htmlFor="symbol">Symbol</Label>
-                                    <Input id="symbol" name="symbol" placeholder="e.g., RELIANCE, TSLA" />
-                                </div>
+                        <div className="space-y-6 py-6">
+                            <div className="space-y-2">
+                                <Label htmlFor="symbol">Symbol</Label>
+                                <Input id="symbol" name="symbol" placeholder="e.g., RELIANCE, TSLA" />
                             </div>
+                            
                             <div className="grid grid-cols-2 gap-4">
-                                <div>
+                                <div className="space-y-2">
                                     <Label htmlFor="direction">Direction</Label>
                                     <Select name="direction" defaultValue="Long">
                                         <SelectTrigger>
@@ -80,34 +79,42 @@ export default function AddTradeSheet({ children }: { children: React.ReactNode 
                                         </SelectContent>
                                     </Select>
                                 </div>
-                                <div>
+                                <div className="space-y-2">
                                     <Label htmlFor="size">Size</Label>
                                     <Input id="size" name="size" type="number" placeholder="e.g., 100" />
                                 </div>
                             </div>
+                            
                             <div className="grid grid-cols-2 gap-4">
-                                <div>
+                                <div className="space-y-2">
                                     <Label htmlFor="entryPrice">Entry Price</Label>
                                     <Input id="entryPrice" name="entryPrice" type="number" step="any" placeholder="e.g., 2300.50" />
                                 </div>
-                                <div>
+                                <div className="space-y-2">
                                     <Label htmlFor="exitPrice">Exit Price</Label>
                                     <Input id="exitPrice" name="exitPrice" type="number" step="any" placeholder="e.g., 2315.75" />
                                 </div>
                             </div>
-                             <div>
+                            
+                             <div className="space-y-2">
                                 <Label htmlFor="strategy">Strategy</Label>
                                 <Input id="strategy" name="strategy" placeholder="e.g., Breakout, Momentum" />
                             </div>
-                            <div>
+                            
+                            <div className="space-y-2">
                                 <Label htmlFor="notes">Notes</Label>
-                                <Textarea id="notes" name="notes" placeholder="Why did you take this trade?" />
+                                <Textarea id="notes" name="notes" placeholder="Why did you take this trade? What was your thesis?" />
                             </div>
-                             <div>
-                                <Label htmlFor="potentialAnomaly">Potential Anomaly Description (for AI Analysis)</Label>
-                                <Textarea id="potentialAnomaly" name="potentialAnomaly" placeholder="e.g., Slippage was unusually high, price moved against major news." />
-                                <p className="text-xs text-muted-foreground mt-1">If filled, AI will analyze market data for context.</p>
+                            
+                             <div className="space-y-3 rounded-lg border border-dashed border-amber-500/50 p-4">
+                                <Label htmlFor="potentialAnomaly" className="flex items-center gap-2">
+                                    <Wand2 className="h-5 w-5 text-amber-400" />
+                                    <span className="font-semibold">AI-Powered Anomaly Analysis</span>
+                                </Label>
+                                <Textarea id="potentialAnomaly" name="potentialAnomaly" placeholder="Describe anything unusual about this trade. e.g., 'Slippage was high', 'Price moved against major news', 'Felt hesitant on entry'." />
+                                <p className="text-xs text-muted-foreground">If filled, AI will analyze market data for context around the anomaly.</p>
                             </div>
+                            
                              {state.enhancedContext && (
                                 <Alert>
                                     <Terminal className="h-4 w-4" />
