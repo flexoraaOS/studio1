@@ -7,6 +7,8 @@ import { mockHistoricalEquity, mockFactorReturns, mockFactorAttribution, mockReg
 import MarketRegimePerformance from '@/components/analytics/market-regime-performance';
 import EdgeDecayCurve from '@/components/analytics/edge-decay-curve';
 import SlippageAttribution from '@/components/analytics/slippage-attribution';
+import { Button } from '@/components/ui/button';
+import { Download } from 'lucide-react';
 
 export default function Priority4AnalyticsPage() {
     return (
@@ -15,6 +17,12 @@ export default function Priority4AnalyticsPage() {
                 <div>
                     <h1 className="text-3xl font-bold tracking-tight font-headline text-gradient">Priority-4 Advanced Analytics</h1>
                     <p className="text-muted-foreground">Advanced Risk, Attribution & Edge-Decay Models.</p>
+                </div>
+                 <div className="flex items-center gap-2">
+                    <Button variant="outline">
+                        <Download className="mr-2 h-4 w-4" />
+                        Export PDF
+                    </Button>
                 </div>
             </div>
 

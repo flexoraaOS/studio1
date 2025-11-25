@@ -88,7 +88,7 @@ export default function Priority2AnalyticsPage() {
                         </CardContent>
                         <CardFooter>
                             <Button variant="secondary" className="w-full" disabled>
-                                Explore Attribution <ChevronsRight className="ml-2 w-4 h-4"/>
+                                Explore Attribution (Coming Soon)
                             </Button>
                         </CardFooter>
                     </Card>

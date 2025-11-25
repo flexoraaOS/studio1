@@ -4,6 +4,8 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/com
 import CohortAnalysisChart from '@/components/analytics/cohort-analysis-chart';
 import AnomalyDetector from '@/components/analytics/anomaly-detector';
 import { mockCohortData, mockTrades } from '@/lib/data';
+import { Button } from '@/components/ui/button';
+import { Download } from 'lucide-react';
 
 export default function Priority3AnalyticsPage() {
     return (
@@ -12,6 +14,12 @@ export default function Priority3AnalyticsPage() {
                 <div>
                     <h1 className="text-3xl font-bold tracking-tight font-headline text-gradient">Priority-3 Advanced Analytics</h1>
                     <p className="text-muted-foreground">Deep-dive into behavioral patterns and edge decay.</p>
+                </div>
+                 <div className="flex items-center gap-2">
+                    <Button variant="outline">
+                        <Download className="mr-2 h-4 w-4" />
+                        Export PDF
+                    </Button>
                 </div>
             </div>
 
