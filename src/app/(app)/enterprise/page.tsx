@@ -74,41 +74,45 @@ export default function EnterpriseDashboardPage() {
             </div>
 
             {/* Main Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 
-                {/* Column 1 */}
-                <div className="xl:col-span-1 flex flex-col gap-6">
+                {/* Column 1: Interaction & Psychology */}
+                <div className="flex flex-col gap-6">
                     <NLPCompanionPanel />
-                    <RiskOfRuin />
                     <TraderDNAReport />
                 </div>
 
-                {/* Column 2 & 3 */}
-                <div className="md:col-span-2 xl:col-span-2 flex flex-col gap-6">
+                {/* Column 2: Core Analytics & Risk */}
+                <div className="flex flex-col gap-6">
                     <MultiPathMonteCarlo />
-                    <PerformanceMatrix />
-                    <RiskMatrix />
+                    <RiskOfRuin />
                 </div>
                 
-                {/* Column 4 */}
-                <div className="xl:col-span-1 flex flex-col gap-6">
+                {/* Column 3: Playbooks & Quality */}
+                <div className="flex flex-col gap-6">
                     <PlaybookBuilder />
                     <TradeBookQualityScore />
                     <PlaybookAdherenceScore />
                 </div>
-
-                {/* Second Row */}
-                <div className="md:col-span-2 xl:col-span-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                   <CrossStrategyConflict />
-                   <HotspotDetection />
-                   <ExposurePyramid />
-                </div>
-
-                {/* Third Row */}
-                 <div className="md:col-span-2 xl:col-span-4">
-                    <ImprovementPlanner />
-                 </div>
             </div>
+
+            {/* Second Row: Deep Dive Matrices */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <PerformanceMatrix />
+                <RiskMatrix />
+            </div>
+
+            {/* Third Row: Detections */}
+             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <CrossStrategyConflict />
+                <HotspotDetection />
+                <ExposurePyramid />
+             </div>
+             
+             {/* Fourth Row: Actionable Planner */}
+             <div className="grid grid-cols-1">
+                <ImprovementPlanner />
+             </div>
         </div>
     );
 }
