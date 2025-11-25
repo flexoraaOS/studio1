@@ -30,7 +30,7 @@ export default function CrossStrategyConflict() {
     });
 
     return (
-        <Card>
+        <Card className="lg:col-span-2">
             <CardHeader>
                 <CardTitle>Cross-Strategy Correlation</CardTitle>
                 <CardDescription>Identify overlapping or conflicting strategies.</CardDescription>
