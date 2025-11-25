@@ -19,7 +19,7 @@ export default function NLPCompanionPanel() {
             <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                     <Bot className="w-5 h-5 text-primary" />
-                    AI Journal Companion
+                    Flexoraa Intelligence
                 </CardTitle>
                 <CardDescription>Ask questions about your trading performance.</CardDescription>
             </CardHeader>
