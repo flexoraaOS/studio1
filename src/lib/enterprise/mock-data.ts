@@ -4,13 +4,18 @@ import {
   DailyEquityRecord,
   Account,
   PlaybookTemplate,
+  PlaybookAdherenceScore,
   PerformanceMatrixData,
   RiskMatrixData,
   Timeframe,
   PerformanceMetric,
   RiskOfRuinParams,
   TradeBookQualityScore,
-  StrategyCorrelation
+  StrategyCorrelation,
+  ExposurePyramidNode,
+  TraderDNA,
+  ImprovementTask,
+  Hotspot
 } from './types';
 
 const SEED = 'tradesightpro';
@@ -126,10 +131,10 @@ export const mockPlaybookTemplates: PlaybookTemplate[] = [
         description: 'Trade breakouts of the first 15-min range.',
         tags: ['intraday', 'breakout'],
         rules: [
-            { id: 'r1', category: 'Setup', description: 'Market is trending pre-market', isMandatory: true },
-            { id: 'r2', category: 'Entry', description: 'Enter on volume spike > 2x avg', isMandatory: true },
-            { id: 'r3', category: 'Risk', description: 'Stop loss below 15-min low/high', isMandatory: true },
-            { id: 'r4', category: 'Exit', description: 'Target 2R or end of day', isMandatory: false },
+            { id: 'r1_1', category: 'Setup', description: 'Market is trending pre-market', isMandatory: true },
+            { id: 'r1_2', category: 'Entry', description: 'Enter on volume spike > 2x avg', isMandatory: true },
+            { id: 'r1_3', category: 'Risk', description: 'Stop loss below 15-min low/high', isMandatory: true },
+            { id: 'r1_4', category: 'Exit', description: 'Target 2R or end of day', isMandatory: false },
         ]
     },
     {
@@ -138,10 +143,10 @@ export const mockPlaybookTemplates: PlaybookTemplate[] = [
         description: 'Fade extensions away from the 50-period EMA on the 5-min chart.',
         tags: ['scalping', 'mean-reversion'],
         rules: [
-            { id: 'r1', category: 'Setup', description: 'Price is > 2 ATR from 50 EMA', isMandatory: true },
-            { id: 'r2', category: 'Entry', description: 'Enter after reversal candlestick pattern', isMandatory: true },
-            { id: 'r3', category: 'Risk', description: 'Stop loss above/below the wick of entry candle', isMandatory: true },
-            { id: 'r4', category: 'Exit', description: 'Target the 50 EMA', isMandatory: true },
+            { id: 'r2_1', category: 'Setup', description: 'Price is > 2 ATR from 50 EMA', isMandatory: true },
+            { id: 'r2_2', category: 'Entry', description: 'Enter after reversal candlestick pattern', isMandatory: true },
+            { id: 'r2_3', category: 'Risk', description: 'Stop loss above/below the wick of entry candle', isMandatory: true },
+            { id: 'r2_4', category: 'Exit', description: 'Target the 50 EMA', isMandatory: true },
         ]
     }
 ];
@@ -193,4 +198,56 @@ export const mockStrategyCorrelations: StrategyCorrelation[] = [
     { strategyA: 'Momentum', strategyB: 'Mean Reversion', correlation: -0.65 },
     { strategyA: 'Momentum', strategyB: 'Breakout', correlation: 0.78 },
     { strategyA: 'Mean Reversion', strategyB: 'Breakout', correlation: -0.21 },
+];
+
+export const mockExposurePyramidData: ExposurePyramidNode = {
+    name: 'Total Portfolio',
+    value: 150000,
+    children: [
+        { 
+            name: 'Equities', 
+            value: 80000, 
+            children: [
+                { name: 'US Tech', value: 40000, children: [{name: 'AAPL', value: 20000}, {name: 'MSFT', value: 20000}] },
+                { name: 'Indian Banks', value: 40000, children: [{name: 'HDFCBANK', value: 25000}, {name: 'ICICIBANK', value: 15000}] }
+            ]
+        },
+        { 
+            name: 'Futures', 
+            value: 50000, 
+            children: [
+                { name: 'Indices', value: 30000, children: [{name: 'ES', value: 30000}] },
+                { name: 'Commodities', value: 20000, children: [{name: 'CL', value: 20000}] }
+            ]
+        },
+        { name: 'FX', value: 20000, children: [{name: 'EUR/USD', value: 20000}] }
+    ]
+};
+
+export const mockPlaybookAdherenceScores: PlaybookAdherenceScore[] = [
+    { tradeId: 'trade_1', playbookName: 'ORB', adherence: 0.75, results: [{ruleId: 'r1_4', passed: false, reason: 'Exited before 2R target'}] },
+    { tradeId: 'trade_2', playbookName: 'ORB', adherence: 1.0, results: []},
+    { tradeId: 'trade_3', playbookName: 'Mean Reversion - 50 EMA', adherence: 0.5, results: [{ruleId: 'r2_1', passed: false, reason: 'Price was only 1.5 ATR from EMA'}]}
+];
+
+
+export const mockTraderDNA: TraderDNA = {
+    primaryBias: 'FOMO',
+    strengths: ['High win-rate in trending markets', 'Good at cutting losers quickly'],
+    weaknesses: ['Over-trades on Fridays', 'Tends to oversize after a large win'],
+    bestRegime: 'Trending',
+    bestTimeframe: 'Intraday'
+};
+
+
+export const mockImprovementTasks: ImprovementTask[] = [
+    { id: 'task_1', title: 'Reduce Friday Trade Size by 50%', description: 'Hotspot detector identified significant losses on Fridays. Implement a rule to halve position sizes.', sourceFeature: 'Hotspot', status: 'Todo', createdDate: new Date().toISOString() },
+    { id: 'task_2', title: 'Review Sizing Consistency', description: 'Consistency score shows high variance in position sizing. Review trade journal to understand why.', sourceFeature: 'Consistency', status: 'InProgress', createdDate: new Date().toISOString() },
+    { id: 'task_3', title: 'Create Pre-Trade Checklist for FOMO', description: 'Trader DNA report flagged FOMO as a primary bias. Create and follow a checklist before entering any trade.', sourceFeature: 'TraderDNA', status: 'Done', createdDate: new Date().toISOString() }
+];
+
+export const mockHotspots: Hotspot[] = [
+    { dimension: 'DayOfWeek', value: 'Friday', lossConcentration: 0.45, tradeCount: 50 },
+    { dimension: 'Hour', value: '14:00', lossConcentration: 0.30, tradeCount: 35 },
+    { dimension: 'Strategy', value: 'Scalping', lossConcentration: 0.25, tradeCount: 110 },
 ];

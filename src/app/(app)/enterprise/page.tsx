@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { DateRangePicker } from '@/components/date-range-picker';
 import { DateRange } from 'react-day-picker';
 import { addDays, subYears } from 'date-fns';
-import { Filter, Building, Bot, GanttChartSquare, Pyramid, ShieldCheck, GitPullRequest, Milestone, Telescope, FileText, CheckCircle, ListTodo } from 'lucide-react';
+import { Filter } from 'lucide-react';
 import PlaybookBuilder from '@/components/enterprise/PlaybookBuilder';
 import PerformanceMatrix from '@/components/enterprise/PerformanceMatrix';
 import RiskOfRuin from '@/components/enterprise/RiskOfRuin';
@@ -16,19 +16,16 @@ import NLPCompanionPanel from '@/components/enterprise/NLPCompanionPanel';
 import RiskMatrix from '@/components/enterprise/RiskMatrix';
 import TradeBookQualityScore from '@/components/enterprise/TradeBookQualityScore';
 import CrossStrategyConflict from '@/components/enterprise/CrossStrategyConflict';
-import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card';
+import ExposurePyramid from '@/components/enterprise/ExposurePyramid';
+import PlaybookAdherenceScore from '@/components/enterprise/PlaybookAdherenceScore';
+import TraderDNAReport from '@/components/enterprise/TraderDNAReport';
+import HotspotDetection from '@/components/enterprise/HotspotDetection';
+import ImprovementPlanner from '@/components/enterprise/ImprovementPlanner';
+
 
 // export const metadata: Metadata = {
 //     title: 'Enterprise Analytics | TradeSight Pro',
 // };
-
-const ComingSoonCard = ({ title, icon: Icon }: { title: string, icon: React.ElementType }) => (
-    <Card className="h-full flex flex-col items-center justify-center text-center p-6 border-dashed">
-        <Icon className="w-12 h-12 text-muted-foreground mb-4" />
-        <h3 className="text-lg font-semibold">{title}</h3>
-        <p className="text-sm text-muted-foreground">Coming Soon</p>
-    </Card>
-);
 
 export default function EnterpriseDashboardPage() {
     const [date, setDate] = useState<DateRange | undefined>({
@@ -79,37 +76,37 @@ export default function EnterpriseDashboardPage() {
             {/* Main Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
                 
+                {/* Column 1 */}
                 <div className="xl:col-span-1 flex flex-col gap-6">
                     <NLPCompanionPanel />
                     <RiskOfRuin />
+                    <TraderDNAReport />
                 </div>
 
+                {/* Column 2 & 3 */}
                 <div className="md:col-span-2 xl:col-span-2 flex flex-col gap-6">
                     <MultiPathMonteCarlo />
                     <PerformanceMatrix />
+                    <RiskMatrix />
                 </div>
                 
+                {/* Column 4 */}
                 <div className="xl:col-span-1 flex flex-col gap-6">
                     <PlaybookBuilder />
                     <TradeBookQualityScore />
+                    <PlaybookAdherenceScore />
                 </div>
 
+                {/* Second Row */}
                 <div className="md:col-span-2 xl:col-span-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                   <RiskMatrix />
                    <CrossStrategyConflict />
-                   <ComingSoonCard title="Exposure Pyramid" icon={Pyramid} />
+                   <HotspotDetection />
+                   <ExposurePyramid />
                 </div>
-                
-                 <div className="md:col-span-2 xl:col-span-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    <ComingSoonCard title="Playbook Adherence" icon={CheckCircle} />
-                    <ComingSoonCard title="Position Lifecycle" icon={Milestone} />
-                    <ComingSoonCard title="Trader DNA Report" icon={FileText} />
-                    <ComingSoonCard title="Hotspot Detection" icon={Telescope} />
-                </div>
-                 <div className="md:col-span-2 xl:col-span-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <ComingSoonCard title="Session Timeline" icon={GanttChartSquare} />
-                    <ComingSoonCard title="Consistency Score" icon={ShieldCheck} />
-                    <ComingSoonCard title="Improvement Planner" icon={ListTodo} />
+
+                {/* Third Row */}
+                 <div className="md:col-span-2 xl:col-span-4">
+                    <ImprovementPlanner />
                  </div>
             </div>
         </div>

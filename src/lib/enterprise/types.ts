@@ -162,6 +162,7 @@ export type AdherenceResult = {
 };
 export type PlaybookAdherenceScore = {
   tradeId: string;
+  playbookName: string;
   adherence: number; // 0-1
   results: AdherenceResult[];
 };
