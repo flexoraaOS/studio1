@@ -7,7 +7,7 @@ export const mockTrades: Trade[] = [
   { id: 'T004', entryTime: '2023-10-28 10:00', exitTime: '2023-10-28 12:30', symbol: 'INFY', direction: 'Long', size: 200, entryPrice: 1450.00, exitPrice: 1435.50, realizedPnl: -2900.00, pnlPercent: -1.00, currency: 'INR', strategy: 'Mean Reversion', status: 'Closed', entryDate: '2023-10-28T10:00:00Z', exitDate: '2023-10-28T12:30:00Z', slippage: 0.15, durationSeconds: 9000, broker: 'Zerodha' },
   { id: 'T005', entryTime: '2023-10-29 09:45', exitTime: '2023-10-29 10:15', symbol: 'AAPL', direction: 'Long', size: 50, entryPrice: 170.10, exitPrice: 172.30, realizedPnl: 110.00, pnlPercent: 1.29, currency: 'USD', strategy: 'Breakout', status: 'Closed', entryDate: '2023-10-29T09:45:00Z', exitDate: '2023-10-29T10:15:00Z', slippage: 0.08, durationSeconds: 1800, broker: 'Interactive Brokers' },
   { id: 'T006', entryTime: '2023-11-01 20:30', exitTime: '2023-11-01 21:00', symbol: 'BTC/USD', direction: 'Short', size: 0.5, entryPrice: 34500, exitPrice: 34800, realizedPnl: -150.00, pnlPercent: -0.87, currency: 'USD', strategy: 'Momentum', status: 'Closed', entryDate: '2023-11-01T20:30:00Z', exitDate: '2023-11-01T21:00:00Z', slippage: 15.0, durationSeconds: 1800, broker: 'Coinbase' },
-  { id: 'T007', entryTime: '2023-11-02 11:00', exitTime: '2023-11-02 11:00', symbol: 'HDFCBANK', direction: 'Long', size: 150, entryPrice: 1490.25, exitPrice: 0, realizedPnl: 0, pnlPercent: 0, currency: 'INR', strategy: 'Breakout', status: 'Open', entryDate: '2023-11-02T11:00:00Z', slippage: 0.0, durationSeconds: 0, broker: 'Zerodha' },
+  { id: 'T007', entryTime: '2023-11-02 11:00', exitTime: '2023-11-02 11:00', symbol: 'HDFCBANK', direction: 'Long', size: 150, entryPrice: 1490.25, exitPrice: 0, realizedPnl: 0, pnlPercent: 0, currency: 'INR', strategy: 'Breakout', status: 'Open', entryDate: '2023-11-02T11:00:00Z', exitDate: '2023-11-02T11:00:00Z', slippage: 0.0, durationSeconds: 0, broker: 'Zerodha' },
   // Anomalous Trades for Detector
   { id: 'A001', entryTime: '2023-11-03 09:30', exitTime: '2023-11-03 09:31', symbol: 'NIFTY50', direction: 'Long', size: 500, entryPrice: 19200, exitPrice: 19100, realizedPnl: -50000.00, pnlPercent: -6.52, currency: 'INR', strategy: 'Scalping', status: 'Closed', entryDate: '2023-11-03T09:30:00Z', exitDate: '2023-11-03T09:31:00Z', slippage: 2.5, durationSeconds: 60, broker: 'Zerodha' },
   { id: 'A002', entryTime: '2023-11-03 10:00', exitTime: '2023-11-03 15:00', symbol: 'AMZN', direction: 'Long', size: 1000, entryPrice: 140.00, exitPrice: 160.50, realizedPnl: 20500, pnlPercent: 14.64, currency: 'USD', strategy: 'Day-Trade', status: 'Closed', entryDate: '2023-11-03T10:00:00Z', exitDate: '2023-11-03T15:00:00Z', slippage: 0.50, durationSeconds: 18000, broker: 'Interactive Brokers' },
@@ -15,10 +15,10 @@ export const mockTrades: Trade[] = [
 ];
 
 export const mockKpis: Kpi[] = [
-  { title: 'Realized P&L', value: '₹1,24,845.72', change: '+2.1%', changeType: 'positive', description: 'Past 30 days' },
-  { title: 'Win Rate', value: '62.5%', change: '-1.5%', changeType: 'negative', description: 'All time' },
-  { title: 'Sharpe Ratio', value: '1.78', description: 'Annualized' },
-  { title: 'Max Drawdown', value: '₹-42,108.30', description: 'All time' },
+  { title: 'Profit Factor', value: '2.41', change: '+0.12', changeType: 'positive', description: 'Gross Win / Gross Loss' },
+  { title: 'Avg P&L / Trade', value: '₹1,245.80', change: '-₹80.10', changeType: 'negative', description: 'Past 30 days' },
+  { title: 'Total Trades', value: '112', description: 'Past 30 days' },
+  { title: 'Behavioral Score', value: '88/100', change: '+5 pts', changeType: 'positive', description: 'Recent discipline' },
 ];
 
 const equityData: ChartData[] = Array.from({ length: 90 }, (_, i) => {

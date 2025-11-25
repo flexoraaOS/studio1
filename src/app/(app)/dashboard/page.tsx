@@ -1,6 +1,6 @@
 'use client'
 import React, {useState, useMemo} from 'react';
-import { TrendingUp, TrendingDown, Target } from 'lucide-react';
+import { TrendingUp, Scale, Hash, HeartPulse } from 'lucide-react';
 import { mockKpis, mockEquityCurve, mockPerformanceData, mockTrades } from '@/lib/data';
 import KpiCard from '@/components/dashboard/kpi-card';
 import EquityChart from '@/components/dashboard/equity-chart';
@@ -11,10 +11,10 @@ import { DateRange } from 'react-day-picker';
 import { addDays } from 'date-fns';
 
 const kpiIcons = {
-    "Realized P&L": <TrendingUp className="text-green-500" />,
-    "Win Rate": <Target className="text-blue-500" />,
-    "Sharpe Ratio": <TrendingUp className="text-purple-500" />,
-    "Max Drawdown": <TrendingDown className="text-red-500" />,
+    "Profit Factor": <TrendingUp className="text-green-500" />,
+    "Avg P&L / Trade": <Scale className="text-blue-500" />,
+    "Total Trades": <Hash className="text-purple-500" />,
+    "Behavioral Score": <HeartPulse className="text-amber-500" />,
 };
 
 export default function DashboardPage() {
