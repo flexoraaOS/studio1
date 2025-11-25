@@ -9,6 +9,7 @@ import {
   Code,
   CreditCard,
   ChevronRight,
+  HeartPulse,
 } from 'lucide-react';
 import {
   SidebarProvider,
@@ -27,6 +28,7 @@ import APISettings from '@/components/settings/api-settings';
 import SecuritySettings from '@/components/settings/security-settings';
 import DataPrivacySettings from '@/components/settings/data-privacy-settings';
 import BillingSettings from '@/components/settings/billing-settings';
+import BehavioralSettings from '@/components/settings/behavioral-settings';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
 import {
@@ -56,6 +58,12 @@ const settingsSections = [
     label: 'Security',
     icon: Lock,
     component: SecuritySettings,
+  },
+  {
+    id: 'behavioral',
+    label: 'Behavioral',
+    icon: HeartPulse,
+    component: BehavioralSettings,
   },
   {
     id: 'data-privacy',
