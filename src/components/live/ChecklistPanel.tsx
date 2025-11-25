@@ -27,17 +27,17 @@ export default function ChecklistPanel({
 }: ChecklistPanelProps) {
   return (
     <ScrollArea className="h-40 pr-4">
-      <div className="space-y-4">
+      <div className="space-y-3">
         {items.map((item) => (
           <div key={item.id} className="flex items-start gap-3 rounded-md border p-3">
             <Checkbox
               id={item.id}
               checked={checklistState[item.id] || false}
               onCheckedChange={(checked) => onChecklistChange(item.id, !!checked)}
-              className="mt-1"
+              className="mt-0.5"
             />
             <div className="grid gap-1.5">
-              <Label htmlFor={item.id} className="font-semibold leading-snug">
+              <Label htmlFor={item.id} className="font-medium leading-snug text-sm">
                 {item.label}
               </Label>
               {item.isMandatory && (

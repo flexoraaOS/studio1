@@ -38,9 +38,11 @@ export default function LiveTradingPage() {
   useEffect(() => {
     // Reset checklist when playbook changes
     const newChecklistState: Record<string, boolean> = {};
-    selectedPlaybook?.checklist.forEach(item => {
-        newChecklistState[item.id] = false;
-    });
+    if (selectedPlaybook) {
+      selectedPlaybook.checklist.forEach(item => {
+          newChecklistState[item.id] = false;
+      });
+    }
     setChecklistState(newChecklistState);
   }, [selectedPlaybook]);
 
@@ -73,20 +75,18 @@ export default function LiveTradingPage() {
 
   return (
     <div className="container mx-auto max-w-7xl p-0 sm:p-4">
-      {/* 7. Use a cleaner header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold tracking-tight font-headline text-gradient">Live Trading Workspace</h1>
-        <p className="text-muted-foreground">Pre-trade checks → Execute → Post-trade upload</p>
+        <h1 className="text-2xl font-bold tracking-tight font-headline text-gradient">Live Trading Workspace</h1>
+        <p className="text-sm text-muted-foreground">Pre-trade checks → Execute → Post-trade upload</p>
       </div>
 
-      {/* 2. Use a 2-column or modular terminal layout */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
         
         {/* --- LEFT COLUMN: Pre-Trade --- */}
         <div className="w-full space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+              <CardTitle className="flex items-center gap-2 text-lg">
                 <BrainCircuit className="w-5 h-5 text-primary"/>
                 1. Select Strategy
               </CardTitle>
@@ -103,7 +103,7 @@ export default function LiveTradingPage() {
 
           <Card>
              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+                <CardTitle className="flex items-center gap-2 text-lg">
                   <BookOpen className="w-5 h-5 text-primary"/>
                   2. Playbook Rules
                 </CardTitle>
@@ -122,7 +122,7 @@ export default function LiveTradingPage() {
           
           <Card>
              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+                <CardTitle className="flex items-center gap-2 text-lg">
                   <ListChecks className="w-5 h-5 text-primary"/>
                   3. Pre-Flight Checklist
                 </CardTitle>
@@ -148,7 +148,7 @@ export default function LiveTradingPage() {
         <div className="w-full space-y-6 sticky top-20">
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+              <CardTitle className="flex items-center gap-2 text-lg">
                 <FileSliders className="w-5 h-5 text-primary"/>
                 4. Trade Parameters
               </CardTitle>
@@ -164,7 +164,6 @@ export default function LiveTradingPage() {
           
           <Separator />
           
-          {/* 8. Replace the “3. Go Live” card with a pro CTA */}
           <div className="space-y-4">
               <h3 className="text-lg font-semibold text-center">5. Go Live</h3>
                {/* TODO: Placeholder for LivePreviewCard component */}
@@ -176,8 +175,6 @@ export default function LiveTradingPage() {
               </Button>
           </div>
           
-           {/* 9. Move Post-Trade Review into a modal */}
-           {/* The upload form and review panels will now be triggered from a modal, not shown directly on the page. */}
         </div>
 
       </div>
@@ -186,7 +183,7 @@ export default function LiveTradingPage() {
 
       {/* Drafts Section */}
       <div className="mt-8">
-        <h2 className="text-2xl font-semibold tracking-tight mb-4">Drafts</h2>
+        <h2 className="text-xl font-semibold tracking-tight mb-4">Drafts</h2>
          <Card>
             <CardContent className="p-4">
                 <ScrollArea className="h-48">
@@ -194,8 +191,8 @@ export default function LiveTradingPage() {
                         {drafts.length > 0 ? drafts.map(draft => (
                             <div key={draft.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-md">
                                 <div>
-                                    <p className="font-semibold">{mockPlaybookTemplates.find(p => p.id === draft.playbookId)?.name || 'Untitled Draft'}</p>
-                                    <p className="text-sm text-muted-foreground">
+                                    <p className="font-semibold text-sm">{mockPlaybookTemplates.find(p => p.id === draft.playbookId)?.name || 'Untitled Draft'}</p>
+                                    <p className="text-xs text-muted-foreground">
                                       Saved: {new Date(draft.createdAt).toLocaleString()}
                                     </p>
                                 </div>

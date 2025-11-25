@@ -35,13 +35,13 @@ export default function RulesList({ rules }: RulesListProps) {
       <Accordion type="multiple" defaultValue={Object.keys(rulesByCategory)}>
         {Object.entries(rulesByCategory).map(([category, categoryRules]) => (
           <AccordionItem value={category} key={category}>
-            <AccordionTrigger className="text-base font-semibold">{category}</AccordionTrigger>
+            <AccordionTrigger className="text-sm font-semibold">{category}</AccordionTrigger>
             <AccordionContent>
               <ul className="space-y-3 pl-2">
                 {categoryRules.map((rule) => (
                   <li key={rule.id} className="text-sm">
                     <p className="font-medium">{rule.name}</p>
-                    <p className="text-muted-foreground">{rule.explanation}</p>
+                    <p className="text-xs text-muted-foreground">{rule.explanation}</p>
                     <p className="text-xs text-muted-foreground/80 mt-1">
                       <span className="font-semibold">Example:</span> {rule.example}
                     </p>
