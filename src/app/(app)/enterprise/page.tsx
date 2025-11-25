@@ -84,7 +84,6 @@ export default function EnterpriseDashboardPage() {
 
                 {/* Column 2: Core Analytics & Risk */}
                 <div className="flex flex-col gap-6">
-                    <MultiPathMonteCarlo />
                     <RiskOfRuin />
                 </div>
                 
