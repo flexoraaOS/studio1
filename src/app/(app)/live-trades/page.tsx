@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -13,6 +12,10 @@ import { Badge } from '@/components/ui/badge';
 import { PlusCircle, Trash2, Rocket, Edit, Copy, BookOpen, ListChecks, FileSliders, BrainCircuit } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 
+import StrategySelect from '@/components/live/StrategySelect';
+import RulesList from '@/components/live/RulesList';
+import ChecklistPanel from '@/components/live/ChecklistPanel';
+
 /**
  * =================================================================
  * Live Trading Workspace Page
@@ -24,36 +27,49 @@ import { Separator } from '@/components/ui/separator';
 export default function LiveTradingPage() {
   const [drafts, setDrafts] = useState<TradeDraft[]>([]);
   const [activeSession, setActiveSession] = useState<LiveTradeSession | null>(null);
+  const [selectedPlaybook, setSelectedPlaybook] = useState<PlaybookTemplate | null>(mockPlaybookTemplates[0] || null);
+  const [checklistState, setChecklistState] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     // Load existing drafts from local storage on component mount
     setDrafts(getDrafts());
   }, []);
 
+  useEffect(() => {
+    // Reset checklist when playbook changes
+    const newChecklistState: Record<string, boolean> = {};
+    selectedPlaybook?.checklist.forEach(item => {
+        newChecklistState[item.id] = false;
+    });
+    setChecklistState(newChecklistState);
+  }, [selectedPlaybook]);
+
   const handleCreateNewDraft = () => {
     const newDraft: TradeDraft = {
       id: `draft_${Date.now()}`,
       createdAt: new Date().toISOString(),
-      // Default empty values, to be filled by user
-      playbookId: '',
+      playbookId: selectedPlaybook?.id || '',
       params: {
           instrument: '',
           side: 'Long',
           size: 0,
-          riskPercent: 1,
+          riskPercent: selectedPlaybook?.defaultParams.riskPercent || 1,
       },
       checklistState: {},
-      notes: '',
+      notes: selectedPlaybook?.notesTemplate || '',
     };
     saveDraft(newDraft);
     setDrafts(getDrafts());
-    // TODO: Set this new draft as the active one to be edited
   };
   
   const handleDeleteDraft = (draftId: string) => {
     deleteDraft(draftId);
     setDrafts(getDrafts());
-  }
+  };
+
+  const handleChecklistChange = (itemId: string, isChecked: boolean) => {
+    setChecklistState(prev => ({...prev, [itemId]: isChecked}));
+  };
 
   return (
     <div className="container mx-auto max-w-7xl p-0 sm:p-4">
@@ -77,10 +93,11 @@ export default function LiveTradingPage() {
               <CardDescription>Choose your playbook to load rules and checklists.</CardDescription>
             </CardHeader>
             <CardContent>
-                {/* TODO: Placeholder for StrategySelect component */}
-                <div className="p-4 rounded-lg h-24 flex items-center justify-center bg-background/50">
-                    <p className="text-muted-foreground text-sm">StrategySelect Component</p>
-                </div>
+                <StrategySelect 
+                    playbooks={mockPlaybookTemplates}
+                    selectedPlaybookId={selectedPlaybook?.id}
+                    onSelectPlaybook={(id) => setSelectedPlaybook(mockPlaybookTemplates.find(p => p.id === id) || null)}
+                />
             </CardContent>
           </Card>
 
@@ -93,11 +110,13 @@ export default function LiveTradingPage() {
                 <CardDescription>Mandatory conditions for this playbook.</CardDescription>
              </CardHeader>
              <CardContent>
-                {/* 3. Convert "Rules" + "Checklist" into collapsible panels */}
-                {/* TODO: Placeholder for RulesList component (as Accordion) */}
-                 <div className="p-4 rounded-lg h-32 flex items-center justify-center bg-background/50">
-                    <p className="text-muted-foreground text-sm">RulesList Accordion Component</p>
-                </div>
+                {selectedPlaybook ? (
+                    <RulesList rules={selectedPlaybook.rules} />
+                ) : (
+                    <div className="p-4 rounded-lg h-32 flex items-center justify-center bg-background/50">
+                        <p className="text-muted-foreground text-sm">Select a playbook to see its rules.</p>
+                    </div>
+                )}
              </CardContent>
           </Card>
           
@@ -110,10 +129,17 @@ export default function LiveTradingPage() {
                 <CardDescription>Confirm your personal and market checks.</CardDescription>
              </CardHeader>
              <CardContent>
-                 {/* TODO: Placeholder for ChecklistPanel component (as Accordion) */}
-                 <div className="p-4 rounded-lg h-40 flex items-center justify-center bg-background/50">
-                    <p className="text-muted-foreground text-sm">ChecklistPanel Component</p>
-                </div>
+                 {selectedPlaybook ? (
+                    <ChecklistPanel 
+                        items={selectedPlaybook.checklist}
+                        checklistState={checklistState}
+                        onChecklistChange={handleChecklistChange}
+                    />
+                 ) : (
+                    <div className="p-4 rounded-lg h-40 flex items-center justify-center bg-background/50">
+                        <p className="text-muted-foreground text-sm">Select a playbook to see its checklist.</p>
+                    </div>
+                 )}
              </CardContent>
           </Card>
         </div>
@@ -168,7 +194,7 @@ export default function LiveTradingPage() {
                         {drafts.length > 0 ? drafts.map(draft => (
                             <div key={draft.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-md">
                                 <div>
-                                    <p className="font-semibold">{draft.params.instrument || 'Untitled Draft'}</p>
+                                    <p className="font-semibold">{mockPlaybookTemplates.find(p => p.id === draft.playbookId)?.name || 'Untitled Draft'}</p>
                                     <p className="text-sm text-muted-foreground">
                                       Saved: {new Date(draft.createdAt).toLocaleString()}
                                     </p>
