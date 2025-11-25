@@ -17,6 +17,7 @@ import { RemindersDialog } from '@/components/reminders/reminders-dialog';
 const navItems = [
     { href: '/dashboard', label: 'Dashboard' },
     { href: '/trades', label: 'Trades' },
+    { href: '/live-trades', label: 'Live Trades' },
     { href: '/import', label: 'Import' },
     { href: '/strategy', label: 'Strategy' },
     { href: '/analytics', label: 'Analytics' },
