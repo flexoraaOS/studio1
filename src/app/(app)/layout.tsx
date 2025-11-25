@@ -18,6 +18,7 @@ const navItems = [
     { href: '/trades', label: 'Trades' },
     { href: '/import', label: 'Import' },
     { href: '/analytics', label: 'Analytics' },
+    { href: '/behavioral', label: 'Behavioral' },
 ];
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {

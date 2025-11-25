@@ -173,3 +173,19 @@ export type SlippageData = {
     avgSlippage: number;
     tradeCount: number;
 };
+
+// --- Priority 5 Analytics Types ---
+export type BehavioralMetric = {
+    title: string;
+    value: string;
+    target: string;
+    status: 'good' | 'warning' | 'bad';
+    description: string;
+};
+
+export type BehavioralDataPoint = {
+    date: string;
+    tradesPerDay: number;
+    avgHoldTime: number; // in hours
+    winRate: number;
+};

@@ -3,7 +3,7 @@ import React, { useState, useMemo } from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Share2, Download } from 'lucide-react';
+import { Share2, Download, TestTube, ChevronsRight } from 'lucide-react';
 import MonteCarloChart from '@/components/analytics/monte-carlo-chart';
 import VarCvarPanel from '@/components/analytics/var-cvar-panel';
 import FactorExposureChart from '@/components/analytics/factor-exposure-chart';
@@ -71,8 +71,27 @@ export default function Priority2AnalyticsPage() {
                         <MonteCarloChart data={mcData} />
                     </CardContent>
                 </Card>
-                <div className="lg:col-span-1">
+                <div className="lg:col-span-1 flex flex-col gap-6">
                     <VarCvarPanel dailyReturns={mockDailyReturns} />
+                    <Card className="bg-muted/30">
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2">
+                                <TestTube className="w-5 h-5 text-purple-400"/>
+                                Advanced MC Analysis
+                            </CardTitle>
+                            <CardDescription>Attribution and scenario analysis for simulations.</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <p className="text-sm text-muted-foreground">
+                                Deeper analysis of simulation results, including factor attribution for tail risk and probability cones for specific market scenarios.
+                            </p>
+                        </CardContent>
+                        <CardFooter>
+                            <Button variant="secondary" className="w-full" disabled>
+                                Explore Attribution <ChevronsRight className="ml-2 w-4 h-4"/>
+                            </Button>
+                        </CardFooter>
+                    </Card>
                 </div>
             </div>
 

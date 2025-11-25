@@ -1,4 +1,4 @@
-import type { Trade, Kpi, ChartData, RollingMetric, StrategyContribution, PnlCalendarData, ExpectancyData, TimeOfDayData, DailyReturn, FactorReturns, MonteCarloData, RollingBeta, CohortDataPoint, HistoricalEquityPoint, Anomaly, FactorAttribution, RegimePerformance, EdgeDecayDataPoint, SlippageData } from './types';
+import type { Trade, Kpi, ChartData, RollingMetric, StrategyContribution, PnlCalendarData, ExpectancyData, TimeOfDayData, DailyReturn, FactorReturns, MonteCarloData, RollingBeta, CohortDataPoint, HistoricalEquityPoint, Anomaly, FactorAttribution, RegimePerformance, EdgeDecayDataPoint, SlippageData, BehavioralMetric, BehavioralDataPoint } from './types';
 
 export const mockTrades: Trade[] = [
   { id: 'T001', entryTime: '2023-10-26 09:30', exitTime: '2023-10-26 10:00', symbol: 'RELIANCE', direction: 'Long', size: 100, entryPrice: 2300.50, exitPrice: 2315.75, realizedPnl: 1525.00, pnlPercent: 0.66, currency: 'INR', strategy: 'Breakout', status: 'Closed', entryDate: '2023-10-26T09:30:00Z', exitDate: '2023-10-26T10:00:00Z', slippage: 0.05, durationSeconds: 1800, broker: 'Zerodha' },
@@ -198,3 +198,24 @@ export const mockSlippageData: SlippageData[] = [
     { broker: 'OANDA', instrument: 'EUR/USD', avgSlippage: 0.00015, tradeCount: 200 },
     { broker: 'Coinbase', instrument: 'BTC/USD', avgSlippage: 12.50, tradeCount: 80 },
 ];
+
+// --- Priority 5 Mock Data ---
+
+export const mockBehavioralMetrics: BehavioralMetric[] = [
+    { title: 'Trades Per Day', value: '4.5', target: '< 10', status: 'good', description: 'Daily average over the last 30 days.' },
+    { title: 'Avg Hold Time', value: '2.3 hrs', target: '> 1 hr', status: 'good', description: 'Average duration of a winning trade.' },
+    { title: 'Consecutive Losses', value: '3', target: '< 5', status: 'warning', description: 'Current losing streak.' },
+    { title: 'Revenge Trading', value: '8%', target: '< 5%', status: 'bad', description: 'Trades made within 15 mins of a large loss.' },
+];
+
+
+export const mockBehavioralTrend: BehavioralDataPoint[] = Array.from({ length: 30 }, (_, i) => {
+    const date = new Date();
+    date.setDate(date.getDate() - 30 + i);
+    return {
+        date: date.toISOString(),
+        tradesPerDay: Math.floor(Math.random() * 15) + 1,
+        avgHoldTime: Math.random() * 8, // hours
+        winRate: 0.4 + Math.random() * 0.3,
+    };
+});
