@@ -19,6 +19,7 @@ const navItems = [
     { href: '/import', label: 'Import' },
     { href: '/analytics', label: 'Analytics' },
     { href: '/behavioral', label: 'Behavioral' },
+    { href: '/enterprise', label: 'Enterprise' },
 ];
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
