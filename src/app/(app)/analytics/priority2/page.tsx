@@ -33,10 +33,6 @@ export default function Priority2AnalyticsPage() {
                 </div>
                 <div className="flex items-center gap-2">
                     <Button variant="outline">
-                        <Share2 className="mr-2 h-4 w-4" />
-                        Share View
-                    </Button>
-                    <Button variant="outline">
                         <Download className="mr-2 h-4 w-4" />
                         Export PDF
                     </Button>
