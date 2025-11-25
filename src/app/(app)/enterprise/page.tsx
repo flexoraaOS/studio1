@@ -8,15 +8,8 @@ import { DateRangePicker } from '@/components/date-range-picker';
 import { DateRange } from 'react-day-picker';
 import { addDays, subYears } from 'date-fns';
 import { Filter } from 'lucide-react';
-import PlaybookBuilder from '@/components/enterprise/PlaybookBuilder';
 import PerformanceMatrix from '@/components/enterprise/PerformanceMatrix';
-import NLPCompanionPanel from '@/components/enterprise/NLPCompanionPanel';
 import RiskMatrix from '@/components/enterprise/RiskMatrix';
-import TradeBookQualityScore from '@/components/enterprise/TradeBookQualityScore';
-import CrossStrategyConflict from '@/components/enterprise/CrossStrategyConflict';
-import PlaybookAdherenceScore from '@/components/enterprise/PlaybookAdherenceScore';
-import HotspotDetection from '@/components/enterprise/HotspotDetection';
-
 
 // export const metadata: Metadata = {
 //     title: 'Enterprise Analytics | TradeSight Pro',
@@ -69,27 +62,9 @@ export default function EnterpriseDashboardPage() {
             </div>
 
             {/* Main Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                
-                {/* Column 1: Interaction & Psychology */}
-                <div className="flex flex-col gap-6">
-                    <NLPCompanionPanel />
-                </div>
-
-                {/* Column 2: Core Analytics & Risk */}
-                <div className="flex flex-col gap-6">
-                    <PerformanceMatrix />
-                </div>
-                
-                {/* Column 3: Playbooks & Quality */}
-                <div className="flex flex-col gap-6">
-                    <HotspotDetection />
-                </div>
-            </div>
-
-            {/* Second Row: Deep Dive Matrices */}
-            <div className="grid grid-cols-1 gap-6">
-                <RiskMatrix />
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                 <PerformanceMatrix />
+                 <RiskMatrix />
             </div>
 
         </div>

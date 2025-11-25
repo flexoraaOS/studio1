@@ -1,6 +1,6 @@
 'use client'
 import React, {useState, useMemo} from 'react';
-import { TrendingUp, TrendingDown, Target, Scale, Hash, HeartPulse, AreaChart, BarChart, LineChart, TestTube, Dna } from 'lucide-react';
+import { TrendingUp, TrendingDown, Target, Scale, Hash, HeartPulse, AreaChart, BarChart, LineChart, TestTube, Dna, Bot } from 'lucide-react';
 import { mockKpis, mockEquityCurve, mockTrades, mockPnlCalendar, mockPerformanceData } from '@/lib/data';
 import KpiCard from '@/components/dashboard/kpi-card';
 import EquityChart from '@/components/dashboard/equity-chart';
@@ -17,6 +17,7 @@ import { Button } from '@/components/ui/button';
 import { Kpi } from '@/lib/types';
 import TraderDNAReport from '@/components/enterprise/TraderDNAReport';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
+import NLPCompanionDialog from '@/components/enterprise/NLPCompanionDialog';
 
 
 const kpiIcons = {
@@ -85,6 +86,11 @@ export default function DashboardPage() {
                 <h1 className="text-3xl font-bold tracking-tight font-headline text-gradient">Dashboard</h1>
                 <div className="flex items-center gap-2">
                     <DateRangePicker date={date} setDate={setDate} />
+                    <NLPCompanionDialog>
+                        <Button variant="outline" size="icon">
+                            <Bot className="w-4 h-4 text-primary"/>
+                        </Button>
+                    </NLPCompanionDialog>
                 </div>
             </div>
 
