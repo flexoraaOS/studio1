@@ -124,3 +124,9 @@ export type RollingMetric<T extends string> = {
 } & {
     [key in T]: number;
 };
+
+// --- Priority 3 Analytics Types ---
+export type CohortDataPoint = {
+    day: number;
+    [cohortName: string]: number; // cohortName will be e.g., "2023-01", value is cumulative PnL
+};

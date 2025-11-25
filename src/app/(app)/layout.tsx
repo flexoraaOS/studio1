@@ -18,8 +18,6 @@ const navItems = [
     { href: '/trades', label: 'Trades' },
     { href: '/import', label: 'Import' },
     { href: '/analytics', label: 'Analytics' },
-    { href: '/analytics/priority2', label: 'Advanced Analytics' },
-    { href: '/settings', label: 'Settings' },
 ];
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
@@ -55,7 +53,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     if (isUserLoading || !user) {
         // This will show a loading screen but won't redirect.
         // Once not loading, if there's no user, it will proceed to render children
-        // which might have তাদের own logic, or just appear broken without user data.
+        // which might have their own logic, or just appear broken without user data.
         // For the dev button, this is what we want.
     }
 

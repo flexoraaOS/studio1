@@ -77,6 +77,23 @@ export default function AnalyticsPage() {
                 </CardContent>
             </Card>
 
+            <Card className="bg-card/30">
+                <CardHeader>
+                    <CardTitle>Priority-3 Advanced Analytics</CardTitle>
+                    <CardDescription>Explore advanced analytics including Cohort Analysis and more.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <p className="mb-4 text-sm">
+                        This section contains institutional-grade analytics for deeper behavioral and edge-decay analysis.
+                    </p>
+                    <Button asChild>
+                        <Link href="/analytics/priority3">
+                            Go to Cohort Analysis
+                        </Link>
+                    </Button>
+                </CardContent>
+            </Card>
+
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                 {mockKpis.map((kpi) => (
                     <KpiCard

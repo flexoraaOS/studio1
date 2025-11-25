@@ -1,4 +1,4 @@
-import type { Trade, Kpi, ChartData, RollingMetric, StrategyContribution, PnlCalendarData, ExpectancyData, TimeOfDayData, DailyReturn, FactorReturns, MonteCarloData, RollingBeta } from './types';
+import type { Trade, Kpi, ChartData, RollingMetric, StrategyContribution, PnlCalendarData, ExpectancyData, TimeOfDayData, DailyReturn, FactorReturns, MonteCarloData, RollingBeta, CohortDataPoint } from './types';
 
 export const mockTrades: Trade[] = [
   { id: 'T001', entryTime: '2023-10-26 09:30', exitTime: '2023-10-26 10:00', symbol: 'RELIANCE', direction: 'Long', size: 100, entryPrice: 2300.50, exitPrice: 2315.75, realizedPnl: 1525.00, pnlPercent: 0.66, currency: 'INR', strategy: 'Breakout', status: 'Closed', entryDate: '2023-10-26T09:30:00Z', exitDate: '2023-10-26T10:00:00Z' },
@@ -143,3 +143,17 @@ mockDailyReturns.forEach(dr => {
     mockFactorReturns.SMB.push((Math.random() - 0.5) * 0.005);
     mockFactorReturns.HML.push((Math.random() - 0.5) * 0.004);
 });
+
+// --- Priority 3 Mock Data ---
+
+export const mockCohortData: { cohorts: Record<string, number[]>, cohortNames: string[] } = {
+  cohortNames: ["2023-01", "2023-02", "2023-03", "2023-04", "2023-05", "2023-06"],
+  cohorts: {
+    "2023-01": [0, 100, 150, 120, 200, 220, 210, 250, 240, 230, 260, 280],
+    "2023-02": [0, 80, 110, 130, 125, 140, 160, 150, 170, 190, 180],
+    "2023-03": [0, 120, 100, 90, 80, 70, 60, 50, 40, 30],
+    "2023-04": [0, 50, 60, 70, 80, 90, 100, 110],
+    "2023-05": [0, 200, 220, 240, 230, 250],
+    "2023-06": [0, -50, -40, -30],
+  },
+};
