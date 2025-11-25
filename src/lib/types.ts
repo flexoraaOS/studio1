@@ -1,4 +1,3 @@
-
 export type Trade = {
   id: string;
   entryTime: string;
@@ -62,4 +61,66 @@ export type TimeOfDayData = {
     pnl: number;
     winRate: number;
     tradeCount: number;
+};
+
+
+// --- Priority 2 Analytics Types ---
+
+export type DailyReturn = {
+  date: string;
+  return: number;
+  isWin: boolean;
+};
+
+export type FactorReturns = {
+  dates: string[];
+  Mkt_RF: number[];
+  SMB: number[];
+  HML: number[];
+};
+
+export type HistoricalEquityPoint = {
+    date: string;
+    equity: number;
+};
+
+export type MonteCarloSimulation = number[]; // An array of equity values over time for one simulation
+
+export type MonteCarloPercentiles = {
+    p5: number;
+    p25: number;
+    p50: number; // Median
+    p75: number;
+    p95: number;
+};
+
+export type MonteCarloData = {
+    actualEquity: HistoricalEquityPoint[];
+    simulations: MonteCarloSimulation[];
+    percentiles: MonteCarloPercentiles[];
+};
+
+export type VarAnalysis = {
+    var: number;
+    cvar: number;
+};
+
+export type RollingBeta = {
+    date: string;
+    betas: {
+        'Mkt_RF'?: number;
+        'SMB'?: number;
+        'HML'?: number;
+    };
+    ci: {
+       'Mkt_RF'?: { lower: number; upper: number };
+       'SMB'?: { lower: number; upper: number };
+       'HML'?: { lower: number; upper: number };
+    }
+};
+
+export type RollingMetric<T extends string> = {
+    date: string;
+} & {
+    [key in T]: number;
 };

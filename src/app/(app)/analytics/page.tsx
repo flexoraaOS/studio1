@@ -1,7 +1,6 @@
-
 'use client';
 import React, {useState, useMemo} from 'react';
-import { TrendingUp, TrendingDown, Target } from 'lucide-react';
+import { TrendingUp, TrendingDown, Target, HelpCircle } from 'lucide-react';
 import {
     mockKpis,
     mockEquityCurve,
@@ -24,6 +23,9 @@ import { DateRange } from 'react-day-picker';
 import { addDays } from 'date-fns';
 import ExpectancyTable from '@/components/analytics/expectancy-table';
 import TimeOfDayMatrix from '@/components/analytics/time-of-day-matrix';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 const kpiIcons = {
     "Realized P&L": <TrendingUp className="text-green-500" />,
@@ -60,11 +62,28 @@ export default function AnalyticsPage() {
         <div className="flex flex-col gap-6">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-4">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight font-headline text-gradient">Advanced Analytics</h1>
+                    <h1 className="text-3xl font-bold tracking-tight font-headline text-gradient">Analytics Dashboard</h1>
                     <p className="text-muted-foreground">Deep dive into your trading performance.</p>
                 </div>
                  <DateRangePicker date={date} setDate={setDate} />
             </div>
+
+            <Card className="bg-card/30">
+                <CardHeader>
+                    <CardTitle>Priority-2 Advanced Analytics</CardTitle>
+                    <CardDescription>Explore advanced quantitative metrics including Monte Carlo simulations, VaR, and factor analysis.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <p className="mb-4 text-sm">
+                        This section contains institutional-grade analytics for deeper risk and performance analysis. Click below to explore these advanced modules.
+                    </p>
+                    <Button asChild>
+                        <Link href="/analytics/priority2">
+                            Go to Advanced Analytics
+                        </Link>
+                    </Button>
+                </CardContent>
+            </Card>
 
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                 {mockKpis.map((kpi) => (

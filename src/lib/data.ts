@@ -1,5 +1,4 @@
-
-import type { Trade, Kpi, ChartData, RollingMetric, StrategyContribution, PnlCalendarData, ExpectancyData, TimeOfDayData } from './types';
+import type { Trade, Kpi, ChartData, RollingMetric, StrategyContribution, PnlCalendarData, ExpectancyData, TimeOfDayData, DailyReturn, FactorReturns, MonteCarloData, RollingBeta } from './types';
 
 export const mockTrades: Trade[] = [
   { id: 'T001', entryTime: '2023-10-26 09:30', exitTime: '2023-10-26 10:00', symbol: 'RELIANCE', direction: 'Long', size: 100, entryPrice: 2300.50, exitPrice: 2315.75, realizedPnl: 1525.00, pnlPercent: 0.66, currency: 'INR', strategy: 'Breakout', status: 'Closed', entryDate: '2023-10-26T09:30:00Z', exitDate: '2023-10-26T10:00:00Z' },
@@ -93,4 +92,54 @@ export const mockTimeOfDayData: TimeOfDayData[] = Array.from({ length: 17 }, (_,
         winRate: 0.4 + Math.random() * 0.3, // win rate between 40% and 70%
         tradeCount: Math.floor(Math.random() * 20) + 5,
     };
+});
+
+
+// --- Priority 2 Mock Data ---
+
+// Generate a realistic 3-year historical equity curve
+export const mockHistoricalEquity: { date: string; equity: number }[] = [];
+let lastEquity = 100000;
+const startDate = new Date();
+startDate.setFullYear(startDate.getFullYear() - 3);
+
+for (let i = 0; i < 365 * 3; i++) {
+    const date = new Date(startDate);
+    date.setDate(date.getDate() + i);
+    const dailyReturn = (Math.random() - 0.49) * 0.03; // Avg daily return slightly positive, with volatility
+    lastEquity *= (1 + dailyReturn);
+    // Add some larger shock events
+    if (i % 100 === 0) lastEquity *= (1 + (Math.random() - 0.5) * 0.1);
+
+    mockHistoricalEquity.push({
+        date: date.toISOString(),
+        equity: lastEquity,
+    });
+}
+
+// Generate daily returns from the equity curve
+export const mockDailyReturns: DailyReturn[] = mockHistoricalEquity.slice(1).map((current, i) => {
+    const previous = mockHistoricalEquity[i];
+    const dailyReturn = (current.equity - previous.equity) / previous.equity;
+    return {
+        date: current.date,
+        return: dailyReturn,
+        isWin: dailyReturn > 0,
+    };
+});
+
+// Mock Fama-French factor returns
+export const mockFactorReturns: FactorReturns = {
+    dates: [],
+    Mkt_RF: [],
+    SMB: [],
+    HML: [],
+};
+
+mockDailyReturns.forEach(dr => {
+    mockFactorReturns.dates.push(dr.date);
+    // Simulate some correlation with the market and other factors
+    mockFactorReturns.Mkt_RF.push(dr.return * 0.8 + (Math.random() - 0.5) * 0.01);
+    mockFactorReturns.SMB.push((Math.random() - 0.5) * 0.005);
+    mockFactorReturns.HML.push((Math.random() - 0.5) * 0.004);
 });

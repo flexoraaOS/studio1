@@ -18,6 +18,7 @@ const navItems = [
     { href: '/trades', label: 'Trades' },
     { href: '/import', label: 'Import' },
     { href: '/analytics', label: 'Analytics' },
+    { href: '/analytics/priority2', label: 'Advanced Analytics' },
     { href: '/settings', label: 'Settings' },
 ];
 
