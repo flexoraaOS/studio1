@@ -17,6 +17,7 @@ import CrossStrategyConflict from '@/components/enterprise/CrossStrategyConflict
 import ExposurePyramid from '@/components/enterprise/ExposurePyramid';
 import PlaybookAdherenceScore from '@/components/enterprise/PlaybookAdherenceScore';
 import HotspotDetection from '@/components/enterprise/HotspotDetection';
+import ImprovementPlanner from '@/components/enterprise/ImprovementPlanner';
 
 
 // export const metadata: Metadata = {
@@ -79,25 +80,21 @@ export default function EnterpriseDashboardPage() {
 
                 {/* Column 2: Core Analytics & Risk */}
                 <div className="flex flex-col gap-6">
-                    
+                    <PerformanceMatrix />
                 </div>
                 
                 {/* Column 3: Playbooks & Quality */}
                 <div className="flex flex-col gap-6">
-                    
+                    <ImprovementPlanner />
                 </div>
             </div>
 
             {/* Second Row: Deep Dive Matrices */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <PerformanceMatrix />
                 <RiskMatrix />
+                <ExposurePyramid />
             </div>
 
-            {/* Third Row: Detections */}
-             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <ExposurePyramid />
-             </div>
         </div>
     );
 }

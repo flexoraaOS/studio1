@@ -1,6 +1,6 @@
 'use client'
 import React, {useState, useMemo} from 'react';
-import { TrendingUp, TrendingDown, Target, Scale, Hash, HeartPulse, AreaChart, BarChart, LineChart, TestTube } from 'lucide-react';
+import { TrendingUp, TrendingDown, Target, Scale, Hash, HeartPulse, AreaChart, BarChart, LineChart, TestTube, Dna } from 'lucide-react';
 import { mockKpis, mockEquityCurve, mockTrades, mockPnlCalendar, mockPerformanceData } from '@/lib/data';
 import KpiCard from '@/components/dashboard/kpi-card';
 import EquityChart from '@/components/dashboard/equity-chart';
@@ -15,6 +15,9 @@ import PerformanceChart from '@/components/dashboard/performance-chart';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Kpi } from '@/lib/types';
+import TraderDNAReport from '@/components/enterprise/TraderDNAReport';
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
+
 
 const kpiIcons = {
     "Realized P&L": <TrendingUp className="text-green-500" />,
@@ -115,7 +118,7 @@ export default function DashboardPage() {
                         <CardTitle>Advanced Analytics</CardTitle>
                         <CardDescription>Explore deeper insights into your trading performance.</CardDescription>
                     </CardHeader>
-                    <CardContent className="grid gap-4 md:grid-cols-3">
+                    <CardContent className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                          {analyticsSections.map(section => (
                             <Card key={section.title} className="flex flex-col">
                                 <CardHeader>
@@ -136,6 +139,29 @@ export default function DashboardPage() {
                                 </CardFooter>
                             </Card>
                          ))}
+                         <Dialog>
+                            <DialogTrigger asChild>
+                                 <Card className="flex flex-col cursor-pointer hover:bg-muted/50 transition-colors">
+                                    <CardHeader>
+                                        <div className="flex items-start gap-4">
+                                            <Dna className="w-8 h-8 text-primary" />
+                                            <div>
+                                                <CardTitle className="text-lg">Trader DNA Report</CardTitle>
+                                                <CardDescription className="text-xs">Your unique trading personality profile.</CardDescription>
+                                            </div>
+                                        </div>
+                                    </CardHeader>
+                                    <CardFooter className="mt-auto">
+                                        <Button className="w-full" variant="secondary">
+                                            View Report
+                                        </Button>
+                                    </CardFooter>
+                                </Card>
+                            </DialogTrigger>
+                            <DialogContent>
+                                <TraderDNAReport />
+                            </DialogContent>
+                        </Dialog>
                     </CardContent>
                 </Card>
             </div>
