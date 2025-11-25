@@ -18,6 +18,7 @@ const navItems = [
     { href: '/dashboard', label: 'Dashboard' },
     { href: '/trades', label: 'Trades' },
     { href: '/import', label: 'Import' },
+    { href: '/strategy', label: 'Strategy' },
     { href: '/analytics', label: 'Analytics' },
     { href: '/behavioral', label: 'Behavioral' },
     { href: 'reminders', label: 'Reminders' },

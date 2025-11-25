@@ -87,9 +87,7 @@ export default function EnterpriseDashboardPage() {
                 
                 {/* Column 3: Playbooks & Quality */}
                 <div className="flex flex-col gap-6">
-                    <PlaybookBuilder />
-                    <TradeBookQualityScore />
-                    <PlaybookAdherenceScore />
+                    
                 </div>
             </div>
 
@@ -101,8 +99,6 @@ export default function EnterpriseDashboardPage() {
 
             {/* Third Row: Detections */}
              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <CrossStrategyConflict />
-                <HotspotDetection />
                 <ExposurePyramid />
              </div>
         </div>
