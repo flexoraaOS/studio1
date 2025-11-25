@@ -48,9 +48,6 @@ export default function DraftsList({ onOpenDraft }: DraftsListProps) {
 
   return (
     <Card className="bg-transparent border-white/10 rounded-sm">
-      <CardHeader className="p-3">
-        <CardTitle className="text-sm font-semibold">Prepared Drafts</CardTitle>
-      </CardHeader>
       <CardContent className="p-0">
         <ScrollArea className="h-40">
           {drafts.length > 0 ? (
