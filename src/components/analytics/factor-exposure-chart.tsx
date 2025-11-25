@@ -107,7 +107,7 @@ export default function FactorExposureChart({ strategyReturns, factorReturns }: 
                     <Area
                         dataKey="confidenceInterval"
                         type="monotone"
-                        fill={chartConfig[selectedFactor].color}
+                        fill={chartConfig[selectedFactor]?.color ?? 'hsl(var(--chart-1))'}
                         fillOpacity={0.2}
                         stroke="none"
                         name="95% CI"
@@ -116,10 +116,10 @@ export default function FactorExposureChart({ strategyReturns, factorReturns }: 
                     <Line
                         type="monotone"
                         dataKey={selectedFactor}
-                        stroke={chartConfig[selectedFactor].color}
+                        stroke={chartConfig[selectedFactor]?.color ?? 'hsl(var(--chart-1))'}
                         strokeWidth={2}
                         dot={false}
-                        name={`Beta (${chartConfig[selectedFactor].label})`}
+                        name={`Beta (${chartConfig[selectedFactor]?.label})`}
                     />
                 </ComposedChart>
             </ChartContainer>

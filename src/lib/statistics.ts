@@ -240,10 +240,13 @@ function ols(y: number[], x: number[]): { beta: number; alpha: number, stdErr: n
     const numerator = x.reduce((acc, xi, i) => acc + (xi - meanX) * (y[i] - meanY), 0);
     const denominator = x.reduce((acc, xi) => acc + Math.pow(xi - meanX, 2), 0);
 
-    const beta = numerator / denominator;
+    const beta = denominator === 0 ? 0 : numerator / denominator;
     const alpha = meanY - beta * meanX;
 
     // Calculate Standard Error of the beta coefficient
+    if (n <= 2 || denominator === 0) {
+        return { beta, alpha, stdErr: 0 };
+    }
     const predictions = x.map(xi => alpha + beta * xi);
     const residuals = y.map((yi, i) => yi - predictions[i]);
     const residualSumOfSquares = residuals.reduce((acc, res) => acc + res * res, 0);
@@ -276,13 +279,17 @@ export function calculateRollingBetas(
     for (let i = windowSize - 1; i < factorReturns.dates.length; i++) {
         const windowDates = factorReturns.dates.slice(i - windowSize + 1, i + 1);
         
-        const y = windowDates.map(date => returnsMap.get(new Date(date).toDateString()) || 0);
+        const y = windowDates.map(date => returnsMap.get(new Date(date).toDateString()) || 0).filter(v => !isNaN(v));
+
+        if (y.length < windowSize) continue;
 
         const betas: { [key in Factor]?: number } = {};
         const ci: { [key in Factor]?: { lower: number; upper: number } } = {};
 
         factors.forEach(factor => {
             const factorData = factorReturns[factor];
+            if(!factorData) return;
+            
             const x = factorData.slice(i - windowSize + 1, i + 1);
             
             if (y.length === x.length) {
