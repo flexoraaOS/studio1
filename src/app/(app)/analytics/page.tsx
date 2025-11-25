@@ -7,7 +7,9 @@ import {
     mockPerformanceData,
     mockRollingMetrics,
     mockStrategyContributions,
-    mockPnlCalendar
+    mockPnlCalendar,
+    mockExpectancyData,
+    mockTimeOfDayData,
 } from '@/lib/data';
 import KpiCard from '@/components/dashboard/kpi-card';
 import EquityChart from '@/components/dashboard/equity-chart';
@@ -19,6 +21,8 @@ import PnlCalendar from '@/components/analytics/pnl-calendar';
 import { DateRangePicker } from '@/components/date-range-picker';
 import { DateRange } from 'react-day-picker';
 import { addDays } from 'date-fns';
+import ExpectancyTable from '@/components/analytics/expectancy-table';
+import TimeOfDayMatrix from '@/components/analytics/time-of-day-matrix';
 
 const kpiIcons = {
     "Realized P&L": <TrendingUp className="text-green-500" />,
@@ -69,6 +73,14 @@ export default function AnalyticsPage() {
                         icon={kpiIcons[kpi.title as keyof typeof kpiIcons]}
                     />
                 ))}
+            </div>
+
+            <div className="grid gap-4 lg:grid-cols-1">
+                <ExpectancyTable data={mockExpectancyData} />
+            </div>
+            
+            <div className="grid gap-4 lg:grid-cols-1">
+                <TimeOfDayMatrix data={mockTimeOfDayData} />
             </div>
 
             <div className="grid gap-4 lg:grid-cols-2">

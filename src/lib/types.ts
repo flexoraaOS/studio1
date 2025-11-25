@@ -45,3 +45,20 @@ export type PnlCalendarData = {
     date: string;
     pnl: number;
 }
+
+export type ExpectancyData = {
+    strategy: string;
+    expectancy: number;
+    winRate: number;
+    avgWin: number;
+    lossRate: number;
+    avgLoss: number;
+    tradeCount: number;
+};
+
+export type TimeOfDayData = {
+    hour: number;
+    pnl: number;
+    winRate: number;
+    tradeCount: number;
+};

@@ -1,4 +1,4 @@
-import type { Trade, Kpi, ChartData, RollingMetric, StrategyContribution, PnlCalendarData } from './types';
+import type { Trade, Kpi, ChartData, RollingMetric, StrategyContribution, PnlCalendarData, ExpectancyData, TimeOfDayData } from './types';
 
 export const mockTrades: Trade[] = [
   { id: 'T001', entryTime: '2023-10-26 09:30', exitTime: '2023-10-26 10:00', symbol: 'RELIANCE', direction: 'Long', size: 100, entryPrice: 2300.50, exitPrice: 2315.75, realizedPnl: 1525.00, pnlPercent: 0.66, currency: 'INR', strategy: 'Breakout', status: 'Closed', entryDate: '2023-10-26T09:30:00Z', exitDate: '2023-10-26T10:00:00Z' },
@@ -74,5 +74,22 @@ export const mockPnlCalendar: PnlCalendarData[] = Array.from({ length: 365 }, (_
     return {
         date: date.toISOString().split('T')[0],
         pnl,
+    };
+});
+
+export const mockExpectancyData: ExpectancyData[] = [
+    { strategy: 'Breakout', expectancy: 150.75, winRate: 0.65, avgWin: 450.25, lossRate: 0.35, avgLoss: 250.00, tradeCount: 50 },
+    { strategy: 'Momentum', expectancy: 210.20, winRate: 0.58, avgWin: 750.50, lossRate: 0.42, avgLoss: 420.10, tradeCount: 75 },
+    { strategy: 'Mean Reversion', expectancy: -50.10, winRate: 0.72, avgWin: 200.00, lossRate: 0.28, avgLoss: 700.50, tradeCount: 40 },
+    { strategy: 'Scalping', expectancy: 5.50, winRate: 0.85, avgWin: 25.00, lossRate: 0.15, avgLoss: 105.00, tradeCount: 250 },
+];
+
+export const mockTimeOfDayData: TimeOfDayData[] = Array.from({ length: 17 }, (_, i) => {
+    const hour = i + 8; // Trading hours from 8 AM to midnight
+    return {
+        hour,
+        pnl: (Math.random() - 0.4) * 2000,
+        winRate: 0.4 + Math.random() * 0.3, // win rate between 40% and 70%
+        tradeCount: Math.floor(Math.random() * 20) + 5,
     };
 });
