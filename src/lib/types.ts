@@ -1,3 +1,4 @@
+
 export type Trade = {
   id: string;
   entryTime: string;

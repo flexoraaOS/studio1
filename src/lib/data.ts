@@ -1,3 +1,4 @@
+
 import type { Trade, Kpi, ChartData, RollingMetric, StrategyContribution, PnlCalendarData, ExpectancyData, TimeOfDayData } from './types';
 
 export const mockTrades: Trade[] = [
