@@ -5,9 +5,12 @@ import {
   Account,
   PlaybookTemplate,
   PerformanceMatrixData,
+  RiskMatrixData,
   Timeframe,
   PerformanceMetric,
-  RiskOfRuinParams
+  RiskOfRuinParams,
+  TradeBookQualityScore,
+  StrategyCorrelation
 } from './types';
 
 const SEED = 'tradesightpro';
@@ -155,3 +158,39 @@ export const mockPerformanceMatrix: PerformanceMatrixData = {
 export const mockTrades3Years = generateMockTrades(1500, 3 * 365);
 export const mockEquity3YearsAcc1 = generateMockEquityCurve(3 * 365, 100000, 'acc_01');
 export const mockEquity3YearsAcc2 = generateMockEquityCurve(3 * 365, 50000, 'acc_02');
+
+
+export const mockRiskMatrix: RiskMatrixData[] = [];
+const tradeTypes = ['Momentum', 'Mean Reversion', 'Breakout'];
+const regimes = ['High Vol', 'Low Vol', 'Trending', 'Ranging'];
+
+tradeTypes.forEach(type => {
+  regimes.forEach(regime => {
+    mockRiskMatrix.push({
+      tradeType: type,
+      marketRegime: regime,
+      expectancy: (random() - 0.3) * 200,
+      confidence: random() * 0.5 + 0.5,
+      tradeCount: Math.floor(random() * 50) + 10,
+    });
+  });
+});
+
+export const mockTradeBookQualityScore: TradeBookQualityScore = {
+    overallScore: 78,
+    rMultipleDistribution: [
+        { r: -3, count: 5 }, { r: -2, count: 15 }, { r: -1, count: 40 },
+        { r: 0, count: 10 }, { r: 1, count: 35 }, { r: 2, count: 25 },
+        { r: 3, count: 10 }, { r: 5, count: 5 }
+    ],
+    planAdherence: 0.85,
+    exitEfficiency: 0.72,
+    riskManagement: 0.9,
+    discipline: 0.68,
+};
+
+export const mockStrategyCorrelations: StrategyCorrelation[] = [
+    { strategyA: 'Momentum', strategyB: 'Mean Reversion', correlation: -0.65 },
+    { strategyA: 'Momentum', strategyB: 'Breakout', correlation: 0.78 },
+    { strategyA: 'Mean Reversion', strategyB: 'Breakout', correlation: -0.21 },
+];

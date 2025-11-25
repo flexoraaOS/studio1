@@ -97,13 +97,15 @@ export type TradeBookQualityScore = {
   rMultipleDistribution: RMultipleDistribution[];
   planAdherence: number; // 0-1
   exitEfficiency: number; // 0-1
+  riskManagement: number;
+  discipline: number;
 };
 
 // --- Feature 6: Risk-of-Ruin Dashboard ---
 
 export type RiskOfRuinParams = {
   riskPerTrade: number; // as percentage of bankroll
-  winRate: number; // 0-1
+  winRate: number; // 0-100
   avgWinLossRatio: number; // e.g., 2 for 2:1 R:R
   bankroll: number;
 };
