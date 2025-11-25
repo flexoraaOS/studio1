@@ -12,6 +12,7 @@ import SearchBar from '@/components/search-bar';
 import { cn } from '@/lib/utils';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { Skeleton } from '@/components/ui/skeleton';
+import { RemindersDialog } from '@/components/reminders/reminders-dialog';
 
 const navItems = [
     { href: '/dashboard', label: 'Dashboard' },
@@ -19,6 +20,7 @@ const navItems = [
     { href: '/import', label: 'Import' },
     { href: '/analytics', label: 'Analytics' },
     { href: '/behavioral', label: 'Behavioral' },
+    { href: 'reminders', label: 'Reminders' },
     { href: '/enterprise', label: 'Enterprise' },
 ];
 
@@ -70,15 +72,26 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                         <FlexoraaTraderOSLogo className="h-6 w-6" />
                         <span className="sr-only">Flexoraa TraderOS</span>
                     </Link>
-                    {navItems.map((item) => (
-                        <Link
-                            key={item.href}
-                            href={item.href}
-                            className="text-muted-foreground transition-colors hover:text-primary font-medium"
-                        >
-                            {item.label}
-                        </Link>
-                    ))}
+                    {navItems.map((item) => {
+                        if (item.href === 'reminders') {
+                            return (
+                                <RemindersDialog key={item.href}>
+                                    <button className="text-muted-foreground transition-colors hover:text-primary font-medium">
+                                        {item.label}
+                                    </button>
+                                </RemindersDialog>
+                            );
+                        }
+                        return (
+                            <Link
+                                key={item.href}
+                                href={item.href}
+                                className="text-muted-foreground transition-colors hover:text-primary font-medium"
+                            >
+                                {item.label}
+                            </Link>
+                        );
+                    })}
                 </nav>
                 <div className="flex w-full items-center gap-4 md:ml-auto md:gap-2 lg:gap-4">
                     <div className="ml-auto flex-1 sm:flex-initial">

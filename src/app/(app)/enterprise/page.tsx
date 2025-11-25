@@ -105,11 +105,6 @@ export default function EnterpriseDashboardPage() {
                 <HotspotDetection />
                 <ExposurePyramid />
              </div>
-             
-             {/* Fourth Row: Actionable Planner */}
-             <div className="grid grid-cols-1">
-                <ImprovementPlanner />
-             </div>
         </div>
     );
 }
