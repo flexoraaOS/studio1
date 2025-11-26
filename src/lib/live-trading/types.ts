@@ -1,6 +1,5 @@
 export type ISOString = string;
 export type InstrumentType = 'Stock' | 'Futures' | 'FX' | 'Options' | 'Crypto';
-export type OrderType = 'Market' | 'Limit';
 export type TradeSide = 'Long' | 'Short';
 export type InstrumentCategory = 
   | 'Forex Majors' | 'Forex Minors' | 'Forex Exotics' 
@@ -41,7 +40,7 @@ export interface LiveTradeSession {
   playbookId: string;
   instrument: Instrument;
   side: TradeSide;
-  size: number; // Represents lot size, e.g., 1.0 for a standard lot
+  size: number; // Represents lot size for FX, contracts for Futures, shares for Stocks etc.
 }
 
 // A pre-trade snapshot with selected strategy and parameters.
@@ -73,7 +72,7 @@ export type CompletedTrade = {
   playbookId: string;
   instrument: Instrument;
   side: TradeSide;
-  size: number; // Represents lot size
+  size: number; // Represents lot size/contracts/shares
   entryTimestamp: ISOString;
   exitTimestamp: ISOString;
   entryPrice: number;
@@ -81,6 +80,7 @@ export type CompletedTrade = {
   stopLoss: number;
   fees: number;
   pnl: number;
+  riskAmount: number; // The initial calculated risk
   rMultiple: number;
   slippage: number;
   notes: string;

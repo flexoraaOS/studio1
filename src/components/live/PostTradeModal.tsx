@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,8 +7,8 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle, XCircle, Upload, Save, AlertTriangle } from 'lucide-react';
-import { PlaybookTemplate, TradeDraft, CompletedTrade } from '@/lib/live-trading/types';
-import { computePnL, computeRMultiple } from '@/lib/live-trading/trade-utils';
+import { PlaybookTemplate, TradeDraft, CompletedTrade, LiveTradeSession } from '@/lib/live-trading/types';
+import { computeTradeMetrics } from '@/lib/live-trading/trade-engine';
 import { useDropzone } from 'react-dropzone';
 import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -45,15 +45,26 @@ interface PostTradeModalProps {
 export const PostTradeModal: React.FC<PostTradeModalProps> = ({ isOpen, onClose, onSave, initialState, playbooks }) => {
   const { mode, draft, existingTrade } = initialState;
   
-  const [entryPrice, setEntryPrice] = useState('');
-  const [exitPrice, setExitPrice] = useState('');
-  const [stopLoss, setStopLoss] = useState('');
-  const [fees, setFees] = useState('0');
+  const [entryPriceStr, setEntryPrice] = useState('');
+  const [exitPriceStr, setExitPrice] = useState('');
+  const [stopLossPriceStr, setStopLoss] = useState('');
+  const [feesStr, setFees] = useState('0');
   const [notes, setNotes] = useState('');
   const [tags, setTags] = useState('');
   const [screenshot, setScreenshot] = useState<string | null>(null);
 
-  const playbook = playbooks.find(p => p.id === (draft?.playbookId || existingTrade?.playbookId));
+  const activeSessionData: LiveTradeSession | CompletedTrade | null = useMemo(() => {
+    if (existingTrade) return existingTrade;
+    if (draft) return {
+      instrument: draft.params.instrument,
+      side: draft.params.side,
+      size: draft.params.size,
+      playbookId: draft.playbookId
+    };
+    return null;
+  }, [draft, existingTrade]);
+  
+  const playbook = playbooks.find(p => p.id === (activeSessionData?.playbookId));
   
   const [ruleAdherence, setRuleAdherence] = useState<Record<string, boolean>>({});
 
@@ -99,41 +110,45 @@ export const PostTradeModal: React.FC<PostTradeModalProps> = ({ isOpen, onClose,
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop, accept: {'image/*':[]} });
 
+  const { netPnl, rMultiple, riskAmount } = useMemo(() => computeTradeMetrics({
+      entryPriceStr,
+      exitPriceStr,
+      stopLossPriceStr: stopLossPriceStr,
+      feesStr,
+      session: activeSessionData
+  }), [entryPriceStr, exitPriceStr, stopLossPriceStr, feesStr, activeSessionData]);
+
+
   const handleSave = () => {
     const associatedDraft = draft || existingTrade;
-    if (!associatedDraft) return;
+    if (!associatedDraft || !activeSessionData) return;
 
     const baseTradeId = existingTrade?.id || `trade_${Date.now()}`;
     const baseDraftId = associatedDraft.id;
 
-    const instrument = draft?.params.instrument || existingTrade?.instrument;
-    const side = draft?.params.side || existingTrade?.side;
-    const lotSize = draft?.params.size || existingTrade?.size || 0;
-
-    const entry = parseFloat(entryPrice);
-    const exit = parseFloat(exitPrice);
-    const stop = parseFloat(stopLoss);
+    const entry = parseFloat(entryPriceStr);
+    const exit = parseFloat(exitPriceStr);
+    const stop = parseFloat(stopLossPriceStr);
+    const fees = parseFloat(feesStr);
     
-    if (isNaN(entry) || isNaN(exit) || !side || !instrument) return;
-
-    const pnl = computePnL(entry, exit, lotSize, side, instrument);
-    const rMultiple = computeRMultiple(entry, exit, stop, side);
+    if (isNaN(entry) || isNaN(exit) || isNaN(stop)) return;
 
     const newTrade: CompletedTrade = {
       id: baseTradeId,
       draftId: baseDraftId,
-      playbookId: associatedDraft.playbookId,
-      instrument: instrument,
-      side: side,
-      size: lotSize,
-      entryTimestamp: associatedDraft.createdAt || existingTrade?.entryTimestamp || new Date().toISOString(),
+      playbookId: activeSessionData.playbookId,
+      instrument: activeSessionData.instrument,
+      side: activeSessionData.side,
+      size: activeSessionData.size,
+      entryTimestamp: draft?.createdAt || existingTrade?.entryTimestamp || new Date().toISOString(),
       exitTimestamp: new Date().toISOString(),
       entryPrice: entry,
       exitPrice: exit,
       stopLoss: stop,
-      fees: parseFloat(fees),
-      pnl: pnl - parseFloat(fees || '0'),
+      fees: fees,
+      pnl: netPnl,
       rMultiple,
+      riskAmount: riskAmount,
       slippage: 0, // Placeholder
       notes,
       tags: tags.split(',').map(t => t.trim()).filter(Boolean),
@@ -147,32 +162,31 @@ export const PostTradeModal: React.FC<PostTradeModalProps> = ({ isOpen, onClose,
 
   const adherenceScore = playbook ? 
     (Object.values(ruleAdherence).filter(Boolean).length / playbook.rules.length) * 100 : 0;
-
-
-  const pnl = computePnL(parseFloat(entryPrice), parseFloat(exitPrice), draft?.params.size || existingTrade?.size || 0, draft?.params.side || existingTrade?.side || 'Long', draft?.params.instrument || existingTrade?.instrument);
-  const netPnl = pnl - parseFloat(fees || '0');
-  const rMultiple = computeRMultiple(parseFloat(entryPrice), parseFloat(exitPrice), parseFloat(stopLoss), draft?.params.side || existingTrade?.side || 'Long');
+  
+  const descriptionText = activeSessionData
+    ? `Finalize: ${activeSessionData.size} lots of ${activeSessionData.instrument.symbol} ${activeSessionData.side}`
+    : 'Enter trade details manually.';
 
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl bg-[#0F0F10] border-white/10 text-gray-200 font-code flex flex-col">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold text-white">{existingTrade ? 'Edit Trade' : 'Finalize Trade'}</DialogTitle>
+          <DialogTitle className="text-2xl font-bold text-white">{existingTrade ? 'Edit Finalized Trade' : 'Finalize Trade'}</DialogTitle>
           <DialogDescription className="text-gray-400">
-             {draft ? `Confirm details for: ${draft.params.instrument?.symbol} ${draft.params.side} @ ${draft.params.size} lots` : 'Enter trade details manually.'}
+             {descriptionText}
           </DialogDescription>
         </DialogHeader>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 py-4 flex-grow overflow-y-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 py-4 flex-grow overflow-hidden">
           {/* Left Column */}
           <div className="flex flex-col gap-6">
             
             {/* Price Inputs */}
             <div className="grid grid-cols-3 gap-4">
-              <div><Label htmlFor="entryPrice">Entry Price</Label><Input id="entryPrice" value={entryPrice} onChange={e => setEntryPrice(e.target.value)} className="bg-[#1A1A1B] border-white/10" /></div>
-              <div><Label htmlFor="exitPrice">Exit Price</Label><Input id="exitPrice" value={exitPrice} onChange={e => setExitPrice(e.target.value)} className="bg-[#1A1A1B] border-white/10" /></div>
-              <div><Label htmlFor="stopLoss">Stop Loss</Label><Input id="stopLoss" value={stopLoss} onChange={e => setStopLoss(e.target.value)} className="bg-[#1A1A1B] border-white/10" /></div>
+              <div><Label htmlFor="entryPrice">Entry Price</Label><Input id="entryPrice" value={entryPriceStr} onChange={e => setEntryPrice(e.target.value)} className="bg-[#1A1A1B] border-white/10" /></div>
+              <div><Label htmlFor="exitPrice">Exit Price</Label><Input id="exitPrice" value={exitPriceStr} onChange={e => setExitPrice(e.target.value)} className="bg-[#1A1A1B] border-white/10" /></div>
+              <div><Label htmlFor="stopLoss">Stop Loss</Label><Input id="stopLoss" value={stopLossPriceStr} onChange={e => setStopLoss(e.target.value)} className="bg-[#1A1A1B] border-white/10" /></div>
             </div>
             
             {/* P&L Section */}
@@ -191,14 +205,14 @@ export const PostTradeModal: React.FC<PostTradeModalProps> = ({ isOpen, onClose,
                 </div>
                  <div>
                   <Label htmlFor="fees" className="text-sm text-gray-400">Fees / Comm.</Label>
-                  <Input id="fees" value={fees} onChange={e => setFees(e.target.value)} className="bg-[#2a2a2c] border-white/10 mt-1 text-center" />
+                  <Input id="fees" value={feesStr} onChange={e => setFees(e.target.value)} className="bg-[#2a2a2c] border-white/10 mt-1 text-center" />
                 </div>
             </div>
 
             {/* Qualitative Inputs */}
             <div className="flex-1 flex flex-col gap-4">
                 <Label htmlFor="notes">Trade Rationale & Notes</Label>
-                <Textarea id="notes" value={notes} onChange={e => setNotes(e.target.value)} className="bg-[#1A1A1B] border-white/10 flex-1" placeholder="Pre-trade thoughts, execution notes..."/>
+                <Textarea id="notes" value={notes} onChange={e => setNotes(e.target.value)} className="bg-[#1A1A1B] border-white/10 flex-grow" placeholder="Pre-trade thoughts, execution notes..."/>
             </div>
 
             <div {...getRootProps()} className="p-4 border-2 border-dashed border-white/20 rounded-md text-center cursor-pointer hover:bg-white/5">
@@ -211,12 +225,12 @@ export const PostTradeModal: React.FC<PostTradeModalProps> = ({ isOpen, onClose,
           </div>
 
           {/* Right Column */}
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-4 overflow-hidden">
             <div>
               <h3 className="text-lg font-semibold text-white mb-2">Playbook Rule Adherence</h3>
               <p className="text-sm text-gray-500 mb-3">Review which rules were followed for this trade.</p>
             </div>
-            <ScrollArea className="h-full pr-2">
+            <ScrollArea className="flex-grow pr-2">
               <div className="space-y-3">
                 {playbook ? playbook.rules.map(rule => (
                   <div key={rule.id} className="p-3 bg-[#1A1A1B] border border-white/10 rounded-md flex items-center justify-between">
@@ -231,12 +245,12 @@ export const PostTradeModal: React.FC<PostTradeModalProps> = ({ isOpen, onClose,
                 )) : <p className="text-gray-500">No playbook associated with this draft.</p>}
               </div>
             </ScrollArea>
-            {playbook && <div className="p-3 bg-white/5 rounded-md text-center text-sm">Adherence Score: <span className="font-bold">{adherenceScore.toFixed(0)}%</span></div>}
+            {playbook && <div className="p-3 bg-white/5 rounded-md text-center text-sm mt-auto">Adherence Score: <span className="font-bold">{adherenceScore.toFixed(0)}%</span></div>}
           </div>
         </div>
         
-        <div className="pt-4 border-t border-white/10 flex justify-end">
-          <Button onClick={handleSave} variant="destructive" className="bg-[#FF3B47] text-white hover:bg-[#FF3B47]/80 shadow-[0_0_15px_rgba(255,59,71,0.5)] w-auto">
+        <div className="pt-4 mt-auto border-t border-white/10 flex justify-end">
+           <Button onClick={handleSave} variant="destructive" className="bg-[#FF3B47] text-white hover:bg-[#FF3B47]/80 shadow-[0_0_15px_rgba(255,59,71,0.5)] w-auto">
             <Save className="w-4 h-4 mr-2" />
             Save Finalized Trade
           </Button>
