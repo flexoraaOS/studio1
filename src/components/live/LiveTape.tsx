@@ -1,6 +1,7 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { ActiveTrade } from '@/lib/live-trading/types';
 import { cn } from '@/lib/utils';
 import { computePnL, computeRMultiple } from '@/lib/live-trading/trade-utils';
