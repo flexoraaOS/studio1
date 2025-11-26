@@ -28,18 +28,12 @@ export const useLiveTrading = () => {
   // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-        if (e.key.toLowerCase() === 's') {
-            e.preventDefault();
-            handlePrepareTrade();
-        }
         if (e.key.toLowerCase() === 'e') {
             e.preventDefault();
-            handleFinalizeTrade();
+            handleLogTrade();
         }
          if (e.key.toLowerCase() === 'k' && (e.ctrlKey || e.metaKey)) {
             e.preventDefault();
-            // This is a placeholder for focusing the instrument input.
-            // A more robust solution might use a ref or a global state.
             const instrumentTrigger = document.querySelector('[data-testid="instrument-select-trigger"]');
             if (instrumentTrigger instanceof HTMLElement) {
                 instrumentTrigger.focus();
@@ -49,51 +43,12 @@ export const useLiveTrading = () => {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [session, playbooks]); // Dependencies might need to be adjusted based on implementation details.
+  }, [session, playbooks]);
 
 
   const refreshBlotter = () => setBlotterKey(Date.now());
-
-  const handlePrepareTrade = useCallback(() => {
-    if (!session.instrument || !session.playbookId) {
-      toast({
-        variant: 'destructive',
-        title: "Cannot Prepare Trade",
-        description: "Please select a playbook and an instrument first.",
-      });
-      return;
-    };
-
-    const newDraft: TradeDraft = {
-      id: `draft_${Date.now()}`,
-      playbookId: session.playbookId,
-      playbookName: playbooks.find(p => p.id === session.playbookId)?.name || 'Unknown',
-      createdAt: new Date().toISOString(),
-      params: {
-        instrument: session.instrument,
-        side: session.side,
-        size: session.size,
-        riskPercent: session.riskPercent,
-        // Mock entry and stop-loss prices for demonstration
-        entryPrice: 1.0567, 
-        stopLoss: 1.0547,
-      },
-      notes: '',
-    };
-    
-    // We don't save the draft anymore as it's a transient object
-    setActiveTrade(newDraft); // Set as active context
-    
-    // Immediately open the modal to finalize
-    openModal({ 
-      mode: 'finalize',
-      draft: newDraft
-    });
-
-  }, [session, playbooks, openModal, toast]);
   
-  // This function now opens the modal for a manual entry (no pre-filled draft)
-  const handleFinalizeTrade = useCallback((activeDraft?: TradeDraft | null) => {
+  const handleLogTrade = useCallback((activeDraft?: TradeDraft | null) => {
     const draftToFinalize = activeDraft || {
       id: `draft_${Date.now()}`,
       playbookId: session.playbookId,
@@ -110,7 +65,7 @@ export const useLiveTrading = () => {
   
   const handleSaveTrade = (trade: CompletedTrade, draftId?: string) => {
     storage.saveTrade(trade);
-    setActiveTrade(null); // Clear the active context
+    setActiveTrade(null);
     refreshBlotter();
     toast({
       title: "Trade Logged",
@@ -129,8 +84,7 @@ export const useLiveTrading = () => {
     playbooks,
     activeTrade,
     blotterKey,
-    handlePrepareTrade,
-    handleFinalizeTrade,
+    handleLogTrade,
     handleSaveTrade,
     handleClearBlotter,
     modalState,

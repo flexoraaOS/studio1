@@ -13,12 +13,11 @@ interface LiveControlBarProps {
   session: LiveTradeSession;
   onSessionChange: (session: LiveTradeSession) => void;
   playbooks: PlaybookTemplate[];
-  onPrepareTrade: () => void;
-  onFinalizeTrade: () => void;
-  isTradeActive: boolean; // Simplified from activeTrade object
+  onLogTrade: () => void;
+  isTradeActive: boolean;
 }
 
-export default function LiveControlBar({ session, onSessionChange, playbooks, onPrepareTrade, onFinalizeTrade, isTradeActive }: LiveControlBarProps) {
+export default function LiveControlBar({ session, onSessionChange, playbooks, onLogTrade, isTradeActive }: LiveControlBarProps) {
   const handleSessionValueChange = <K extends keyof LiveTradeSession>(key: K, value: LiveTradeSession[K]) => {
     onSessionChange({ ...session, [key]: value });
   };
@@ -91,29 +90,15 @@ export default function LiveControlBar({ session, onSessionChange, playbooks, on
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
-                  className="bg-[#FFAA55]/80 text-black hover:bg-[#FFAA55]"
-                  onClick={onFinalizeTrade}
-                  data-testid="finalize-manual-trade-button"
-                >
-                  <Square className="w-4 h-4 mr-2"/>
-                  Manual Entry
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent className="bg-[#0F0F10] border-white/20 text-gray-200"><p>Log a trade manually (E)</p></TooltipContent>
-            </Tooltip>
-            
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
                   className="bg-[#39FF88] text-black hover:bg-[#39FF88]/80 shadow-[0_0_15px_rgba(57,255,136,0.5)]"
-                  onClick={onPrepareTrade}
-                  data-testid="prepare-trade-button"
+                  onClick={onLogTrade}
+                  data-testid="log-trade-button"
                 >
                   <Play className="w-4 h-4 mr-2"/>
-                  Prepare Trade
+                  Log Trade
                 </Button>
               </TooltipTrigger>
-              <TooltipContent className="bg-[#0F0F10] border-white/20 text-gray-200"><p>Prepare a new trade draft (S)</p></TooltipContent>
+              <TooltipContent className="bg-[#0F0F10] border-white/20 text-gray-200"><p>Log a new trade (E)</p></TooltipContent>
             </Tooltip>
           </div>
         </div>

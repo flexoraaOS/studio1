@@ -13,10 +13,9 @@ export default function LiveTradingCockpitPage() {
     session,
     setSession,
     playbooks,
-    activeTrade, // This is now a draft, but we keep the name for minimal refactoring where it represents the "active context"
+    activeTrade,
     blotterKey,
-    handlePrepareTrade,
-    handleFinalizeTrade,
+    handleLogTrade,
     handleSaveTrade,
     handleClearBlotter,
     modalState,
@@ -31,8 +30,7 @@ export default function LiveTradingCockpitPage() {
           session={session}
           onSessionChange={setSession}
           playbooks={playbooks}
-          onPrepareTrade={handlePrepareTrade}
-          onFinalizeTrade={() => handleFinalizeTrade(activeTrade)}
+          onLogTrade={() => handleLogTrade(activeTrade)}
           isTradeActive={!!activeTrade}
         />
 
