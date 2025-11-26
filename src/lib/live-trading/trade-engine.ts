@@ -57,7 +57,7 @@ interface PnlParams {
 export function calculateGrossPnl(params: PnlParams): number {
     const { entryPrice, exitPrice, size, side, instrument } = params;
 
-    if (isNaN(entryPrice) || isNaN(exitPrice) || isNaN(size) || !instrument) {
+    if (isNaN(entryPrice) || isNaN(exitPrice) || isNaN(size) || !instrument || size === 0) {
         return 0;
     }
 
@@ -66,10 +66,15 @@ export function calculateGrossPnl(params: PnlParams): number {
     
     // FOREX
     if (assetClass.startsWith('Forex')) {
+        const lots = size;
         const pipSize = getPipSize(instrument.symbol);
         const pips = priceDiff / pipSize;
-        const pipValuePerLot = STANDARD_LOT_SIZE * pipSize;
-        const pipValueForTrade = pipValuePerLot * size; // size is in lots
+        
+        // Pip value per standard lot ($10 for non-JPY, etc.)
+        const pipValuePerLot = STANDARD_LOT_SIZE * pipSize; 
+        // Value for the specific trade size
+        const pipValueForTrade = pipValuePerLot * lots;
+
         const grossPnl = pips * pipValueForTrade;
         return grossPnl;
     }
@@ -110,26 +115,28 @@ interface RiskParams {
 export function calculateRiskAmount(params: RiskParams): number {
     const { entryPrice, stopLossPrice, size, side, instrument } = params;
 
-    if (isNaN(entryPrice) || isNaN(stopLossPrice) || stopLossPrice === entryPrice || isNaN(size)) {
+    if (isNaN(entryPrice) || isNaN(stopLossPrice) || stopLossPrice === entryPrice || isNaN(size) || size === 0) {
         return 0;
     }
     
-    const riskPerUnit = side === 'Long' ? entryPrice - stopLossPrice : stopLossPrice - entryPrice;
-    if (riskPerUnit <= 0) return 0; // Invalid stop-loss
+    const riskPerUnitInPrice = side === 'Long' ? entryPrice - stopLossPrice : stopLossPrice - entryPrice;
+    if (riskPerUnitInPrice <= 0) return 0; // Invalid stop-loss
 
     const assetClass = getAssetClass(instrument);
 
     // FOREX
     if (assetClass.startsWith('Forex')) {
+        const lots = size;
         const pipSize = getPipSize(instrument.symbol);
-        const riskPips = riskPerUnit / pipSize;
+        const riskPips = riskPerUnitInPrice / pipSize;
+        
         const pipValuePerLot = STANDARD_LOT_SIZE * pipSize;
-        const riskAmount = riskPips * pipValuePerLot * size;
+        const riskAmount = riskPips * pipValuePerLot * lots;
         return riskAmount;
     }
 
     // STOCKS, CRYPTO, FUTURES, etc.
-    return riskPerUnit * size;
+    return riskPerUnitInPrice * size;
 }
 
 /**
