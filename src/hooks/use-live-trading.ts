@@ -17,7 +17,7 @@ export const useLiveTrading = () => {
       playbookId: defaultPlaybook?.id || '',
       instrument: loadDefaultInstrument(),
       side: 'Long',
-      size: 10000,
+      size: 1.0, // Default to 1 standard lot
     };
   });
   

@@ -41,8 +41,7 @@ export interface LiveTradeSession {
   playbookId: string;
   instrument: Instrument;
   side: TradeSide;
-  size: number;
-  riskPercent: number;
+  size: number; // Represents lot size, e.g., 1.0 for a standard lot
 }
 
 // A pre-trade snapshot with selected strategy and parameters.
@@ -54,8 +53,7 @@ export type TradeDraft = {
   params: {
     instrument: Instrument;
     side: TradeSide;
-    size: number;
-    riskPercent: number;
+    size: number; // Represents lot size
     entryPrice?: number;
     stopLoss?: number;
   };
@@ -75,7 +73,7 @@ export type CompletedTrade = {
   playbookId: string;
   instrument: Instrument;
   side: TradeSide;
-  size: number;
+  size: number; // Represents lot size
   entryTimestamp: ISOString;
   exitTimestamp: ISOString;
   entryPrice: number;

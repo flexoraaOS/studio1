@@ -1,10 +1,12 @@
 import { TradeSide, Instrument } from './types';
 
+const FOREX_STANDARD_LOT_UNITS = 100000;
+
 /**
  * Computes the Profit and Loss (PnL) of a trade.
  * @param entry - The entry price.
  * @param exit - The exit price.
- * @param size - The size of the trade in currency units (e.g., 100,000 for 1 standard lot).
+ * @param size - The size of the trade in lots (e.g., 1.0 for a standard lot).
  * @param side - The direction of the trade ('Long' or 'Short').
  * @param instrument - The instrument being traded, to determine calculation logic.
  * @returns The raw P&L of the trade.
@@ -12,12 +14,13 @@ import { TradeSide, Instrument } from './types';
 export function computePnL(entry: number, exit: number, size: number, side: TradeSide, instrument?: Instrument): number {
   if (isNaN(entry) || isNaN(exit) || isNaN(size) || !side || !instrument) return 0;
 
-  // For Forex, a standard lot is 100,000 units. The pnl is (exit-entry) * units.
+  // For Forex, convert lot size to currency units. The pnl is (exit-entry) * units.
   if (instrument.category.startsWith('Forex')) {
+    const units = size * FOREX_STANDARD_LOT_UNITS;
     if (side === 'Long') {
-      return (exit - entry) * size;
+      return (exit - entry) * units;
     }
-    return (entry - exit) * size;
+    return (entry - exit) * units;
   }
   
   // For other instruments like stocks or futures, size might represent shares or contracts.
