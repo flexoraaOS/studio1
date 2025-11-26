@@ -66,7 +66,7 @@ export default function LiveControlBar({ session, onSessionChange, playbooks, on
             </Button>
           </div>
 
-          {/* Size & Risk */}
+          {/* Size */}
           <div className="flex items-center gap-4">
              <div className="flex items-center gap-2">
                 <Label htmlFor="size-input" className="text-xs text-gray-400">Size</Label>
@@ -77,17 +77,6 @@ export default function LiveControlBar({ session, onSessionChange, playbooks, on
                     onChange={(e) => handleSessionValueChange('size', parseFloat(e.target.value))}
                     className="w-28 bg-transparent border-white/10 rounded-sm"
                     placeholder="Size"
-                />
-            </div>
-             <div className="flex items-center gap-2">
-                <Label htmlFor="risk-input" className="text-xs text-gray-400">Risk %</Label>
-                <Input
-                    id="risk-input"
-                    type="number"
-                    value={session.riskPercent}
-                    onChange={(e) => handleSessionValueChange('riskPercent', parseFloat(e.target.value))}
-                    className="w-24 bg-transparent border-white/10 rounded-sm"
-                    placeholder="Risk %"
                 />
             </div>
           </div>
