@@ -1,5 +1,5 @@
 'use client';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Card, CardContent } from '@/components/ui/card';
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
@@ -18,6 +18,11 @@ interface TradesDataTableProps {
 export default function TradesDataTable({ trades }: TradesDataTableProps) {
     const searchParams = useSearchParams();
     const searchQuery = searchParams.get('q') || '';
+    const [isClient, setIsClient] = useState(false);
+
+    useEffect(() => {
+        setIsClient(true);
+    }, []);
 
     const filteredTrades = trades.filter(trade => 
         trade.symbol.toLowerCase().includes(searchQuery.toLowerCase())
@@ -33,9 +38,49 @@ export default function TradesDataTable({ trades }: TradesDataTableProps) {
     }, [searchQuery]);
 
     const formatDate = (dateString?: string) => {
-        if (!dateString) return 'N/A';
-        return format(new Date(dateString), 'PPpp');
+        if (!dateString || !isClient) return 'Loading...';
+        try {
+            return format(new Date(dateString), 'PPpp');
+        } catch (e) {
+            return 'Invalid Date';
+        }
     };
+    
+    if (!isClient) {
+        // Render a skeleton or loading state on the server and initial client render
+        return (
+            <Card>
+                <CardContent className="p-0">
+                    <div className="overflow-x-auto">
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>Symbol</TableHead>
+                                    <TableHead>Direction</TableHead>
+                                    <TableHead>Strategy</TableHead>
+                                    <TableHead>Entry Time</TableHead>
+                                    <TableHead>Exit Time</TableHead>
+                                    <TableHead>Status</TableHead>
+                                    <TableHead className="text-right">P&L (%)</TableHead>
+                                    <TableHead className="text-right">Realized P&L</TableHead>
+                                    <TableHead>
+                                        <span className="sr-only">Actions</span>
+                                    </TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                <TableRow>
+                                    <TableCell colSpan={9} className="h-24 text-center">
+                                        Loading trades...
+                                    </TableCell>
+                                </TableRow>
+                            </TableBody>
+                        </Table>
+                    </div>
+                </CardContent>
+            </Card>
+        );
+    }
 
     return (
         <Card>
