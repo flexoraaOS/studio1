@@ -1,5 +1,3 @@
-
-
 'use client';
 import React, { useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
@@ -63,6 +61,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         // Once not loading, if there's no user, it will proceed to render children
         // which might have their own logic, or just appear broken without user data.
         // For the dev button, this is what we want.
+    }
+
+    if (pathname === '/login') {
+        return <>{children}</>;
     }
     
     // Custom layout for the live trading cockpit
