@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { LiveTradeSession, PlaybookTemplate, TradeSide, Instrument, TradeDraft } from '@/lib/live-trading/types';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { Play, Square } from 'lucide-react';
+import { Play } from 'lucide-react';
 import InstrumentSelect from './InstrumentSelect';
 import { cn } from '@/lib/utils';
 import { Label } from '../ui/label';
@@ -67,18 +67,25 @@ export default function LiveControlBar({ session, onSessionChange, playbooks, on
           </div>
 
           {/* Size */}
-          <div className="flex items-center gap-4">
-             <div className="flex items-center gap-2">
-                <Label htmlFor="size-input" className="text-xs text-gray-400">Size</Label>
-                <Input
-                    id="size-input"
-                    type="number"
-                    value={session.size}
-                    onChange={(e) => handleSessionValueChange('size', parseFloat(e.target.value))}
-                    className="w-28 bg-transparent border-white/10 rounded-sm"
-                    placeholder="Size"
-                />
-            </div>
+          <div className="flex items-center gap-2">
+            <Label htmlFor="lot-size-select" className="text-xs text-gray-400">Lot Size</Label>
+            <Select
+              value={String(session.size)}
+              onValueChange={(val) => handleSessionValueChange('size', parseInt(val, 10))}
+            >
+              <SelectTrigger id="lot-size-select" className="w-28 bg-transparent border-white/10 rounded-sm">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="bg-[#0F0F10] border-white/20 text-gray-200">
+                <SelectItem value="1">1</SelectItem>
+                <SelectItem value="10">10</SelectItem>
+                <SelectItem value="25">25</SelectItem>
+                <SelectItem value="50">50</SelectItem>
+                <SelectItem value="100">100</SelectItem>
+                <SelectItem value="1000">1,000</SelectItem>
+                <SelectItem value="10000">10,000</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="flex-grow" />
