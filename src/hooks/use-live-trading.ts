@@ -8,7 +8,7 @@ import { useToast } from '@/hooks/use-toast';
 
 export const useLiveTrading = () => {
   const [playbooks] = useState<PlaybookTemplate[]>(loadPlaybooks());
-  const { openModal } = usePostTradeModal();
+  const { modalState, openModal, closeModal } = usePostTradeModal();
   const { toast } = useToast();
 
   const [session, setSession] = useState<LiveTradeSession>(() => {
@@ -116,6 +116,7 @@ export const useLiveTrading = () => {
   }, [openModal, session, playbooks]);
   
   const handleSaveTrade = (trade: CompletedTrade, draftId?: string) => {
+    storage.saveTrade(trade);
     if (draftId) {
       storage.deleteDraft(draftId);
     }
@@ -170,5 +171,8 @@ export const useLiveTrading = () => {
     handleDeleteDraft,
     handleCloneDraft,
     handleClearBlotter,
+    modalState,
+    openModal,
+    closeModal,
   };
 };
