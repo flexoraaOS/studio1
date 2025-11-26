@@ -1,139 +1,144 @@
-// This file contains the logic for the playbook rule engine.
+'use client';
+import React, { useEffect } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
+import { useUser, useAuth } from '@/firebase';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger, DropdownMenuSub, DropdownMenuSubTrigger, DropdownMenuSubContent } from '@/components/ui/dropdown-menu';
+import { Settings, LogOut, User, Monitor } from 'lucide-react';
+import Link from 'next/link';
+import { FlexoraaTraderOSLogo } from '@/components/icons';
+import SearchBar from '@/components/search-bar';
+import { cn } from '@/lib/utils';
+import { ThemeToggle } from '@/components/theme-toggle';
+import { Skeleton } from '@/components/ui/skeleton';
+import { RemindersDialog } from '@/components/reminders/reminders-dialog';
 
-import { 
-    PlaybookTemplate,
-    CompletedTrade,
-    RuleEvaluationResult, 
-    PlaybookResult 
-} from './types';
+const navItems = [
+    { href: '/dashboard', label: 'Dashboard' },
+    { href: '/trades', label: 'Trades' },
+    { href: '/import', label: 'Import' },
+    { href: '/strategy', label: 'Strategy' },
+    { href: '/analytics', label: 'Analytics' },
+    { href: '/behavioral', label: 'Behavioral' },
+    { href: 'reminders', label: 'Reminders' },
+];
 
-/**
- * =================================================================
- * PLAYBOOK RULE ENGINE
- * =================================================================
- * This file contains the deterministic logic for evaluating trade
- * data against a playbook's rules and calculating adherence scores.
- * 
- * TODO: Add unit tests for this engine in `tests/utils/playbookEngine.test.ts`.
- */
+export default function AppLayout({ children }: { children: React.ReactNode }) {
+    const { user, isUserLoading } = useUser();
+    const auth = useAuth();
+    const router = useRouter();
+    const pathname = usePathname();
 
-// --- Rule Evaluation ---
-
-function evaluateRule(rule: any, trade: CompletedTrade): RuleEvaluationResult {
-    const { condition } = rule;
-    let passed = false;
-    let actualValue: any = 'N/A';
-    let expectedValue: string = 'N/A';
-
-    // Helper to get time from ISO string as HH:mm
-    const getHhMm = (isoString: string) => new Date(isoString).toTimeString().substring(0, 5);
-
-    try {
-        switch (condition.type) {
-            case 'numeric':
-                actualValue = trade.session.params[condition.metric as keyof typeof trade.session.params];
-                expectedValue = `${condition.operator} ${condition.value}`;
-                if (typeof actualValue === 'number') {
-                    if (condition.operator === '>') passed = actualValue > condition.value;
-                    if (condition.operator === '>=') passed = actualValue >= condition.value;
-                    if (condition.operator === '<') passed = actualValue < condition.value;
-                    if (condition.operator === '<=') passed = actualValue <= condition.value;
-                }
-                break;
-            
-            case 'timeWindow':
-                actualValue = getHhMm(trade.execution.entryTimestamp);
-                expectedValue = `between ${condition.after} and ${condition.before}`;
-                passed = actualValue >= condition.after && actualValue <= condition.before;
-                break;
-            
-            case 'equality':
-                 actualValue = trade.session.params[condition.metric as keyof typeof trade.session.params];
-                 expectedValue = String(condition.value);
-                 if (actualValue !== undefined) {
-                    passed = actualValue === condition.value;
-                 }
-                break;
-
-            // TODO: Implement other rule types (range, textContains, boolean)
-            
-            default:
-                // For un-implemented rule types, we mark as not applicable (passed = true by default)
-                passed = true;
-                actualValue = 'N/A';
-                expectedValue = 'Rule type not implemented';
+    // useEffect(() => {
+    //     if (!isUserLoading && !user) {
+    //         router.push('/login');
+    //     }
+    // }, [isUserLoading, user, router]);
+    
+    const getInitials = (name: string | null | undefined) => {
+        if (!name) return "U";
+        const names = name.split(' ');
+        if (names.length > 1) {
+            return `${names[0][0]}${names[names.length - 1][0]}`.toUpperCase();
         }
-    } catch (e) {
-        console.error(`Error evaluating rule ${rule.id}:`, e);
-        passed = false; // Fail rule if an error occurs during evaluation
-        actualValue = 'Error';
+        if (names.length === 1 && names[0].length > 1) {
+            return names[0].substring(0, 2).toUpperCase();
+        }
+        return "U";
+    };
+
+    const handleLogout = async () => {
+        if (auth) {
+            await auth.signOut();
+        }
+        router.push('/login');
+    };
+    
+    if (isUserLoading || !user) {
+        // This will show a loading screen but won't redirect.
+        // Once not loading, if there's no user, it will proceed to render children
+        // which might have their own logic, or just appear broken without user data.
+        // For the dev button, this is what we want.
     }
 
-
-    return {
-        ruleId: rule.id,
-        ruleName: rule.name,
-        passed,
-        actualValue: String(actualValue),
-        expectedValue,
-    };
-}
-
-
-// --- Main Engine Function ---
-
-/**
- * Runs the playbook engine to evaluate a completed trade against its playbook.
- * @param trade - The completed trade object.
- * @param playbook - The playbook template used for the trade.
- * @returns A PlaybookResult object with scores and detailed rule evaluations.
- */
-export function runPlaybookEngine(trade: CompletedTrade, playbook: PlaybookTemplate): PlaybookResult {
-    // 1. Evaluate Checklist Adherence
-    const mandatoryChecks = playbook.checklist.filter(c => c.isMandatory);
-    const passedMandatoryChecks = mandatoryChecks.every(c => trade.session.checklistState[c.id]);
+    if (pathname === '/login') {
+        return <>{children}</>;
+    }
     
-    const checklistPassed = Object.values(trade.session.checklistState).filter(Boolean).length;
-    const checklistTotal = playbook.checklist.length;
-
-    // 2. Evaluate Playbook Rules
-    const ruleResults = playbook.rules.map(rule => evaluateRule(rule, trade));
-    const passedRules = ruleResults.filter(r => r.passed).length;
-    const totalRules = playbook.rules.length;
-
-    // 3. Calculate Adherence Percentage
-    // (passed_rules + completed_manual_checks) / total_rules_and_checks * 100
-    const adherencePercent = ((passedRules + checklistPassed) / (totalRules + checklistTotal)) * 100;
-
-    // 4. Calculate Plan-Follow Score (weighted)
-    // Weights: entry 40%, risk 30%, exit 20%, checklist 10%
-    const categoryWeights = { Entry: 0.4, Risk: 0.3, Exit: 0.2, Setup: 0 }; // Setup is covered by checklist
-    let weightedScore = 0;
-    let totalWeight = 0;
-
-    ruleResults.forEach(result => {
-        const rule = playbook.rules.find(r => r.id === result.ruleId);
-        if (rule) {
-            const category = rule.condition.type === 'timeWindow' ? 'Entry' : rule.condition.type === 'numeric' ? 'Risk' : 'Entry'; // Simplified mapping
-            const weight = categoryWeights[category as keyof typeof categoryWeights] || 0;
-            if (result.passed) {
-                weightedScore += weight;
-            }
-            totalWeight += weight;
-        }
-    });
-
-    const checklistScore = (checklistPassed / checklistTotal) * 0.1; // Checklist weight
-    weightedScore += checklistScore;
-    totalWeight += 0.1;
-    
-    const planFollowScore = (totalWeight > 0 ? (weightedScore / totalWeight) : 0) * 100;
-
-    return {
-        adherencePercent: parseFloat(adherencePercent.toFixed(1)),
-        planFollowScore: parseFloat(planFollowScore.toFixed(1)),
-        ruleResults,
-        checklistPassed,
-        checklistTotal,
-    };
+    return (
+       <div className={cn("flex min-h-screen w-full flex-col", "animated-background")}>
+           <header className="sticky top-0 flex h-16 items-center gap-4 border-b bg-background/80 backdrop-blur-sm px-4 md:px-6 z-10">
+                <nav className="hidden flex-col gap-6 text-lg font-medium md:flex md:flex-row md:items-center md:gap-5 lg:gap-6">
+                    <Link
+                        href="/dashboard"
+                        className="flex items-center gap-2 text-lg font-semibold md:text-base"
+                    >
+                        <FlexoraaTraderOSLogo className="h-6 w-6" />
+                        <span className="sr-only">Flexoraa TraderOS</span>
+                    </Link>
+                    {navItems.map((item) => {
+                        if (item.href === 'reminders') {
+                            return (
+                                <RemindersDialog key={item.href}>
+                                    <button className="text-muted-foreground transition-colors hover:text-primary font-medium">
+                                        {item.label}
+                                    </button>
+                                </RemindersDialog>
+                            );
+                        }
+                        return (
+                            <Link
+                                key={item.href}
+                                href={item.href}
+                                className="text-muted-foreground transition-colors hover:text-primary font-medium"
+                            >
+                                {item.label}
+                            </Link>
+                        );
+                    })}
+                </nav>
+                <div className="flex w-full items-center gap-4 md:ml-auto md:gap-2 lg:gap-4">
+                    <div className="ml-auto flex-1 sm:flex-initial">
+                        <SearchBar />
+                    </div>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="secondary" size="icon" className="rounded-full">
+                               <Avatar>
+                                    <AvatarImage src={user?.photoURL || ''} alt={user?.displayName || 'User'} />
+                                    <AvatarFallback>{getInitials(user?.displayName)}</AvatarFallback>
+                                </Avatar>
+                                <span className="sr-only">Toggle user menu</span>
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                            <DropdownMenuLabel>{user?.displayName || 'Guest'}</DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem asChild>
+                                <Link href="/settings" className="flex items-center w-full">
+                                    <Settings className="mr-2" /> Settings
+                                </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuSub>
+                                <DropdownMenuSubTrigger>
+                                     <Monitor className="mr-2" /> Theme
+                                </DropdownMenuSubTrigger>
+                                <DropdownMenuSubContent>
+                                    <ThemeToggle />
+                                </DropdownMenuSubContent>
+                            </DropdownMenuSub>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem onClick={handleLogout}>
+                                <LogOut className="mr-2" /> Logout
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                </div>
+            </header>
+            <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
+                {children}
+            </main>
+        </div>
+    );
 }

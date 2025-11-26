@@ -1,136 +1,144 @@
-// @/components/live/LiveControlBar.tsx
 'use client';
-import React, { useState, useEffect } from 'react';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import React, { useEffect } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
+import { useUser, useAuth } from '@/firebase';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Sparkles, Save } from 'lucide-react';
-import { mockInstruments } from '@/lib/live-trading/mock-data';
-import { PlaybookTemplate, LiveTradeSession } from '@/lib/live-trading/types';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger, DropdownMenuSub, DropdownMenuSubTrigger, DropdownMenuSubContent } from '@/components/ui/dropdown-menu';
+import { Settings, LogOut, User, Monitor } from 'lucide-react';
+import Link from 'next/link';
+import { FlexoraaTraderOSLogo } from '@/components/icons';
+import SearchBar from '@/components/search-bar';
 import { cn } from '@/lib/utils';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip"
+import { ThemeToggle } from '@/components/theme-toggle';
+import { Skeleton } from '@/components/ui/skeleton';
+import { RemindersDialog } from '@/components/reminders/reminders-dialog';
 
+const navItems = [
+    { href: '/dashboard', label: 'Dashboard' },
+    { href: '/trades', label: 'Trades' },
+    { href: '/import', label: 'Import' },
+    { href: '/strategy', label: 'Strategy' },
+    { href: '/analytics', label: 'Analytics' },
+    { href: '/behavioral', label: 'Behavioral' },
+    { href: 'reminders', label: 'Reminders' },
+];
 
-interface LiveControlBarProps {
-  session: LiveTradeSession;
-  onSessionChange: (update: Partial<LiveTradeSession>) => void;
-  playbooks: PlaybookTemplate[];
-  onPrepareTrade: () => void;
-}
+export default function AppLayout({ children }: { children: React.ReactNode }) {
+    const { user, isUserLoading } = useUser();
+    const auth = useAuth();
+    const router = useRouter();
+    const pathname = usePathname();
 
-export default function LiveControlBar({ session, onSessionChange, playbooks, onPrepareTrade }: LiveControlBarProps) {
-  
-  // Keyboard shortcuts
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key.toLowerCase() === 's' && (e.metaKey || e.ctrlKey)) {
-        e.preventDefault();
-        onPrepareTrade();
-      }
+    // useEffect(() => {
+    //     if (!isUserLoading && !user) {
+    //         router.push('/login');
+    //     }
+    // }, [isUserLoading, user, router]);
+    
+    const getInitials = (name: string | null | undefined) => {
+        if (!name) return "U";
+        const names = name.split(' ');
+        if (names.length > 1) {
+            return `${names[0][0]}${names[names.length - 1][0]}`.toUpperCase();
+        }
+        if (names.length === 1 && names[0].length > 1) {
+            return names[0].substring(0, 2).toUpperCase();
+        }
+        return "U";
     };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [onPrepareTrade]);
 
-  return (
-    <div className="flex h-14 shrink-0 items-center gap-2 border-b border-white/10 bg-[#141415]/80 p-2 backdrop-blur-sm font-mono text-xs">
-       <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <div className="w-48">
-              <Select value={session.playbookId} onValueChange={(val) => onSessionChange({ playbookId: val })}>
-                <SelectTrigger className="bg-transparent border-white/10 rounded-sm">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {playbooks.map(p => (
-                    <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>Select a playbook to load its rules and defaults.</p>
-          </TooltipContent>
-        </Tooltip>
+    const handleLogout = async () => {
+        if (auth) {
+            await auth.signOut();
+        }
+        router.push('/login');
+    };
+    
+    if (isUserLoading || !user) {
+        // This will show a loading screen but won't redirect.
+        // Once not loading, if there's no user, it will proceed to render children
+        // which might have their own logic, or just appear broken without user data.
+        // For the dev button, this is what we want.
+    }
 
-        <Tooltip>
-          <TooltipTrigger asChild>
-             <div className="w-32">
-              <Select value={session.instrument} onValueChange={(val) => onSessionChange({ instrument: val })}>
-                <SelectTrigger className="bg-transparent border-white/10 rounded-sm">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {Object.entries(mockInstruments).map(([type, symbols]) => (
-                    <div key={type}>
-                      <p className="px-2 py-1 text-xs font-semibold text-muted-foreground">{type}</p>
-                      {symbols.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+    if (pathname === '/login') {
+        return <>{children}</>;
+    }
+    
+    return (
+       <div className={cn("flex min-h-screen w-full flex-col", "animated-background")}>
+           <header className="sticky top-0 flex h-16 items-center gap-4 border-b bg-background/80 backdrop-blur-sm px-4 md:px-6 z-10">
+                <nav className="hidden flex-col gap-6 text-lg font-medium md:flex md:flex-row md:items-center md:gap-5 lg:gap-6">
+                    <Link
+                        href="/dashboard"
+                        className="flex items-center gap-2 text-lg font-semibold md:text-base"
+                    >
+                        <FlexoraaTraderOSLogo className="h-6 w-6" />
+                        <span className="sr-only">Flexoraa TraderOS</span>
+                    </Link>
+                    {navItems.map((item) => {
+                        if (item.href === 'reminders') {
+                            return (
+                                <RemindersDialog key={item.href}>
+                                    <button className="text-muted-foreground transition-colors hover:text-primary font-medium">
+                                        {item.label}
+                                    </button>
+                                </RemindersDialog>
+                            );
+                        }
+                        return (
+                            <Link
+                                key={item.href}
+                                href={item.href}
+                                className="text-muted-foreground transition-colors hover:text-primary font-medium"
+                            >
+                                {item.label}
+                            </Link>
+                        );
+                    })}
+                </nav>
+                <div className="flex w-full items-center gap-4 md:ml-auto md:gap-2 lg:gap-4">
+                    <div className="ml-auto flex-1 sm:flex-initial">
+                        <SearchBar />
                     </div>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>Select the instrument to trade.</p>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
-
-      <div className="flex items-center">
-        <Button 
-          variant="ghost" 
-          onClick={() => onSessionChange({ side: 'Long' })}
-          className={cn(
-            "rounded-r-none h-9 px-3 hover:bg-green-500/40",
-            session.side === 'Long' ? 'bg-green-500/30 text-green-300' : 'bg-white/5 text-gray-400'
-          )}>
-            Long
-        </Button>
-        <Button 
-          variant="ghost" 
-          onClick={() => onSessionChange({ side: 'Short' })}
-          className={cn(
-            "rounded-l-none h-9 px-3 hover:bg-red-500/40",
-            session.side === 'Short' ? 'bg-red-500/30 text-red-300' : 'bg-white/5 text-gray-400'
-          )}>
-            Short
-        </Button>
-      </div>
-
-      <Input 
-        type="number" 
-        placeholder="Size" 
-        value={session.size}
-        onChange={(e) => onSessionChange({ size: parseFloat(e.target.value) || 0 })}
-        className="w-24 bg-transparent border-white/10 rounded-sm" 
-      />
-      <Input 
-        type="number" 
-        placeholder="Risk %"
-        value={session.riskPercent}
-        onChange={(e) => onSessionChange({ riskPercent: parseFloat(e.target.value) || 0 })} 
-        className="w-20 bg-transparent border-white/10 rounded-sm" 
-      />
-
-      <Button 
-        variant="ghost" 
-        className="bg-[#FFAA55]/20 text-[#FFAA55] hover:bg-[#FFAA55]/30 h-9"
-        onClick={onPrepareTrade}
-      >
-        <Sparkles className="mr-2 h-4 w-4" /> Prepare Trade
-      </Button>
-
-      <div className="ml-auto text-xs text-gray-500">
-        This cockpit records Drafts for manual quick-entry. Live market feeds are disabled.
-      </div>
-    </div>
-  );
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="secondary" size="icon" className="rounded-full">
+                               <Avatar>
+                                    <AvatarImage src={user?.photoURL || ''} alt={user?.displayName || 'User'} />
+                                    <AvatarFallback>{getInitials(user?.displayName)}</AvatarFallback>
+                                </Avatar>
+                                <span className="sr-only">Toggle user menu</span>
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                            <DropdownMenuLabel>{user?.displayName || 'Guest'}</DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem asChild>
+                                <Link href="/settings" className="flex items-center w-full">
+                                    <Settings className="mr-2" /> Settings
+                                </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuSub>
+                                <DropdownMenuSubTrigger>
+                                     <Monitor className="mr-2" /> Theme
+                                </DropdownMenuSubTrigger>
+                                <DropdownMenuSubContent>
+                                    <ThemeToggle />
+                                </DropdownMenuSubContent>
+                            </DropdownMenuSub>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem onClick={handleLogout}>
+                                <LogOut className="mr-2" /> Logout
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                </div>
+            </header>
+            <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
+                {children}
+            </main>
+        </div>
+    );
 }

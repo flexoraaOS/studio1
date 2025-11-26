@@ -1,51 +1,144 @@
-// @/components/live/PreTradePanel.tsx
 'use client';
-import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import DraftsList from './DraftsList';
-import { PlaybookTemplate, TradeDraft } from '@/lib/live-trading/types';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Label } from '@/components/ui/label';
+import React, { useEffect } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
+import { useUser, useAuth } from '@/firebase';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger, DropdownMenuSub, DropdownMenuSubTrigger, DropdownMenuSubContent } from '@/components/ui/dropdown-menu';
+import { Settings, LogOut, User, Monitor } from 'lucide-react';
+import Link from 'next/link';
+import { FlexoraaTraderOSLogo } from '@/components/icons';
+import SearchBar from '@/components/search-bar';
+import { cn } from '@/lib/utils';
+import { ThemeToggle } from '@/components/theme-toggle';
+import { Skeleton } from '@/components/ui/skeleton';
+import { RemindersDialog } from '@/components/reminders/reminders-dialog';
 
-interface PreTradePanelProps {
-    playbook: PlaybookTemplate;
-    onOpenDraft: (draft: TradeDraft) => void;
-}
+const navItems = [
+    { href: '/dashboard', label: 'Dashboard' },
+    { href: '/trades', label: 'Trades' },
+    { href: '/import', label: 'Import' },
+    { href: '/strategy', label: 'Strategy' },
+    { href: '/analytics', label: 'Analytics' },
+    { href: '/behavioral', label: 'Behavioral' },
+    { href: 'reminders', label: 'Reminders' },
+];
 
-export default function PreTradePanel({ playbook, onOpenDraft }: PreTradePanelProps) {
+export default function AppLayout({ children }: { children: React.ReactNode }) {
+    const { user, isUserLoading } = useUser();
+    const auth = useAuth();
+    const router = useRouter();
+    const pathname = usePathname();
+
+    // useEffect(() => {
+    //     if (!isUserLoading && !user) {
+    //         router.push('/login');
+    //     }
+    // }, [isUserLoading, user, router]);
+    
+    const getInitials = (name: string | null | undefined) => {
+        if (!name) return "U";
+        const names = name.split(' ');
+        if (names.length > 1) {
+            return `${names[0][0]}${names[names.length - 1][0]}`.toUpperCase();
+        }
+        if (names.length === 1 && names[0].length > 1) {
+            return names[0].substring(0, 2).toUpperCase();
+        }
+        return "U";
+    };
+
+    const handleLogout = async () => {
+        if (auth) {
+            await auth.signOut();
+        }
+        router.push('/login');
+    };
+    
+    if (isUserLoading || !user) {
+        // This will show a loading screen but won't redirect.
+        // Once not loading, if there's no user, it will proceed to render children
+        // which might have their own logic, or just appear broken without user data.
+        // For the dev button, this is what we want.
+    }
+
+    if (pathname === '/login') {
+        return <>{children}</>;
+    }
+    
     return (
-        <>
-            <Card className="flex-1 flex flex-col bg-transparent border-white/10 rounded-sm overflow-hidden">
-                <CardHeader className="p-3 border-b border-white/10">
-                    <CardTitle className="text-sm font-semibold flex items-center justify-between">
-                        <span>{playbook.name}</span>
-                        <Badge variant="outline" className="border-amber-500/50 text-amber-500 font-mono text-xs">
-                            v{playbook.version}
-                        </Badge>
-                    </CardTitle>
-                    <CardDescription className="text-xs text-gray-400 pt-1">
-                        {playbook.description}
-                    </CardDescription>
-                </CardHeader>
-                <CardContent className="p-3 flex-1 overflow-y-auto space-y-3">
-                     <h4 className="text-xs font-semibold text-gray-400">Key Rules</h4>
-                     <ul className="space-y-3">
-                        {playbook.rules.map(rule => (
-                             <li key={rule.id} className="text-xs p-2 rounded-sm bg-black/20">
-                                <div className="flex items-center gap-3">
-                                    <Checkbox id={rule.id} />
-                                    <Label htmlFor={rule.id} className="flex-1 text-gray-300">
-                                        <span className="font-semibold text-gray-400">{rule.category}:</span> {rule.description}
-                                        {rule.isMandatory && <span className="text-red-400 ml-1">*</span>}
-                                    </Label>
-                                </div>
-                            </li>
-                        ))}
-                     </ul>
-                </CardContent>
-            </Card>
-            <DraftsList onOpenDraft={onOpenDraft} />
-        </>
+       <div className={cn("flex min-h-screen w-full flex-col", "animated-background")}>
+           <header className="sticky top-0 flex h-16 items-center gap-4 border-b bg-background/80 backdrop-blur-sm px-4 md:px-6 z-10">
+                <nav className="hidden flex-col gap-6 text-lg font-medium md:flex md:flex-row md:items-center md:gap-5 lg:gap-6">
+                    <Link
+                        href="/dashboard"
+                        className="flex items-center gap-2 text-lg font-semibold md:text-base"
+                    >
+                        <FlexoraaTraderOSLogo className="h-6 w-6" />
+                        <span className="sr-only">Flexoraa TraderOS</span>
+                    </Link>
+                    {navItems.map((item) => {
+                        if (item.href === 'reminders') {
+                            return (
+                                <RemindersDialog key={item.href}>
+                                    <button className="text-muted-foreground transition-colors hover:text-primary font-medium">
+                                        {item.label}
+                                    </button>
+                                </RemindersDialog>
+                            );
+                        }
+                        return (
+                            <Link
+                                key={item.href}
+                                href={item.href}
+                                className="text-muted-foreground transition-colors hover:text-primary font-medium"
+                            >
+                                {item.label}
+                            </Link>
+                        );
+                    })}
+                </nav>
+                <div className="flex w-full items-center gap-4 md:ml-auto md:gap-2 lg:gap-4">
+                    <div className="ml-auto flex-1 sm:flex-initial">
+                        <SearchBar />
+                    </div>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="secondary" size="icon" className="rounded-full">
+                               <Avatar>
+                                    <AvatarImage src={user?.photoURL || ''} alt={user?.displayName || 'User'} />
+                                    <AvatarFallback>{getInitials(user?.displayName)}</AvatarFallback>
+                                </Avatar>
+                                <span className="sr-only">Toggle user menu</span>
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                            <DropdownMenuLabel>{user?.displayName || 'Guest'}</DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem asChild>
+                                <Link href="/settings" className="flex items-center w-full">
+                                    <Settings className="mr-2" /> Settings
+                                </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuSub>
+                                <DropdownMenuSubTrigger>
+                                     <Monitor className="mr-2" /> Theme
+                                </DropdownMenuSubTrigger>
+                                <DropdownMenuSubContent>
+                                    <ThemeToggle />
+                                </DropdownMenuSubContent>
+                            </DropdownMenuSub>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem onClick={handleLogout}>
+                                <LogOut className="mr-2" /> Logout
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                </div>
+            </header>
+            <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
+                {children}
+            </main>
+        </div>
     );
 }

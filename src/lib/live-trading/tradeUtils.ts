@@ -1,84 +1,144 @@
-// This file contains utility functions for trade-related calculations.
+'use client';
+import React, { useEffect } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
+import { useUser, useAuth } from '@/firebase';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger, DropdownMenuSub, DropdownMenuSubTrigger, DropdownMenuSubContent } from '@/components/ui/dropdown-menu';
+import { Settings, LogOut, User, Monitor } from 'lucide-react';
+import Link from 'next/link';
+import { FlexoraaTraderOSLogo } from '@/components/icons';
+import SearchBar from '@/components/search-bar';
+import { cn } from '@/lib/utils';
+import { ThemeToggle } from '@/components/theme-toggle';
+import { Skeleton } from '@/components/ui/skeleton';
+import { RemindersDialog } from '@/components/reminders/reminders-dialog';
 
-/**
- * =================================================================
- * TRADE CALCULATION UTILS
- * =================================================================
- * This file contains deterministic, well-documented functions for
- * common trade calculations like P&L, slippage, and R-multiple.
- */
+const navItems = [
+    { href: '/dashboard', label: 'Dashboard' },
+    { href: '/trades', label: 'Trades' },
+    { href: '/import', label: 'Import' },
+    { href: '/strategy', label: 'Strategy' },
+    { href: '/analytics', label: 'Analytics' },
+    { href: '/behavioral', label: 'Behavioral' },
+    { href: 'reminders', label: 'Reminders' },
+];
 
-import type { CompletedTrade, TradeSide } from './types';
+export default function AppLayout({ children }: { children: React.ReactNode }) {
+    const { user, isUserLoading } = useUser();
+    const auth = useAuth();
+    const router = useRouter();
+    const pathname = usePathname();
 
-/**
- * Calculates the realized Profit and Loss (P&L) for a trade.
- * @param side - The direction of the trade ('Long' or 'Short').
- * @param entryPrice - The entry price of the trade.
- * @param exitPrice - The exit price of the trade.
- * @param size - The number of shares or contracts.
- * @param fees - Total fees for the trade.
- * @returns The realized P&L.
- */
-export function calculateRealizedPnl(
-  side: TradeSide,
-  entryPrice: number,
-  exitPrice: number,
-  size: number,
-  fees: number
-): number {
-  if (entryPrice <= 0 || exitPrice <= 0 || size <= 0) return -fees;
-
-  const pnl = side === 'Long'
-    ? (exitPrice - entryPrice) * size
-    : (entryPrice - exitPrice) * size;
-  
-  return pnl - fees;
-}
-
-/**
- * Calculates slippage for a trade.
- * @param side - The direction of the trade ('Long' | 'Short').
- * @param filledPrice - The actual executed price.
- * @param expectedPrice - The price at which the order was placed (e.g., limit price or market price at time of order).
- * @returns The slippage amount per share/contract. Positive is bad slippage.
- */
-export function calculateSlippage(
-  side: TradeSide,
-  filledPrice: number,
-  expectedPrice: number
-): number {
-  if (filledPrice <= 0 || expectedPrice <= 0) return 0;
-  
-  return side === 'Long'
-    ? filledPrice - expectedPrice
-    : expectedPrice - filledPrice;
-}
-
-/**
- * Calculates the R-Multiple (Reward/Risk Ratio) of a completed trade.
- * @param entryPrice - The entry price of the trade.
- * @param exitPrice - The exit price of the trade.
- * @param stopLossPrice - The pre-defined stop-loss price.
- * @param side - The direction of the trade ('Long' | 'Short').
- * @returns The R-Multiple of the trade.
- */
-export function calculateRMultiple(
-  entryPrice: number,
-  exitPrice: number,
-  stopLossPrice: number,
-  side: TradeSide
-): number {
-  if (entryPrice <= 0 || stopLossPrice <= 0) return 0;
-
-  const riskPerShare = side === 'Long'
-    ? entryPrice - stopLossPrice
-    : stopLossPrice - entryPrice;
-
-  if (riskPerShare <= 0) return 0;
-
-  const rewardPerShare = side === 'Long'
-    ? exitPrice - entryPrice
-    : entryPrice - exitPrice;
+    // useEffect(() => {
+    //     if (!isUserLoading && !user) {
+    //         router.push('/login');
+    //     }
+    // }, [isUserLoading, user, router]);
     
-  return rewardPerShare / riskPerShare;
+    const getInitials = (name: string | null | undefined) => {
+        if (!name) return "U";
+        const names = name.split(' ');
+        if (names.length > 1) {
+            return `${names[0][0]}${names[names.length - 1][0]}`.toUpperCase();
+        }
+        if (names.length === 1 && names[0].length > 1) {
+            return names[0].substring(0, 2).toUpperCase();
+        }
+        return "U";
+    };
+
+    const handleLogout = async () => {
+        if (auth) {
+            await auth.signOut();
+        }
+        router.push('/login');
+    };
+    
+    if (isUserLoading || !user) {
+        // This will show a loading screen but won't redirect.
+        // Once not loading, if there's no user, it will proceed to render children
+        // which might have their own logic, or just appear broken without user data.
+        // For the dev button, this is what we want.
+    }
+
+    if (pathname === '/login') {
+        return <>{children}</>;
+    }
+    
+    return (
+       <div className={cn("flex min-h-screen w-full flex-col", "animated-background")}>
+           <header className="sticky top-0 flex h-16 items-center gap-4 border-b bg-background/80 backdrop-blur-sm px-4 md:px-6 z-10">
+                <nav className="hidden flex-col gap-6 text-lg font-medium md:flex md:flex-row md:items-center md:gap-5 lg:gap-6">
+                    <Link
+                        href="/dashboard"
+                        className="flex items-center gap-2 text-lg font-semibold md:text-base"
+                    >
+                        <FlexoraaTraderOSLogo className="h-6 w-6" />
+                        <span className="sr-only">Flexoraa TraderOS</span>
+                    </Link>
+                    {navItems.map((item) => {
+                        if (item.href === 'reminders') {
+                            return (
+                                <RemindersDialog key={item.href}>
+                                    <button className="text-muted-foreground transition-colors hover:text-primary font-medium">
+                                        {item.label}
+                                    </button>
+                                </RemindersDialog>
+                            );
+                        }
+                        return (
+                            <Link
+                                key={item.href}
+                                href={item.href}
+                                className="text-muted-foreground transition-colors hover:text-primary font-medium"
+                            >
+                                {item.label}
+                            </Link>
+                        );
+                    })}
+                </nav>
+                <div className="flex w-full items-center gap-4 md:ml-auto md:gap-2 lg:gap-4">
+                    <div className="ml-auto flex-1 sm:flex-initial">
+                        <SearchBar />
+                    </div>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="secondary" size="icon" className="rounded-full">
+                               <Avatar>
+                                    <AvatarImage src={user?.photoURL || ''} alt={user?.displayName || 'User'} />
+                                    <AvatarFallback>{getInitials(user?.displayName)}</AvatarFallback>
+                                </Avatar>
+                                <span className="sr-only">Toggle user menu</span>
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                            <DropdownMenuLabel>{user?.displayName || 'Guest'}</DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem asChild>
+                                <Link href="/settings" className="flex items-center w-full">
+                                    <Settings className="mr-2" /> Settings
+                                </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuSub>
+                                <DropdownMenuSubTrigger>
+                                     <Monitor className="mr-2" /> Theme
+                                </DropdownMenuSubTrigger>
+                                <DropdownMenuSubContent>
+                                    <ThemeToggle />
+                                </DropdownMenuSubContent>
+                            </DropdownMenuSub>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem onClick={handleLogout}>
+                                <LogOut className="mr-2" /> Logout
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                </div>
+            </header>
+            <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
+                {children}
+            </main>
+        </div>
+    );
 }
