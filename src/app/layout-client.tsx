@@ -18,7 +18,7 @@ const navItems = [
     { href: '/dashboard', label: 'Dashboard' },
     { href: '/trades', label: 'Trades' },
     { href: '/import', label: 'Import' },
-    { href: '/live-trading', label: 'Live Cockpit' },
+    { href: '/live-trading', label: 'Live' },
     { href: '/strategy', label: 'Strategy' },
     { href: '/analytics', label: 'Analytics' },
     { href: '/behavioral', label: 'Behavioral' },
