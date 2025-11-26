@@ -132,3 +132,11 @@ export const mockInstruments: Record<string, Instrument[]> = {
   Crypto: INSTRUMENT_GROUPS['Crypto Large'],
   Stocks: INSTRUMENT_GROUPS['Stocks Tech'],
 };
+
+export function loadPlaybooks(): PlaybookTemplate[] {
+  return mockPlaybookTemplates;
+}
+
+export function loadDefaultInstrument(): Instrument {
+  return ALL_INSTRUMENTS[0];
+}
