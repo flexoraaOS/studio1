@@ -12,9 +12,10 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 interface TradeBlotterProps {
   blotterKey: number; // To force re-renders
   onClear: () => void;
+  onEditTrade: (trade: CompletedTrade) => void;
 }
 
-export default function TradeBlotter({ blotterKey, onClear }: TradeBlotterProps) {
+export default function TradeBlotter({ blotterKey, onClear, onEditTrade }: TradeBlotterProps) {
   const [trades, setTrades] = useState<CompletedTrade[]>([]);
 
   useEffect(() => {
@@ -38,7 +39,11 @@ export default function TradeBlotter({ blotterKey, onClear }: TradeBlotterProps)
               </TableHeader>
               <TableBody>
                 {trades.length > 0 ? trades.map(trade => (
-                  <TableRow key={trade.id} className="border-white/10 hover:bg-white/5 cursor-pointer">
+                  <TableRow 
+                    key={trade.id} 
+                    className="border-white/10 hover:bg-white/5 cursor-pointer"
+                    onClick={() => onEditTrade(trade)}
+                  >
                     <TableCell className="text-xs py-2">{format(new Date(trade.exitTimestamp), 'HH:mm:ss')}</TableCell>
                     <TableCell className="font-semibold py-2 text-sm">{trade.instrument.symbol}</TableCell>
                     <TableCell className={cn("text-right font-semibold py-2 text-sm", trade.pnl >= 0 ? 'text-[#39FF88]' : 'text-[#FF3B47]')}>${trade.pnl.toFixed(2)}</TableCell>

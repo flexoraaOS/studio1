@@ -17,6 +17,7 @@ export interface ModalState {
   isOpen: boolean;
   mode: 'manual' | 'finalize';
   draft?: TradeDraft;
+  existingTrade?: CompletedTrade;
 }
 
 export const usePostTradeModal = () => {
@@ -42,7 +43,7 @@ interface PostTradeModalProps {
 }
 
 export const PostTradeModal: React.FC<PostTradeModalProps> = ({ isOpen, onClose, onSave, initialState, playbooks }) => {
-  const { mode, draft } = initialState;
+  const { mode, draft, existingTrade } = initialState;
   
   const [entryPrice, setEntryPrice] = useState('');
   const [exitPrice, setExitPrice] = useState('');
@@ -52,26 +53,40 @@ export const PostTradeModal: React.FC<PostTradeModalProps> = ({ isOpen, onClose,
   const [tags, setTags] = useState('');
   const [screenshot, setScreenshot] = useState<string | null>(null);
 
-  const playbook = playbooks.find(p => p.id === draft?.playbookId);
+  const playbook = playbooks.find(p => p.id === (draft?.playbookId || existingTrade?.playbookId));
   
   const [ruleAdherence, setRuleAdherence] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     if (isOpen) {
-      setEntryPrice(draft?.params.entryPrice?.toString() || '');
-      setExitPrice('');
-      setStopLoss(draft?.params.stopLoss?.toString() || '');
-      setFees('0');
-      setNotes(draft?.notes || '');
-      setTags(draft?.tags?.join(', ') || '');
-      setScreenshot(null);
-      if (playbook) {
-        setRuleAdherence(playbook.rules.reduce((acc, rule) => ({ ...acc, [rule.id]: true }), {}));
-      } else {
-        setRuleAdherence({});
+      if (existingTrade) {
+        // Editing an existing trade
+        setEntryPrice(existingTrade.entryPrice.toString());
+        setExitPrice(existingTrade.exitPrice.toString());
+        setStopLoss(existingTrade.stopLoss.toString());
+        setFees(existingTrade.fees.toString());
+        setNotes(existingTrade.notes || '');
+        setTags(existingTrade.tags?.join(', ') || '');
+        setScreenshot(existingTrade.attachments?.[0]?.data || null);
+        setRuleAdherence(existingTrade.adherence || {});
+      } else if (draft) {
+        // Finalizing a new draft
+        setEntryPrice(draft.params.entryPrice?.toString() || '');
+        setExitPrice('');
+        setStopLoss(draft.params.stopLoss?.toString() || '');
+        setFees('0');
+        setNotes(draft.notes || '');
+        setTags('');
+        setScreenshot(null);
+        if (playbook) {
+          setRuleAdherence(playbook.rules.reduce((acc, rule) => ({ ...acc, [rule.id]: true }), {}));
+        } else {
+          setRuleAdherence({});
+        }
       }
     }
-  }, [isOpen, draft, playbook]);
+  }, [isOpen, draft, existingTrade, playbook]);
+
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     const file = acceptedFiles[0];
@@ -85,8 +100,16 @@ export const PostTradeModal: React.FC<PostTradeModalProps> = ({ isOpen, onClose,
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop, accept: {'image/*':[]} });
 
   const handleSave = () => {
-    if (!draft) return;
-    const { side, size = 0, instrument } = draft.params;
+    const associatedDraft = draft || existingTrade;
+    if (!associatedDraft) return;
+
+    const baseTradeId = existingTrade?.id || `trade_${Date.now()}`;
+    const baseDraftId = associatedDraft.id;
+
+    const instrument = draft?.params.instrument || existingTrade?.instrument;
+    const side = draft?.params.side || existingTrade?.side;
+    const size = draft?.params.size || existingTrade?.size || 0;
+
     const entry = parseFloat(entryPrice);
     const exit = parseFloat(exitPrice);
     const stop = parseFloat(stopLoss);
@@ -97,19 +120,19 @@ export const PostTradeModal: React.FC<PostTradeModalProps> = ({ isOpen, onClose,
     const rMultiple = computeRMultiple(entry, exit, stop, side);
 
     const newTrade: CompletedTrade = {
-      id: `trade_${Date.now()}`,
-      draftId: draft.id,
-      playbookId: draft.playbookId,
+      id: baseTradeId,
+      draftId: baseDraftId,
+      playbookId: associatedDraft.playbookId,
       instrument: instrument,
       side: side,
       size: size,
-      entryTimestamp: draft.createdAt,
+      entryTimestamp: associatedDraft.createdAt || existingTrade?.entryTimestamp || new Date().toISOString(),
       exitTimestamp: new Date().toISOString(),
       entryPrice: entry,
       exitPrice: exit,
       stopLoss: stop,
       fees: parseFloat(fees),
-      pnl: pnl - parseFloat(fees),
+      pnl: pnl - parseFloat(fees || '0'),
       rMultiple,
       slippage: 0, // Placeholder
       notes,
@@ -118,7 +141,7 @@ export const PostTradeModal: React.FC<PostTradeModalProps> = ({ isOpen, onClose,
       adherence: ruleAdherence,
     };
 
-    onSave(newTrade, draft.id);
+    onSave(newTrade, draft?.id);
     onClose();
   };
 
@@ -126,22 +149,22 @@ export const PostTradeModal: React.FC<PostTradeModalProps> = ({ isOpen, onClose,
     (Object.values(ruleAdherence).filter(Boolean).length / playbook.rules.length) * 100 : 0;
 
 
-  const pnl = computePnL(parseFloat(entryPrice), parseFloat(exitPrice), draft?.params.size || 0, draft?.params.side || 'Long', draft?.params.instrument);
+  const pnl = computePnL(parseFloat(entryPrice), parseFloat(exitPrice), draft?.params.size || existingTrade?.size || 0, draft?.params.side || existingTrade?.side || 'Long', draft?.params.instrument || existingTrade?.instrument);
   const netPnl = pnl - parseFloat(fees || '0');
-  const rMultiple = computeRMultiple(parseFloat(entryPrice), parseFloat(exitPrice), parseFloat(stopLoss), draft?.params.side || 'Long');
+  const rMultiple = computeRMultiple(parseFloat(entryPrice), parseFloat(exitPrice), parseFloat(stopLoss), draft?.params.side || existingTrade?.side || 'Long');
 
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl h-auto bg-[#0F0F10] border-white/10 text-gray-200 font-code flex flex-col">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold text-white">{mode === 'finalize' ? 'Finalize Trade' : 'Log Manual Trade'}</DialogTitle>
+          <DialogTitle className="text-2xl font-bold text-white">{existingTrade ? 'Edit Trade' : 'Finalize Trade'}</DialogTitle>
           <DialogDescription className="text-gray-400">
-            {mode === 'finalize' && draft ? `Confirm details for: ${draft.params.instrument?.symbol} ${draft.params.side} @ ${draft.params.size/100000} lots` : 'Enter trade details manually.'}
+             {draft ? `Confirm details for: ${draft.params.instrument?.symbol} ${draft.params.side} @ ${draft.params.size/100000} lots` : 'Enter trade details manually.'}
           </DialogDescription>
         </DialogHeader>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 py-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 py-4 flex-grow">
           {/* Left Column */}
           <div className="flex flex-col gap-6">
             
@@ -193,7 +216,7 @@ export const PostTradeModal: React.FC<PostTradeModalProps> = ({ isOpen, onClose,
               <h3 className="text-lg font-semibold text-white mb-2">Playbook Rule Adherence</h3>
               <p className="text-sm text-gray-500 mb-3">Review which rules were followed for this trade.</p>
             </div>
-            <ScrollArea className="h-[350px] pr-2">
+            <ScrollArea className="h-full pr-2">
               <div className="space-y-3">
                 {playbook ? playbook.rules.map(rule => (
                   <div key={rule.id} className="p-3 bg-[#1A1A1B] border border-white/10 rounded-md flex items-center justify-between">
@@ -222,5 +245,3 @@ export const PostTradeModal: React.FC<PostTradeModalProps> = ({ isOpen, onClose,
     </Dialog>
   );
 };
-
-    

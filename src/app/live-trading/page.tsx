@@ -21,6 +21,7 @@ export default function LiveTradingCockpitPage() {
     modalState,
     openModal,
     closeModal,
+    handleEditTrade,
   } = useLiveTrading();
 
   return (
@@ -52,7 +53,7 @@ export default function LiveTradingCockpitPage() {
 
             {/* Right Column */}
             <div className="flex flex-col gap-2 overflow-y-auto">
-              <TradeBlotter blotterKey={blotterKey} onClear={handleClearBlotter} />
+              <TradeBlotter blotterKey={blotterKey} onClear={handleClearBlotter} onEditTrade={handleEditTrade} />
             </div>
           </div>
         </div>

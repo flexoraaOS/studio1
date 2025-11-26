@@ -18,7 +18,6 @@ export const useLiveTrading = () => {
       instrument: loadDefaultInstrument(),
       side: 'Long',
       size: 10000,
-      riskPercent: 1,
     };
   });
   
@@ -62,6 +61,28 @@ export const useLiveTrading = () => {
       draft: draftToFinalize
     });
   }, [openModal, session, playbooks]);
+
+  const handleEditTrade = useCallback((trade: CompletedTrade) => {
+     const draftToEdit: TradeDraft = {
+        id: trade.draftId || trade.id,
+        createdAt: trade.entryTimestamp,
+        playbookId: trade.playbookId,
+        playbookName: playbooks.find(p => p.id === trade.playbookId)?.name || 'Unknown',
+        params: {
+            instrument: trade.instrument,
+            side: trade.side,
+            size: trade.size,
+            entryPrice: trade.entryPrice,
+            stopLoss: trade.stopLoss,
+        },
+        notes: trade.notes,
+     };
+     openModal({
+        mode: 'finalize', // Or a new 'edit' mode if logic diverges
+        draft: draftToEdit,
+        existingTrade: trade
+     })
+  }, [openModal, playbooks]);
   
   const handleSaveTrade = (trade: CompletedTrade, draftId?: string) => {
     storage.saveTrade(trade);
@@ -90,5 +111,6 @@ export const useLiveTrading = () => {
     modalState,
     openModal,
     closeModal,
+    handleEditTrade,
   };
 };
