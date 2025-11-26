@@ -68,8 +68,12 @@ export function calculateGrossPnl(params: PnlParams): number {
     if (assetClass.startsWith('Forex')) {
         const pipSize = getPipSize(instrument.symbol);
         const pips = priceDiff / pipSize;
-        const positionUnits = size * STANDARD_LOT_SIZE; // size is in lots
-        const grossPnl = pips * positionUnits * pipSize;
+        
+        // Correct calculation based on user's formula
+        const pipValuePerLot = STANDARD_LOT_SIZE * pipSize;
+        const pipValueForTrade = pipValuePerLot * size; // size is in lots
+        const grossPnl = pips * pipValueForTrade;
+        
         return grossPnl;
     }
 
@@ -122,8 +126,9 @@ export function calculateRiskAmount(params: RiskParams): number {
     if (assetClass.startsWith('Forex')) {
         const pipSize = getPipSize(instrument.symbol);
         const riskPips = riskPerUnit / pipSize;
-        const positionUnits = size * STANDARD_LOT_SIZE; // size is in lots
-        const riskAmount = riskPips * positionUnits * pipSize;
+        const pipValuePerLot = STANDARD_LOT_SIZE * pipSize;
+        const pipValueForTrade = pipValuePerLot * size; // size is in lots
+        const riskAmount = riskPips * pipValueForTrade;
         return riskAmount;
     }
 
