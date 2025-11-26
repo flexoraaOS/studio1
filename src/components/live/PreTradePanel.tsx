@@ -47,7 +47,7 @@ export default function PreTradePanel({ playbookId, playbooks }: PreTradePanelPr
 
   return (
     <>
-      <Card className="bg-[#121213] border-white/10 flex flex-col">
+      <Card className="bg-[#121213] border-white/10 flex flex-col h-full">
         <CardHeader className="p-3 border-b border-white/10">
           <div className="flex justify-between items-start">
             <div>
@@ -59,9 +59,9 @@ export default function PreTradePanel({ playbookId, playbooks }: PreTradePanelPr
             </Button>
           </div>
         </CardHeader>
-        <CardContent className="p-3 flex-1 overflow-y-auto space-y-3">
+        <CardContent className="p-3 flex-1 flex flex-col gap-3">
           <h4 className="text-sm font-semibold text-gray-400">Pre-Flight Checklist</h4>
-          <ScrollArea className="h-[150px] pr-2">
+          <ScrollArea className="flex-1 pr-2">
             <div className="space-y-2">
               {playbook.rules.map(rule => (
                 <div key={rule.id} className="flex items-center space-x-2 bg-[#1A1A1B] p-2 rounded-md border border-white/5">
