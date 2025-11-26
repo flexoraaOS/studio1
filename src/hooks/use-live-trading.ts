@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect, useCallback } from 'react';
-import { LiveTradeSession, PlaybookTemplate, TradeDraft, CompletedTrade, ActiveTrade } from '@/lib/live-trading/types';
+import { LiveTradeSession, PlaybookTemplate, TradeDraft, CompletedTrade } from '@/lib/live-trading/types';
 import { loadPlaybooks, loadDefaultInstrument } from '@/lib/live-trading/mock-data';
 import * as storage from '@/lib/live-trading/storage';
 import { usePostTradeModal } from '@/components/live/PostTradeModal';
@@ -23,13 +23,8 @@ export const useLiveTrading = () => {
   });
   
   const [activeTrade, setActiveTrade] = useState<TradeDraft | null>(null);
-  const [drafts, setDrafts] = useState<TradeDraft[]>([]);
   const [blotterKey, setBlotterKey] = useState(Date.now());
 
-  useEffect(() => {
-    setDrafts(storage.loadDrafts());
-  }, []);
-  
   // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -58,7 +53,6 @@ export const useLiveTrading = () => {
 
 
   const refreshBlotter = () => setBlotterKey(Date.now());
-  const refreshDrafts = () => setDrafts(storage.loadDrafts());
 
   const handlePrepareTrade = useCallback(() => {
     if (!session.instrument || !session.playbookId) {
@@ -87,8 +81,7 @@ export const useLiveTrading = () => {
       notes: '',
     };
     
-    storage.saveDraft(newDraft);
-    refreshDrafts();
+    // We don't save the draft anymore as it's a transient object
     setActiveTrade(newDraft); // Set as active context
     
     // Immediately open the modal to finalize
@@ -117,40 +110,13 @@ export const useLiveTrading = () => {
   
   const handleSaveTrade = (trade: CompletedTrade, draftId?: string) => {
     storage.saveTrade(trade);
-    if (draftId) {
-      storage.deleteDraft(draftId);
-    }
     setActiveTrade(null); // Clear the active context
-    refreshDrafts();
     refreshBlotter();
     toast({
       title: "Trade Logged",
       description: `${trade.instrument.symbol} ${trade.side} has been saved.`
     });
   };
-
-  const handleOpenDraft = (draft: TradeDraft) => {
-    setActiveTrade(draft); // Set as active context for the tape
-    openModal({
-      mode: 'finalize',
-      draft: draft,
-    });
-  };
-
-  const handleDeleteDraft = (draftId: string) => {
-    storage.deleteDraft(draftId);
-    refreshDrafts();
-  };
-  
-  const handleCloneDraft = (draftId: string) => {
-    const drafts = storage.loadDrafts();
-    const draftToClone = drafts.find(d => d.id === draftId);
-    if(draftToClone) {
-        const newDraft = { ...draftToClone, id: `draft_${Date.now()}`};
-        storage.saveDraft(newDraft);
-        refreshDrafts();
-    }
-  }
 
   const handleClearBlotter = () => {
     storage.clearTrades();
@@ -162,14 +128,10 @@ export const useLiveTrading = () => {
     setSession,
     playbooks,
     activeTrade,
-    drafts,
     blotterKey,
     handlePrepareTrade,
     handleFinalizeTrade,
     handleSaveTrade,
-    handleOpenDraft,
-    handleDeleteDraft,
-    handleCloneDraft,
     handleClearBlotter,
     modalState,
     openModal,

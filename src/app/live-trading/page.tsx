@@ -7,7 +7,6 @@ import PreTradePanel from '@/components/live/PreTradePanel';
 import TradeBlotter from '@/components/live/TradeBlotter';
 import { PostTradeModal } from '@/components/live/PostTradeModal';
 import { useLiveTrading } from '@/hooks/use-live-trading';
-import DraftsList from '@/components/live/DraftsList';
 
 export default function LiveTradingCockpitPage() {
   const {
@@ -15,14 +14,10 @@ export default function LiveTradingCockpitPage() {
     setSession,
     playbooks,
     activeTrade, // This is now a draft, but we keep the name for minimal refactoring where it represents the "active context"
-    drafts,
     blotterKey,
     handlePrepareTrade,
     handleFinalizeTrade,
     handleSaveTrade,
-    handleOpenDraft,
-    handleDeleteDraft,
-    handleCloneDraft,
     handleClearBlotter,
     modalState,
     openModal,
@@ -47,12 +42,6 @@ export default function LiveTradingCockpitPage() {
             <PreTradePanel
               playbookId={session.playbookId}
               playbooks={playbooks}
-            />
-            <DraftsList
-                drafts={drafts}
-                onOpenDraft={handleOpenDraft}
-                onCloneDraft={handleCloneDraft}
-                onDeleteDraft={handleDeleteDraft}
             />
           </div>
 
