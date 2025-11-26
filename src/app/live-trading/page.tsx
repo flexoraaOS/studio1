@@ -5,9 +5,8 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import LiveControlBar from '@/components/live/LiveControlBar';
 import PreTradePanel from '@/components/live/PreTradePanel';
 import TradeBlotter from '@/components/live/TradeBlotter';
-import { PostTradeModal, usePostTradeModal } from '@/components/live/PostTradeModal';
+import { PostTradeModal } from '@/components/live/PostTradeModal';
 import { useLiveTrading } from '@/hooks/use-live-trading';
-import LiveTape from '@/components/live/LiveTape';
 import DraftsList from '@/components/live/DraftsList';
 
 export default function LiveTradingCockpitPage() {
@@ -25,9 +24,10 @@ export default function LiveTradingCockpitPage() {
     handleDeleteDraft,
     handleCloneDraft,
     handleClearBlotter,
+    modalState,
+    openModal,
+    closeModal,
   } = useLiveTrading();
-
-  const { modalState, openModal, closeModal } = usePostTradeModal();
 
   return (
     <DndProvider backend={HTML5Backend}>
@@ -41,7 +41,7 @@ export default function LiveTradingCockpitPage() {
           isTradeActive={!!activeTrade}
         />
 
-        <div className="flex-1 grid grid-cols-1 lg:grid-cols-[380px_1fr_380px] gap-2 p-2 overflow-hidden">
+        <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-2 p-2 overflow-hidden">
           {/* Left Column */}
           <div className="flex flex-col gap-2 overflow-y-auto">
             <PreTradePanel
@@ -54,11 +54,6 @@ export default function LiveTradingCockpitPage() {
                 onCloneDraft={handleCloneDraft}
                 onDeleteDraft={handleDeleteDraft}
             />
-          </div>
-
-          {/* Center Column */}
-          <div className="flex flex-col gap-2 overflow-y-auto">
-             <LiveTape activeTrade={activeTrade} />
           </div>
 
           {/* Right Column */}
