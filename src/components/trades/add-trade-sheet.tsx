@@ -1,3 +1,4 @@
+
 'use client';
 import { useState } from 'react';
 import {
@@ -44,6 +45,14 @@ import { cn } from '@/lib/utils';
 
 const instruments = [...new Set(mockTrades.map(t => t.symbol))].map(symbol => ({ label: symbol, value: symbol }));
 
+const LOT_SIZES = [
+  { value: 0.01, label: '0.01 (Micro)' },
+  { value: 0.1, label: '0.10 (Mini)' },
+  { value: 1.0, label: '1.00 (Standard)' },
+  { value: 2.0, label: '2.00' },
+  { value: 5.0, label: '5.00' },
+];
+
 const tradeSchema = z.object({
   symbol: z.string().min(1, 'Symbol is required'),
   direction: z.enum(['Long', 'Short']),
@@ -67,6 +76,7 @@ export default function AddTradeSheet({
   children: React.ReactNode;
 }) {
   const [open, setOpen] = useState(false);
+  const [sizePopoverOpen, setSizePopoverOpen] = useState(false);
   const [formState, setFormState] = useState<FormState>(initialState);
   const { toast } = useToast();
 
@@ -77,6 +87,7 @@ export default function AddTradeSheet({
       notes: '',
       strategy: '',
       potentialAnomaly: '',
+      size: 1.0,
     },
   });
 
@@ -210,11 +221,57 @@ export default function AddTradeSheet({
                     name="size"
                     render={({ field }) => (
                         <FormItem>
-                        <FormLabel>Size</FormLabel>
-                        <FormControl>
-                            <Input type="number" placeholder="100" {...field} />
-                        </FormControl>
-                        <FormMessage />
+                          <FormLabel>Size (Lots)</FormLabel>
+                            <Popover open={sizePopoverOpen} onOpenChange={setSizePopoverOpen}>
+                              <div className="relative">
+                                  <FormControl>
+                                      <Input
+                                          type="number"
+                                          step="0.01"
+                                          placeholder="e.g. 1.0"
+                                          {...field}
+                                          onChange={e => field.onChange(parseFloat(e.target.value))}
+                                      />
+                                  </FormControl>
+                                  <PopoverTrigger asChild>
+                                      <Button
+                                          variant="ghost"
+                                          role="combobox"
+                                          aria-expanded={sizePopoverOpen}
+                                          className="absolute right-0 top-0 h-full px-2"
+                                      >
+                                          <ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50" />
+                                      </Button>
+                                  </PopoverTrigger>
+                              </div>
+                               <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+                                  <Command>
+                                      <CommandList>
+                                          <CommandGroup>
+                                              {LOT_SIZES.map((size) => (
+                                                  <CommandItem
+                                                      key={size.value}
+                                                      value={String(size.value)}
+                                                      onSelect={(currentValue) => {
+                                                          field.onChange(parseFloat(currentValue));
+                                                          setSizePopoverOpen(false);
+                                                      }}
+                                                  >
+                                                      <Check
+                                                          className={cn(
+                                                              "mr-2 h-4 w-4",
+                                                              field.value === size.value ? "opacity-100" : "opacity-0"
+                                                          )}
+                                                      />
+                                                      {size.label}
+                                                  </CommandItem>
+                                              ))}
+                                          </CommandGroup>
+                                      </CommandList>
+                                  </Command>
+                              </PopoverContent>
+                          </Popover>
+                          <FormMessage />
                         </FormItem>
                     )}
                  />
