@@ -1,14 +1,14 @@
 'use client';
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { LiveTradeSession, PlaybookTemplate, TradeSide, Instrument, TradeDraft } from '@/lib/live-trading/types';
+import { PlaybookTemplate } from '@/lib/live-trading/types';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Play } from 'lucide-react';
 import InstrumentSelect from './InstrumentSelect';
-import { cn } from '@/lib/utils';
 import { Label } from '../ui/label';
+import { LiveTradeSession } from '@/lib/live-trading/types';
+import SizeSelect from './SizeSelect';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface LiveControlBarProps {
   session: LiveTradeSession;
@@ -18,7 +18,7 @@ interface LiveControlBarProps {
   isTradeActive: boolean;
 }
 
-export default function LiveControlBar({ session, onSessionChange, playbooks, onLogTrade, isTradeActive }: LiveControlBarProps) {
+export default function LiveControlBar({ session, onSessionChange, playbooks, onLogTrade }: LiveControlBarProps) {
   const handleSessionValueChange = <K extends keyof LiveTradeSession>(key: K, value: LiveTradeSession[K]) => {
     onSessionChange({ ...session, [key]: value });
   };
@@ -69,23 +69,10 @@ export default function LiveControlBar({ session, onSessionChange, playbooks, on
           {/* Size */}
           <div className="flex items-center gap-2">
             <Label htmlFor="lot-size-select" className="text-xs text-gray-400">Lot Size</Label>
-            <Select
-              value={String(session.size)}
-              onValueChange={(val) => handleSessionValueChange('size', parseInt(val, 10))}
-            >
-              <SelectTrigger id="lot-size-select" className="w-28 bg-transparent border-white/10 rounded-sm">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="bg-[#0F0F10] border-white/20 text-gray-200">
-                <SelectItem value="1">1</SelectItem>
-                <SelectItem value="10">10</SelectItem>
-                <SelectItem value="25">25</SelectItem>
-                <SelectItem value="50">50</SelectItem>
-                <SelectItem value="100">100</SelectItem>
-                <SelectItem value="1000">1,000</SelectItem>
-                <SelectItem value="10000">10,000</SelectItem>
-              </SelectContent>
-            </Select>
+            <SizeSelect
+              value={session.size}
+              onChange={(val) => handleSessionValueChange('size', val)}
+            />
           </div>
 
           <div className="flex-grow" />
