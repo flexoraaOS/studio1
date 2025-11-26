@@ -108,7 +108,7 @@ export const PostTradeModal: React.FC<PostTradeModalProps> = ({ isOpen, onClose,
 
     const instrument = draft?.params.instrument || existingTrade?.instrument;
     const side = draft?.params.side || existingTrade?.side;
-    const size = draft?.params.size || existingTrade?.size || 0;
+    const lotSize = draft?.params.size || existingTrade?.size || 0;
 
     const entry = parseFloat(entryPrice);
     const exit = parseFloat(exitPrice);
@@ -116,7 +116,7 @@ export const PostTradeModal: React.FC<PostTradeModalProps> = ({ isOpen, onClose,
     
     if (isNaN(entry) || isNaN(exit) || !side || !instrument) return;
 
-    const pnl = computePnL(entry, exit, size, side, instrument);
+    const pnl = computePnL(entry, exit, lotSize, side, instrument);
     const rMultiple = computeRMultiple(entry, exit, stop, side);
 
     const newTrade: CompletedTrade = {
@@ -125,7 +125,7 @@ export const PostTradeModal: React.FC<PostTradeModalProps> = ({ isOpen, onClose,
       playbookId: associatedDraft.playbookId,
       instrument: instrument,
       side: side,
-      size: size,
+      size: lotSize,
       entryTimestamp: associatedDraft.createdAt || existingTrade?.entryTimestamp || new Date().toISOString(),
       exitTimestamp: new Date().toISOString(),
       entryPrice: entry,
@@ -156,15 +156,15 @@ export const PostTradeModal: React.FC<PostTradeModalProps> = ({ isOpen, onClose,
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl h-auto bg-[#0F0F10] border-white/10 text-gray-200 font-code flex flex-col">
+      <DialogContent className="max-w-4xl bg-[#0F0F10] border-white/10 text-gray-200 font-code flex flex-col">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-white">{existingTrade ? 'Edit Trade' : 'Finalize Trade'}</DialogTitle>
           <DialogDescription className="text-gray-400">
-             {draft ? `Confirm details for: ${draft.params.instrument?.symbol} ${draft.params.side} @ ${draft.params.size/100000} lots` : 'Enter trade details manually.'}
+             {draft ? `Confirm details for: ${draft.params.instrument?.symbol} ${draft.params.side} @ ${draft.params.size} lots` : 'Enter trade details manually.'}
           </DialogDescription>
         </DialogHeader>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 py-4 flex-grow">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 py-4 flex-grow overflow-y-auto">
           {/* Left Column */}
           <div className="flex flex-col gap-6">
             
@@ -236,7 +236,7 @@ export const PostTradeModal: React.FC<PostTradeModalProps> = ({ isOpen, onClose,
         </div>
         
         <div className="pt-4 border-t border-white/10 flex justify-end">
-          <Button onClick={handleSave} variant="destructive" className="w-48">
+          <Button onClick={handleSave} variant="destructive" className="bg-[#FF3B47] text-white hover:bg-[#FF3B47]/80 shadow-[0_0_15px_rgba(255,59,71,0.5)] w-auto">
             <Save className="w-4 h-4 mr-2" />
             Save Finalized Trade
           </Button>
