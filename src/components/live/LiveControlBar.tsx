@@ -8,6 +8,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { Play, Square } from 'lucide-react';
 import InstrumentSelect from './InstrumentSelect';
 import { cn } from '@/lib/utils';
+import { Label } from '../ui/label';
 
 interface LiveControlBarProps {
   session: LiveTradeSession;
@@ -66,39 +67,47 @@ export default function LiveControlBar({ session, onSessionChange, playbooks, on
           </div>
 
           {/* Size & Risk */}
-          <div className="flex items-center gap-1">
-             <Input
-                type="number"
-                value={session.size}
-                onChange={(e) => handleSessionValueChange('size', parseFloat(e.target.value))}
-                className="w-28 bg-transparent border-white/10 rounded-sm"
-                placeholder="Size"
-            />
-            <Input
-                type="number"
-                value={session.riskPercent}
-                onChange={(e) => handleSessionValueChange('riskPercent', parseFloat(e.target.value))}
-                className="w-24 bg-transparent border-white/10 rounded-sm"
-                placeholder="Risk %"
-            />
+          <div className="flex items-center gap-4">
+             <div className="flex items-center gap-2">
+                <Label htmlFor="size-input" className="text-xs text-gray-400">Size</Label>
+                <Input
+                    id="size-input"
+                    type="number"
+                    value={session.size}
+                    onChange={(e) => handleSessionValueChange('size', parseFloat(e.target.value))}
+                    className="w-28 bg-transparent border-white/10 rounded-sm"
+                    placeholder="Size"
+                />
+            </div>
+             <div className="flex items-center gap-2">
+                <Label htmlFor="risk-input" className="text-xs text-gray-400">Risk %</Label>
+                <Input
+                    id="risk-input"
+                    type="number"
+                    value={session.riskPercent}
+                    onChange={(e) => handleSessionValueChange('riskPercent', parseFloat(e.target.value))}
+                    className="w-24 bg-transparent border-white/10 rounded-sm"
+                    placeholder="Risk %"
+                />
+            </div>
           </div>
 
           <div className="flex-grow" />
 
           {/* Actions */}
           <div className="flex items-center gap-2">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  className="bg-[#39FF88] text-black hover:bg-[#39FF88]/80 shadow-[0_0_15px_rgba(57,255,136,0.5)]"
-                  onClick={onLogTrade}
-                  data-testid="log-trade-button"
-                >
-                  <Play className="w-4 h-4 mr-2"/>
-                  Log Trade
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent className="bg-[#0F0F10] border-white/20 text-gray-200"><p>Log a new trade (E)</p></TooltipContent>
+             <Tooltip>
+                <TooltipTrigger asChild>
+                    <Button
+                        className="bg-[#39FF88] text-black hover:bg-[#39FF88]/80 shadow-[0_0_15px_rgba(57,255,136,0.5)]"
+                        onClick={onLogTrade}
+                        data-testid="log-trade-button"
+                    >
+                        <Play className="w-4 h-4 mr-2"/>
+                        Log Trade
+                    </Button>
+                </TooltipTrigger>
+                <TooltipContent className="bg-[#0F0F10] border-white/20 text-gray-200"><p>Log a new trade (E)</p></TooltipContent>
             </Tooltip>
           </div>
         </div>
