@@ -35,7 +35,14 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { useToast } from '@/hooks/use-toast';
 import { addTradeAction, type FormState } from '@/app/actions';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Terminal } from 'lucide-react';
+import { Check, ChevronsUpDown, Terminal } from 'lucide-react';
+import { mockTrades } from '@/lib/data';
+import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '../ui/command';
+import { cn } from '@/lib/utils';
+
+
+const instruments = [...new Set(mockTrades.map(t => t.symbol))].map(symbol => ({ label: symbol, value: symbol }));
 
 const tradeSchema = z.object({
   symbol: z.string().min(1, 'Symbol is required'),
@@ -116,11 +123,58 @@ export default function AddTradeSheet({
                 control={form.control}
                 name="symbol"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="flex flex-col">
                     <FormLabel>Symbol</FormLabel>
-                    <FormControl>
-                      <Input placeholder="e.g., RELIANCE" {...field} />
-                    </FormControl>
+                    <Popover>
+                        <PopoverTrigger asChild>
+                            <FormControl>
+                                <Button
+                                variant="outline"
+                                role="combobox"
+                                className={cn(
+                                    "w-full justify-between",
+                                    !field.value && "text-muted-foreground"
+                                )}
+                                >
+                                {field.value
+                                    ? instruments.find(
+                                        (instrument) => instrument.value === field.value
+                                    )?.label
+                                    : "Select symbol"}
+                                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                </Button>
+                            </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+                            <Command>
+                                <CommandInput placeholder="Search symbols..." />
+                                <CommandList>
+                                    <CommandEmpty>No symbols found.</CommandEmpty>
+                                    <CommandGroup>
+                                        {instruments.map((instrument) => (
+                                        <CommandItem
+                                            value={instrument.label}
+                                            key={instrument.value}
+                                            onSelect={() => {
+                                                form.setValue("symbol", instrument.value)
+                                            }}
+                                        >
+                                            <Check
+                                            className={cn(
+                                                "mr-2 h-4 w-4",
+                                                instrument.value === field.value
+                                                ? "opacity-100"
+                                                : "opacity-0"
+                                            )}
+                                            />
+                                            {instrument.label}
+                                        </CommandItem>
+                                        ))}
+                                    </CommandGroup>
+                                </CommandList>
+                            </Command>
+                        </PopoverContent>
+                    </Popover>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -232,7 +286,7 @@ export default function AddTradeSheet({
                   name="potentialAnomaly"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Potential Anomaly (for AI)</FormLabel>
+                      <FormLabel>AI-Powered Anomaly Analysis</FormLabel>
                        <FormControl>
                         <Textarea
                           placeholder="Describe anything unusual about this trade, e.g., 'unexpectedly large slippage on entry'."
