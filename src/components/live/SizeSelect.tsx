@@ -16,6 +16,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { ChevronsUpDown } from 'lucide-react';
+import { Input } from '@/components/ui/input';
 
 interface SizeSelectProps {
   value: number;
