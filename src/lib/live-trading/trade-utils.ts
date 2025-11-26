@@ -4,16 +4,16 @@ import { TradeSide } from './types';
  * Computes the Profit and Loss (PnL) of a trade.
  * @param entry - The entry price.
  * @param exit - The exit price.
- * @param size - The size of the trade.
+ * @param size - The size of the trade in currency units.
  * @param side - The direction of the trade ('Long' or 'Short').
- * @returns The raw PnL of the trade.
+ * @returns The raw P&L of the trade.
  */
 export function computePnL(entry: number, exit: number, size: number, side: TradeSide): number {
   if (isNaN(entry) || isNaN(exit) || isNaN(size) || !side) return 0;
   if (side === 'Long') {
-    return (exit - entry) * size;
+    return (exit - entry) * (size / 100000); // Standard lot calculation
   }
-  return (entry - exit) * size;
+  return (entry - exit) * (size / 100000); // Standard lot calculation
 }
 
 /**
@@ -69,3 +69,5 @@ export function computeElapsedTime(start: string | Date, end: string | Date): st
 
   return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 }
+
+    

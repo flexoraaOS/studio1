@@ -125,7 +125,7 @@ export const PostTradeModal: React.FC<PostTradeModalProps> = ({ isOpen, onClose,
     (Object.values(ruleAdherence).filter(Boolean).length / playbook.rules.length) * 100 : 0;
 
 
-  const pnl = computePnL(parseFloat(entryPrice), parseFloat(exitPrice), draft?.params.size || 0, draft?.params.side || 'Long');
+  const pnl = computePnL(parseFloat(entryPrice), draft?.params.size || 0, draft?.params.side || 'Long', parseFloat(exitPrice));
   const netPnl = pnl - parseFloat(fees || '0');
   const rMultiple = computeRMultiple(parseFloat(entryPrice), parseFloat(exitPrice), parseFloat(stopLoss), draft?.params.side || 'Long');
 
@@ -136,7 +136,7 @@ export const PostTradeModal: React.FC<PostTradeModalProps> = ({ isOpen, onClose,
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-white">{mode === 'finalize' ? 'Finalize Trade' : 'Log Manual Trade'}</DialogTitle>
           <DialogDescription className="text-gray-400">
-            {mode === 'finalize' && draft ? `Confirm details for: ${draft.params.instrument?.symbol} (${draft.params.side})` : 'Enter trade details manually.'}
+            {mode === 'finalize' && draft ? `Confirm details for: ${draft.params.instrument?.symbol} ${draft.params.side} @ ${draft.params.size / 100000} lots` : 'Enter trade details manually.'}
           </DialogDescription>
         </DialogHeader>
 
@@ -144,13 +144,6 @@ export const PostTradeModal: React.FC<PostTradeModalProps> = ({ isOpen, onClose,
           {/* Left Column */}
           <div className="flex flex-col gap-6 overflow-y-auto pr-4">
             
-            {/* Trade Parameters */}
-            <div className="grid grid-cols-3 gap-4">
-              <div><Label>Instrument</Label><Input value={draft?.params.instrument?.symbol} disabled className="bg-[#1A1A1B] border-white/10" /></div>
-              <div><Label>Side</Label><Input value={draft?.params.side} disabled className="bg-[#1A1A1B] border-white/10" /></div>
-              <div><Label>Size</Label><Input value={draft?.params.size} disabled className="bg-[#1A1A1B] border-white/10" /></div>
-            </div>
-
             {/* Price Inputs */}
             <div className="grid grid-cols-3 gap-4">
               <div><Label htmlFor="entryPrice">Entry Price</Label><Input id="entryPrice" value={entryPrice} onChange={e => setEntryPrice(e.target.value)} className="bg-[#1A1A1B] border-white/10" /></div>
@@ -179,9 +172,8 @@ export const PostTradeModal: React.FC<PostTradeModalProps> = ({ isOpen, onClose,
             </div>
 
             {/* Qualitative Inputs */}
-             <div className="grid grid-cols-2 gap-4">
+             <div className="grid grid-cols-1 gap-4">
                 <div><Label htmlFor="notes">Trade Rationale & Notes</Label><Textarea id="notes" value={notes} onChange={e => setNotes(e.target.value)} className="bg-[#1A1A1B] border-white/10 min-h-[100px]" placeholder="Pre-trade thoughts, execution notes..."/></div>
-                 <div><Label htmlFor="tags">Tags (comma-separated)</Label><Textarea id="tags" value={tags} onChange={e => setTags(e.target.value)} className="bg-[#1A1A1B] border-white/10 min-h-[100px]" placeholder="e.g., News Play, FOMO, Technical Error..."/></div>
              </div>
 
             <div {...getRootProps()} className="p-6 border-2 border-dashed border-white/20 rounded-md text-center cursor-pointer hover:bg-white/5">
@@ -226,3 +218,5 @@ export const PostTradeModal: React.FC<PostTradeModalProps> = ({ isOpen, onClose,
     </Dialog>
   );
 };
+
+    
