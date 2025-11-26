@@ -1,15 +1,13 @@
 'use client';
-import React, { useState } from 'react';
+import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { LiveTradeSession, PlaybookTemplate, TradeSide, Instrument, ActiveTrade } from '@/lib/live-trading/types';
+import { LiveTradeSession, PlaybookTemplate, TradeSide, Instrument, TradeDraft } from '@/lib/live-trading/types';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { Play, Square, ChevronsUpDown, Check } from 'lucide-react';
+import { Play, Square } from 'lucide-react';
 import InstrumentSelect from './InstrumentSelect';
 import { cn } from '@/lib/utils';
-import LiveTimer from './LiveTimer';
-
 
 interface LiveControlBarProps {
   session: LiveTradeSession;
@@ -17,16 +15,14 @@ interface LiveControlBarProps {
   playbooks: PlaybookTemplate[];
   onPrepareTrade: () => void;
   onFinalizeTrade: () => void;
-  activeTrade: ActiveTrade | null;
+  isTradeActive: boolean; // Simplified from activeTrade object
 }
 
-export default function LiveControlBar({ session, onSessionChange, playbooks, onPrepareTrade, onFinalizeTrade, activeTrade }: LiveControlBarProps) {
+export default function LiveControlBar({ session, onSessionChange, playbooks, onPrepareTrade, onFinalizeTrade, isTradeActive }: LiveControlBarProps) {
   const handleSessionValueChange = <K extends keyof LiveTradeSession>(key: K, value: LiveTradeSession[K]) => {
     onSessionChange({ ...session, [key]: value });
   };
   
-  const isTradeActive = !!activeTrade;
-
   return (
     <header className="sticky top-0 z-10 flex items-center h-16 px-4 border-b border-white/10 bg-gradient-to-b from-[#1B0708] to-[#0B0B0C]">
       <TooltipProvider>
@@ -35,7 +31,6 @@ export default function LiveControlBar({ session, onSessionChange, playbooks, on
           <Select
             value={session.playbookId}
             onValueChange={(val) => handleSessionValueChange('playbookId', val)}
-            disabled={isTradeActive}
           >
             <SelectTrigger className="w-[250px] bg-transparent border-white/10 rounded-sm">
               <SelectValue placeholder="Select a playbook..." />
@@ -51,7 +46,6 @@ export default function LiveControlBar({ session, onSessionChange, playbooks, on
            <InstrumentSelect
             value={session.instrument}
             onChange={(val) => handleSessionValueChange('instrument', val)}
-            disabled={isTradeActive}
           />
 
           {/* Side */}
@@ -60,7 +54,6 @@ export default function LiveControlBar({ session, onSessionChange, playbooks, on
               size="sm"
               className={`h-8 px-4 rounded-sm transition-all ${session.side === 'Long' ? 'bg-[#39FF88]/90 text-black' : 'bg-transparent text-gray-400 hover:bg-white/5'}`}
               onClick={() => handleSessionValueChange('side', 'Long')}
-              disabled={isTradeActive}
             >
               Long
             </Button>
@@ -68,7 +61,6 @@ export default function LiveControlBar({ session, onSessionChange, playbooks, on
               size="sm"
               className={`h-8 px-4 rounded-sm transition-all ${session.side === 'Short' ? 'bg-[#FF3B47]/90 text-black' : 'bg-transparent text-gray-400 hover:bg-white/5'}`}
               onClick={() => handleSessionValueChange('side', 'Short')}
-              disabled={isTradeActive}
             >
               Short
             </Button>
@@ -82,7 +74,6 @@ export default function LiveControlBar({ session, onSessionChange, playbooks, on
                 onChange={(e) => handleSessionValueChange('size', parseFloat(e.target.value))}
                 className="w-28 bg-transparent border-white/10 rounded-sm"
                 placeholder="Size"
-                disabled={isTradeActive}
             />
             <Input
                 type="number"
@@ -90,41 +81,39 @@ export default function LiveControlBar({ session, onSessionChange, playbooks, on
                 onChange={(e) => handleSessionValueChange('riskPercent', parseFloat(e.target.value))}
                 className="w-24 bg-transparent border-white/10 rounded-sm"
                 placeholder="Risk %"
-                disabled={isTradeActive}
             />
           </div>
 
           <div className="flex-grow" />
-
-          {/* Live Timer */}
-          {isTradeActive && activeTrade.startTime && <LiveTimer startTime={activeTrade.startTime} />}
 
           {/* Actions */}
           <div className="flex items-center gap-2">
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
-                  className={cn("bg-[#39FF88] text-black hover:bg-[#39FF88]/80 shadow-[0_0_15px_rgba(57,255,136,0.5)]", !isTradeActive && 'hidden')}
+                  className="bg-[#FFAA55]/80 text-black hover:bg-[#FFAA55]"
                   onClick={onFinalizeTrade}
+                  data-testid="finalize-manual-trade-button"
                 >
                   <Square className="w-4 h-4 mr-2"/>
-                  End Trade
+                  Manual Entry
                 </Button>
               </TooltipTrigger>
-              <TooltipContent className="bg-[#0F0F10] border-white/20 text-gray-200"><p>Finalize and log this trade (E)</p></TooltipContent>
+              <TooltipContent className="bg-[#0F0F10] border-white/20 text-gray-200"><p>Log a trade manually (E)</p></TooltipContent>
             </Tooltip>
             
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
-                  className={cn("bg-[#FF3B47] text-white hover:bg-[#FF3B47]/80 shadow-[0_0_15px_rgba(255,59,71,0.5)]", isTradeActive && 'hidden')}
+                  className="bg-[#39FF88] text-black hover:bg-[#39FF88]/80 shadow-[0_0_15px_rgba(57,255,136,0.5)]"
                   onClick={onPrepareTrade}
+                  data-testid="prepare-trade-button"
                 >
                   <Play className="w-4 h-4 mr-2"/>
-                  Start Trade
+                  Prepare Trade
                 </Button>
               </TooltipTrigger>
-              <TooltipContent className="bg-[#0F0F10] border-white/20 text-gray-200"><p>Start a new live trade session (S)</p></TooltipContent>
+              <TooltipContent className="bg-[#0F0F10] border-white/20 text-gray-200"><p>Prepare a new trade draft (S)</p></TooltipContent>
             </Tooltip>
           </div>
         </div>

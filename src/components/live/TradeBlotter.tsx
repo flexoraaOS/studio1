@@ -1,16 +1,13 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { PlusCircle, Save } from 'lucide-react';
 import { CompletedTrade } from '@/lib/live-trading/types';
-import { loadTrades, clearTrades } from '@/lib/live-trading/storage';
+import * as storage from '@/lib/live-trading/storage';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { ScrollArea } from '@/components/ui/scroll-area';
-
 
 interface TradeBlotterProps {
   blotterKey: number; // To force re-renders
@@ -21,7 +18,7 @@ export default function TradeBlotter({ blotterKey, onClear }: TradeBlotterProps)
   const [trades, setTrades] = useState<CompletedTrade[]>([]);
 
   useEffect(() => {
-    setTrades(loadTrades());
+    setTrades(storage.loadTrades());
   }, [blotterKey]);
 
   return (

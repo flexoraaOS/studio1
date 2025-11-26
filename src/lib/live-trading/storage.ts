@@ -1,6 +1,6 @@
 /**
  * =================================================================
- * MOCK STORAGE UTILS for Live Trading Workspace
+ * MOCK STORAGE UTILS for Live Trading Workspace (Draft-to-Finalize)
  * =================================================================
  * Provides an interface to localStorage for storing drafts and closed trades.
  * This simulates a backend and allows for state persistence during development.
@@ -9,11 +9,10 @@
  * to a Firestore backend.
  */
 
-import type { TradeDraft, CompletedTrade, ActiveTrade } from './types';
+import type { TradeDraft, CompletedTrade } from './types';
 
 const DRAFTS_KEY = 'ts_drafts';
 const TRADES_KEY = 'ts_closed_trades';
-const ACTIVE_TRADE_KEY = 'ts_active_trade';
 
 // --- Generic Helpers ---
 
@@ -28,18 +27,7 @@ function getFromStorage<T>(key: string): T[] {
   }
 }
 
-function getObjectFromStorage<T>(key: string): T | null {
-  if (typeof window === 'undefined') return null;
-  try {
-    const item = window.localStorage.getItem(key);
-    return item ? JSON.parse(item) : null;
-  } catch (error) {
-    console.error(`Error reading object from localStorage key “${key}”:`, error);
-    return null;
-  }
-}
-
-function saveToStorage<T>(key: string, data: T[] | T): void {
+function saveToStorage<T>(key: string, data: T[]): void {
   if (typeof window === 'undefined') return;
   try {
     window.localStorage.setItem(key, JSON.stringify(data));
@@ -47,22 +35,6 @@ function saveToStorage<T>(key: string, data: T[] | T): void {
     console.error(`Error writing to localStorage key “${key}”:`, error);
   }
 }
-
-// --- Active Trade ---
-
-export function loadActiveTrade(): ActiveTrade | null {
-  return getObjectFromStorage<ActiveTrade>(ACTIVE_TRADE_KEY);
-}
-
-export function saveActiveTrade(trade: ActiveTrade): void {
-  saveToStorage<ActiveTrade>(ACTIVE_TRADE_KEY, trade);
-}
-
-export function clearActiveTrade(): void {
-  if (typeof window === 'undefined') return;
-  window.localStorage.removeItem(ACTIVE_TRADE_KEY);
-}
-
 
 // --- Drafts ---
 
@@ -86,15 +58,7 @@ export function saveDraft(draft: TradeDraft): void {
   } else {
     drafts.unshift(draft);
   }
-  saveToStorage<TradeDraft[]>(DRAFTS_KEY, drafts);
-}
-
-/**
- * Saves an array of trade drafts to localStorage.
- * TODO: Replace with batched writes or individual `setDoc` calls to Firestore.
- */
-export function saveDrafts(drafts: TradeDraft[]): void {
-  saveToStorage<TradeDraft[]>(DRAFTS_KEY, drafts);
+  saveToStorage<TradeDraft>(DRAFTS_KEY, drafts);
 }
 
 
@@ -105,7 +69,7 @@ export function saveDrafts(drafts: TradeDraft[]): void {
 export function deleteDraft(draftId: string): void {
   let drafts = loadDrafts();
   drafts = drafts.filter(d => d.id !== draftId);
-  saveToStorage<TradeDraft[]>(DRAFTS_KEY, drafts);
+  saveToStorage<TradeDraft>(DRAFTS_KEY, drafts);
 }
 
 /**
@@ -140,7 +104,7 @@ export function saveTrade(trade: CompletedTrade): void {
   } else {
     trades.unshift(trade);
   }
-  saveToStorage<CompletedTrade[]>(TRADES_KEY, trades);
+  saveToStorage<CompletedTrade>(TRADES_KEY, trades);
 }
 
 /**

@@ -63,29 +63,15 @@ export type TradeDraft = {
 };
 
 // Represents a trade that is currently active.
-export type ActiveTrade = {
-  id: string; // "live_..."
-  startTime: ISOString;
-  playbookId: string;
-  createdAt: ISOString;
-  playbookName: string;
-  params: {
-    instrument: Instrument;
-    side: TradeSide;
-    size: number;
-    riskPercent: number;
-    entryPrice: number;
-    stopLoss: number;
-    exitPrice?: number;
-  };
-  notes: string;
-};
+// In the Draft-Finalize flow, this is effectively the same as TradeDraft
+// It represents the "active context" for the modal.
+export type ActiveTrade = TradeDraft;
 
 
 // Represents a fully logged, immutable trade record.
 export type CompletedTrade = {
   id: string; // "trade_..."
-  draftId?: string; // Link to the original draft or active trade
+  draftId?: string; // Link to the original draft
   playbookId: string;
   instrument: Instrument;
   side: TradeSide;

@@ -5,22 +5,20 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { CheckCircle, XCircle, Upload, Save, AlertTriangle } from 'lucide-react';
-import { PlaybookTemplate, TradeDraft, CompletedTrade, ActiveTrade } from '@/lib/live-trading/types';
-import { saveTrade, deleteDraft } from '@/lib/live-trading/storage';
+import { PlaybookTemplate, TradeDraft, CompletedTrade } from '@/lib/live-trading/types';
 import { computePnL, computeRMultiple } from '@/lib/live-trading/trade-utils';
 import { useDropzone } from 'react-dropzone';
+import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 
 export interface ModalState {
   isOpen: boolean;
   mode: 'manual' | 'finalize';
   draft?: TradeDraft;
-  activeTrade?: ActiveTrade;
 }
 
-const usePostTradeModal = () => {
+export const usePostTradeModal = () => {
   const [modalState, setModalState] = useState<ModalState>({ isOpen: false, mode: 'manual' });
 
   const openModal = (state: Omit<ModalState, 'isOpen'>) => {
@@ -37,15 +35,14 @@ const usePostTradeModal = () => {
 interface PostTradeModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (trade: CompletedTrade) => void;
+  onSave: (trade: CompletedTrade, draftId?: string) => void;
   initialState: ModalState;
   playbooks: PlaybookTemplate[];
 }
 
-const PostTradeModal: React.FC<PostTradeModalProps> = ({ isOpen, onClose, onSave, initialState, playbooks }) => {
-  const isFinalizing = initialState.mode === 'finalize';
-  const tradeSource = isFinalizing ? initialState.activeTrade : initialState.draft;
-
+export const PostTradeModal: React.FC<PostTradeModalProps> = ({ isOpen, onClose, onSave, initialState, playbooks }) => {
+  const { mode, draft } = initialState;
+  
   const [entryPrice, setEntryPrice] = useState('');
   const [exitPrice, setExitPrice] = useState('');
   const [stopLoss, setStopLoss] = useState('');
@@ -53,26 +50,25 @@ const PostTradeModal: React.FC<PostTradeModalProps> = ({ isOpen, onClose, onSave
   const [notes, setNotes] = useState('');
   const [screenshot, setScreenshot] = useState<string | null>(null);
 
-  const playbook = playbooks.find(p => p.id === tradeSource?.playbookId);
+  const playbook = playbooks.find(p => p.id === draft?.playbookId);
   
-  const [ruleAdherence, setRuleAdherence] = useState<Record<string, boolean>>(() => {
-    if (!playbook) return {};
-    return playbook.rules.reduce((acc, rule) => ({ ...acc, [rule.id]: !rule.isMandatory }), {});
-  });
+  const [ruleAdherence, setRuleAdherence] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
-    if (isOpen && tradeSource) {
-      setEntryPrice(tradeSource.params.entryPrice?.toString() || '');
-      setExitPrice(isFinalizing ? (tradeSource.params.exitPrice?.toString() || '') : '');
-      setStopLoss(tradeSource.params.stopLoss?.toString() || '');
+    if (isOpen) {
+      setEntryPrice(draft?.params.entryPrice?.toString() || '');
+      setExitPrice(''); // Always clear exit price
+      setStopLoss(draft?.params.stopLoss?.toString() || '');
       setFees('0');
-      setNotes(tradeSource.notes || '');
+      setNotes(draft?.notes || '');
       setScreenshot(null);
       if (playbook) {
         setRuleAdherence(playbook.rules.reduce((acc, rule) => ({ ...acc, [rule.id]: true }), {}));
+      } else {
+        setRuleAdherence({});
       }
     }
-  }, [isOpen, tradeSource, playbook, isFinalizing]);
+  }, [isOpen, draft, playbook]);
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     const file = acceptedFiles[0];
@@ -86,8 +82,8 @@ const PostTradeModal: React.FC<PostTradeModalProps> = ({ isOpen, onClose, onSave
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop, accept: {'image/*':[]} });
 
   const handleSave = () => {
-    if (!tradeSource) return;
-    const { side, size = 0, instrument } = tradeSource.params;
+    if (!draft) return; // Should always have a draft in finalize mode
+    const { side, size = 0, instrument } = draft.params;
     const entry = parseFloat(entryPrice);
     const exit = parseFloat(exitPrice);
     const stop = parseFloat(stopLoss);
@@ -99,12 +95,12 @@ const PostTradeModal: React.FC<PostTradeModalProps> = ({ isOpen, onClose, onSave
 
     const newTrade: CompletedTrade = {
       id: `trade_${Date.now()}`,
-      draftId: tradeSource.id,
-      playbookId: tradeSource.playbookId,
+      draftId: draft.id,
+      playbookId: draft.playbookId,
       instrument: instrument,
       side: side,
       size: size,
-      entryTimestamp: tradeSource.createdAt,
+      entryTimestamp: draft.createdAt,
       exitTimestamp: new Date().toISOString(),
       entryPrice: entry,
       exitPrice: exit,
@@ -112,18 +108,14 @@ const PostTradeModal: React.FC<PostTradeModalProps> = ({ isOpen, onClose, onSave
       fees: parseFloat(fees),
       pnl: pnl - parseFloat(fees),
       rMultiple,
-      slippage: 0,
+      slippage: 0, // Placeholder
       notes,
       tags: [],
       attachments: screenshot ? [{ id: 'ss1', data: screenshot }] : [],
       adherence: ruleAdherence,
     };
 
-    saveTrade(newTrade);
-    if(initialState.draft) {
-      deleteDraft(initialState.draft.id);
-    }
-    onSave(newTrade);
+    onSave(newTrade, draft.id);
     onClose();
   };
 
@@ -135,9 +127,9 @@ const PostTradeModal: React.FC<PostTradeModalProps> = ({ isOpen, onClose, onSave
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl h-[90vh] bg-[#0F0F10] border-white/10 text-gray-200 font-code flex flex-col">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold text-white">Finalize Trade</DialogTitle>
+          <DialogTitle className="text-2xl font-bold text-white">{mode === 'finalize' ? 'Finalize Trade' : 'Log Manual Trade'}</DialogTitle>
           <DialogDescription className="text-gray-400">
-            Confirm details for: {tradeSource?.params.instrument?.symbol} ({tradeSource?.params.side})
+            {mode === 'finalize' && draft ? `Confirm details for: ${draft.params.instrument?.symbol} (${draft.params.side})` : 'Enter trade details manually.'}
           </DialogDescription>
         </DialogHeader>
 
@@ -153,8 +145,8 @@ const PostTradeModal: React.FC<PostTradeModalProps> = ({ isOpen, onClose, onSave
 
             <div className="p-4 bg-[#1A1A1B] rounded-md border border-white/10 text-center">
               <p className="text-sm text-gray-400">Net P&L</p>
-              <p className={`text-3xl font-bold ${computePnL(parseFloat(entryPrice), parseFloat(exitPrice), tradeSource?.params.size || 0, tradeSource?.params.side || 'Long') - parseFloat(fees) >= 0 ? 'text-[#39FF88]' : 'text-[#FF3B47]'}`}>
-                ${(computePnL(parseFloat(entryPrice), parseFloat(exitPrice), tradeSource?.params.size || 0, tradeSource?.params.side || 'Long') - parseFloat(fees)).toFixed(2)}
+              <p className={`text-3xl font-bold ${computePnL(parseFloat(entryPrice), parseFloat(exitPrice), draft?.params.size || 0, draft?.params.side || 'Long') - parseFloat(fees) >= 0 ? 'text-[#39FF88]' : 'text-[#FF3B47]'}`}>
+                ${(computePnL(parseFloat(entryPrice), parseFloat(exitPrice), draft?.params.size || 0, draft?.params.side || 'Long') - parseFloat(fees)).toFixed(2)}
               </p>
             </div>
 
@@ -202,5 +194,3 @@ const PostTradeModal: React.FC<PostTradeModalProps> = ({ isOpen, onClose, onSave
     </Dialog>
   );
 };
-
-export { PostTradeModal, usePostTradeModal };

@@ -8,31 +8,26 @@ import TradeBlotter from '@/components/live/TradeBlotter';
 import { PostTradeModal, usePostTradeModal } from '@/components/live/PostTradeModal';
 import { useLiveTrading } from '@/hooks/use-live-trading';
 import LiveTape from '@/components/live/LiveTape';
+import DraftsList from '@/components/live/DraftsList';
 
 export default function LiveTradingCockpitPage() {
   const {
     session,
     setSession,
     playbooks,
-    activeTrade,
+    activeTrade, // This is now a draft, but we keep the name for minimal refactoring where it represents the "active context"
     drafts,
     blotterKey,
     handlePrepareTrade,
     handleFinalizeTrade,
     handleSaveTrade,
     handleOpenDraft,
+    handleDeleteDraft,
+    handleCloneDraft,
     handleClearBlotter,
   } = useLiveTrading();
-  
-  const { modalState, openModal, closeModal } = usePostTradeModal();
 
-  const handleOpenFinalizeModal = (draft?: any) => {
-    openModal({ 
-      mode: draft ? 'finalize' : 'manual', 
-      draft: draft || undefined,
-      activeTrade: activeTrade || undefined,
-    });
-  };
+  const { modalState, openModal, closeModal } = usePostTradeModal();
 
   return (
     <DndProvider backend={HTML5Backend}>
@@ -42,8 +37,8 @@ export default function LiveTradingCockpitPage() {
           onSessionChange={setSession}
           playbooks={playbooks}
           onPrepareTrade={handlePrepareTrade}
-          onFinalizeTrade={() => activeTrade && handleFinalizeTrade(activeTrade)}
-          activeTrade={activeTrade}
+          onFinalizeTrade={() => handleFinalizeTrade(activeTrade)}
+          isTradeActive={!!activeTrade}
         />
 
         <div className="flex-1 grid grid-cols-1 lg:grid-cols-[380px_1fr_380px] gap-2 p-2 overflow-hidden">
@@ -52,8 +47,12 @@ export default function LiveTradingCockpitPage() {
             <PreTradePanel
               playbookId={session.playbookId}
               playbooks={playbooks}
-              drafts={drafts}
-              onOpenDraft={handleOpenDraft}
+            />
+            <DraftsList
+                drafts={drafts}
+                onOpenDraft={handleOpenDraft}
+                onCloneDraft={handleCloneDraft}
+                onDeleteDraft={handleDeleteDraft}
             />
           </div>
 

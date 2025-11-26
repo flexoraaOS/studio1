@@ -116,10 +116,11 @@ export const ALL_INSTRUMENTS: Instrument[] = [
 ];
 
 export const INSTRUMENT_GROUPS = ALL_INSTRUMENTS.reduce((acc, instrument) => {
-  if (!acc[instrument.category]) {
-    acc[instrument.category] = [];
+  const category = instrument.category as InstrumentCategory;
+  if (!acc[category]) {
+    acc[category] = [];
   }
-  acc[instrument.category].push(instrument);
+  acc[category].push(instrument);
   return acc;
 }, {} as Record<InstrumentCategory, Instrument[]>);
 
@@ -138,5 +139,10 @@ export function loadPlaybooks(): PlaybookTemplate[] {
 }
 
 export function loadDefaultInstrument(): Instrument {
+  // Ensure there's at least one instrument before trying to access it
+  if (ALL_INSTRUMENTS.length === 0) {
+    // Return a fallback instrument or throw an error
+    return { symbol: 'N/A', name: 'No instruments loaded', category: 'Stocks Others' };
+  }
   return ALL_INSTRUMENTS[0];
 }
