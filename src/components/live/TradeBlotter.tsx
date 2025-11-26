@@ -13,16 +13,16 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 
 
 interface TradeBlotterProps {
-  key: number; // To force re-renders
+  blotterKey: number; // To force re-renders
   onClear: () => void;
 }
 
-export default function TradeBlotter({ key, onClear }: TradeBlotterProps) {
+export default function TradeBlotter({ blotterKey, onClear }: TradeBlotterProps) {
   const [trades, setTrades] = useState<CompletedTrade[]>([]);
 
   useEffect(() => {
     setTrades(loadTrades());
-  }, [key]);
+  }, [blotterKey]);
 
   return (
     <Card className="bg-[#121213] border-white/10 flex-1 flex flex-col">

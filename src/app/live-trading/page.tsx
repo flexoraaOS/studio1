@@ -42,7 +42,7 @@ export default function LiveTradingCockpitPage() {
           onSessionChange={setSession}
           playbooks={playbooks}
           onPrepareTrade={handlePrepareTrade}
-          onFinalizeTrade={() => handleOpenFinalizeModal()}
+          onFinalizeTrade={() => activeTrade && handleFinalizeTrade(activeTrade)}
           activeTrade={activeTrade}
         />
 
@@ -64,7 +64,7 @@ export default function LiveTradingCockpitPage() {
 
           {/* Right Column */}
           <div className="flex flex-col gap-2 overflow-y-auto">
-            <TradeBlotter key={blotterKey} onClear={handleClearBlotter} />
+            <TradeBlotter blotterKey={blotterKey} onClear={handleClearBlotter} />
           </div>
         </div>
 
