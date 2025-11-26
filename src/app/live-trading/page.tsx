@@ -29,7 +29,8 @@ export default function LiveTradingCockpitPage() {
   const handleOpenFinalizeModal = (draft?: any) => {
     openModal({ 
       mode: draft ? 'finalize' : 'manual', 
-      draft: draft || undefined
+      draft: draft || undefined,
+      activeTrade: activeTrade || undefined,
     });
   };
 

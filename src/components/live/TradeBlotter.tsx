@@ -9,6 +9,8 @@ import { CompletedTrade } from '@/lib/live-trading/types';
 import { loadTrades, clearTrades } from '@/lib/live-trading/storage';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
+import { ScrollArea } from '@/components/ui/scroll-area';
+
 
 interface TradeBlotterProps {
   key: number; // To force re-renders
@@ -28,40 +30,32 @@ export default function TradeBlotter({ key, onClear }: TradeBlotterProps) {
         <CardTitle className="text-base font-semibold text-white">Today's Logged Trades</CardTitle>
       </CardHeader>
       <CardContent className="p-0 flex-1 overflow-y-auto">
-        <Table>
-          <TableHeader>
-            <TableRow className="border-white/10">
-              <TableHead className="text-gray-400 text-xs">Time</TableHead>
-              <TableHead className="text-gray-400 text-xs">Pair</TableHead>
-              <TableHead className="text-gray-400 text-xs">Side</TableHead>
-              <TableHead className="text-gray-400 text-xs text-right">Size</TableHead>
-              <TableHead className="text-gray-400 text-xs text-right">R-Multiple</TableHead>
-              <TableHead className="text-gray-400 text-xs text-right">Result</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {trades.length > 0 ? trades.map(trade => (
-              <TableRow key={trade.id} className="border-white/10">
-                <TableCell className="text-xs py-2">{format(new Date(trade.exitTimestamp), 'HH:mm:ss')}</TableCell>
-                <TableCell className="font-semibold py-2">{trade.instrument.symbol}</TableCell>
-                <TableCell className="py-2">
-                  <Badge variant={trade.side === 'Long' ? 'default' : 'destructive'} className={`text-xs ${trade.side === 'Long' ? 'bg-[#39FF88]/20 text-[#39FF88] border-none' : 'bg-[#FF3B47]/20 text-[#FF3B47] border-none'}`}>
-                    {trade.side}
-                  </Badge>
-                </TableCell>
-                <TableCell className="text-right py-2">{trade.size.toLocaleString()}</TableCell>
-                <TableCell className={cn("text-right font-semibold py-2", trade.rMultiple >= 0 ? 'text-[#39FF88]' : 'text-[#FF3B47]')}>{trade.rMultiple.toFixed(2)}R</TableCell>
-                <TableCell className={cn("text-right font-semibold py-2", trade.pnl >= 0 ? 'text-[#39FF88]' : 'text-[#FF3B47]')}>${trade.pnl.toFixed(2)}</TableCell>
-              </TableRow>
-            )) : (
-                <TableRow>
-                    <TableCell colSpan={6} className="h-24 text-center text-gray-500">
-                        No trades logged for today.
-                    </TableCell>
+         <ScrollArea className="h-full">
+            <Table>
+              <TableHeader>
+                <TableRow className="border-white/10 hover:bg-transparent">
+                  <TableHead className="text-gray-400 text-xs">Time</TableHead>
+                  <TableHead className="text-gray-400 text-xs">Pair</TableHead>
+                  <TableHead className="text-gray-400 text-xs text-right">Result</TableHead>
                 </TableRow>
-            )}
-          </TableBody>
-        </Table>
+              </TableHeader>
+              <TableBody>
+                {trades.length > 0 ? trades.map(trade => (
+                  <TableRow key={trade.id} className="border-white/10 hover:bg-white/5 cursor-pointer">
+                    <TableCell className="text-xs py-2">{format(new Date(trade.exitTimestamp), 'HH:mm:ss')}</TableCell>
+                    <TableCell className="font-semibold py-2 text-sm">{trade.instrument.symbol}</TableCell>
+                    <TableCell className={cn("text-right font-semibold py-2 text-sm", trade.pnl >= 0 ? 'text-[#39FF88]' : 'text-[#FF3B47]')}>${trade.pnl.toFixed(2)}</TableCell>
+                  </TableRow>
+                )) : (
+                    <TableRow className="hover:bg-transparent">
+                        <TableCell colSpan={3} className="h-24 text-center text-gray-500">
+                            No trades logged for today.
+                        </TableCell>
+                    </TableRow>
+                )}
+              </TableBody>
+            </Table>
+        </ScrollArea>
       </CardContent>
        <CardFooter className="p-2 border-t border-white/10">
         <Button variant="destructive" size="sm" onClick={onClear} className="w-full bg-red-800/50 text-red-400 hover:bg-red-800/70">
@@ -71,4 +65,3 @@ export default function TradeBlotter({ key, onClear }: TradeBlotterProps) {
     </Card>
   );
 }
-

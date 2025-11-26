@@ -3,9 +3,12 @@ import { useState, useEffect, useCallback } from 'react';
 import { LiveTradeSession, PlaybookTemplate, TradeDraft, CompletedTrade, ActiveTrade } from '@/lib/live-trading/types';
 import { loadPlaybooks, loadDefaultInstrument } from '@/lib/live-trading/mock-data';
 import * as storage from '@/lib/live-trading/storage';
+import { usePostTradeModal } from '@/components/live/PostTradeModal';
 
 export const useLiveTrading = () => {
   const [playbooks] = useState<PlaybookTemplate[]>(loadPlaybooks());
+  const { openModal } = usePostTradeModal();
+
   const [session, setSession] = useState<LiveTradeSession>(() => {
     const defaultPlaybook = playbooks[0];
     return {
@@ -32,6 +35,7 @@ export const useLiveTrading = () => {
   const handlePrepareTrade = useCallback(() => {
     if (!session.instrument || !session.playbookId) return;
 
+    // This now creates an ActiveTrade instead of a draft
     const newActiveTrade: ActiveTrade = {
       id: `live_${Date.now()}`,
       startTime: new Date().toISOString(),
@@ -43,8 +47,9 @@ export const useLiveTrading = () => {
         side: session.side,
         size: session.size,
         riskPercent: session.riskPercent,
-        entryPrice: 1.0567, // MOCK PRICE
-        stopLoss: 1.0547, // MOCK PRICE
+        // Mock entry and stop-loss prices for demonstration
+        entryPrice: 1.0567, 
+        stopLoss: 1.0547,
       },
       notes: '',
     };
@@ -52,59 +57,29 @@ export const useLiveTrading = () => {
     storage.saveActiveTrade(newActiveTrade);
     setActiveTrade(newActiveTrade);
   }, [session, playbooks]);
-
-  const handleFinalizeTrade = useCallback(() => {
-    if (!activeTrade) return;
-    
-    const finalTrade: ActiveTrade = {
-      ...activeTrade,
-      params: {
-        ...activeTrade.params,
-        exitPrice: 1.0587 // MOCK PRICE
-      }
-    };
-    // The modal will open, prefilled with this `finalTrade`
-    // This is a placeholder for opening the modal.
-    console.log("Finalizing trade:", finalTrade);
-    // In a real app, you'd open the modal here.
-    // For now, we simulate saving it directly.
-    const completedTrade: CompletedTrade = {
-        id: `trade_${Date.now()}`,
-        draftId: finalTrade.id,
-        playbookId: finalTrade.playbookId,
-        instrument: finalTrade.params.instrument,
-        side: finalTrade.params.side,
-        size: finalTrade.params.size,
-        entryTimestamp: finalTrade.startTime,
-        exitTimestamp: new Date().toISOString(),
-        entryPrice: finalTrade.params.entryPrice,
-        exitPrice: finalTrade.params.exitPrice!,
-        stopLoss: finalTrade.params.stopLoss,
-        fees: 5.0,
-        pnl: (finalTrade.params.exitPrice! - finalTrade.params.entryPrice) * finalTrade.params.size,
-        rMultiple: 1.5,
-        slippage: 0.00002,
-        notes: "Trade finalized from live session.",
-        tags: [],
-        attachments: [],
-        adherence: {},
-    };
-    storage.saveTrade(completedTrade);
-    storage.clearActiveTrade();
-    setActiveTrade(null);
-    refreshBlotter();
-  }, [activeTrade]);
+  
+  const handleFinalizeTrade = useCallback((activeTradeForModal: ActiveTrade) => {
+    openModal({ 
+      mode: 'finalize',
+      activeTrade: activeTradeForModal
+    });
+  }, [openModal]);
   
   const handleSaveTrade = (trade: CompletedTrade) => {
     storage.clearActiveTrade();
     setActiveTrade(null);
+    if (trade.draftId && trade.draftId.startsWith('draft_')) {
+      storage.deleteDraft(trade.draftId);
+    }
     refreshDrafts();
     refreshBlotter();
   };
 
   const handleOpenDraft = (draft: TradeDraft) => {
-    // This would open the modal pre-filled with draft data
-    console.log("Opening draft in modal:", draft);
+    openModal({
+      mode: 'finalize',
+      draft: draft,
+    });
   };
   
   const handleClearBlotter = () => {

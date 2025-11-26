@@ -53,8 +53,8 @@ export default function PreTradePanel({ playbookId, playbooks, drafts, onOpenDra
         <CardHeader className="p-3 border-b border-white/10">
           <div className="flex justify-between items-start">
             <div>
-              <CardTitle className="text-base font-semibold text-white">{playbook.name}</CardTitle>
-              <CardDescription className="text-xs text-gray-500">{playbook.description}</CardDescription>
+              <CardTitle className="text-base font-semibold text-white">Pre-Trade Analysis</CardTitle>
+              <CardDescription className="text-xs text-gray-500">{playbook.name}</CardDescription>
             </div>
             <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setFullPlaybookOpen(true)}>
               <BookOpen className="w-4 h-4" />
@@ -79,8 +79,6 @@ export default function PreTradePanel({ playbookId, playbooks, drafts, onOpenDra
         </CardContent>
       </Card>
 
-      <DraftsList drafts={drafts} onOpenDraft={onOpenDraft} />
-      
       <FullPlaybookModal 
         playbook={playbook}
         isOpen={isFullPlaybookOpen}

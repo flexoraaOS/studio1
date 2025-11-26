@@ -63,13 +63,13 @@ const PostTradeModal: React.FC<PostTradeModalProps> = ({ isOpen, onClose, onSave
   useEffect(() => {
     if (isOpen && tradeSource) {
       setEntryPrice(tradeSource.params.entryPrice?.toString() || '');
-      setExitPrice(isFinalizing ? tradeSource.params.exitPrice?.toString() || '' : '');
+      setExitPrice(isFinalizing ? (tradeSource.params.exitPrice?.toString() || '') : '');
       setStopLoss(tradeSource.params.stopLoss?.toString() || '');
       setFees('0');
       setNotes(tradeSource.notes || '');
       setScreenshot(null);
       if (playbook) {
-        setRuleAdherence(playbook.rules.reduce((acc, rule) => ({ ...acc, [rule.id]: !rule.isMandatory }), {}));
+        setRuleAdherence(playbook.rules.reduce((acc, rule) => ({ ...acc, [rule.id]: true }), {}));
       }
     }
   }, [isOpen, tradeSource, playbook, isFinalizing]);
@@ -153,8 +153,8 @@ const PostTradeModal: React.FC<PostTradeModalProps> = ({ isOpen, onClose, onSave
 
             <div className="p-4 bg-[#1A1A1B] rounded-md border border-white/10 text-center">
               <p className="text-sm text-gray-400">Net P&L</p>
-              <p className={`text-3xl font-bold ${computePnL(parseFloat(entryPrice), parseFloat(exitPrice), tradeSource?.params.size || 0, tradeSource?.params.side) - parseFloat(fees) >= 0 ? 'text-[#39FF88]' : 'text-[#FF3B47]'}`}>
-                ${(computePnL(parseFloat(entryPrice), parseFloat(exitPrice), tradeSource?.params.size || 0, tradeSource?.params.side) - parseFloat(fees)).toFixed(2)}
+              <p className={`text-3xl font-bold ${computePnL(parseFloat(entryPrice), parseFloat(exitPrice), tradeSource?.params.size || 0, tradeSource?.params.side || 'Long') - parseFloat(fees) >= 0 ? 'text-[#39FF88]' : 'text-[#FF3B47]'}`}>
+                ${(computePnL(parseFloat(entryPrice), parseFloat(exitPrice), tradeSource?.params.size || 0, tradeSource?.params.side || 'Long') - parseFloat(fees)).toFixed(2)}
               </p>
             </div>
 
@@ -179,7 +179,7 @@ const PostTradeModal: React.FC<PostTradeModalProps> = ({ isOpen, onClose, onSave
                   <div key={rule.id} className="p-3 bg-[#1A1A1B] border border-white/10 rounded-md flex items-center justify-between">
                     <p className="flex-1 text-sm">{rule.description}</p>
                     <div className="flex items-center gap-2">
-                      {rule.isMandatory && <AlertTriangle className="w-4 h-4 text-amber-400" />}
+                      {rule.isMandatory && <TooltipProvider><Tooltip><TooltipTrigger><AlertTriangle className="w-4 h-4 text-amber-400" /></TooltipTrigger><TooltipContent><p>Mandatory Rule</p></TooltipContent></Tooltip></TooltipProvider>}
                       <button onClick={() => setRuleAdherence(prev => ({ ...prev, [rule.id]: !prev[rule.id]}))} className={`p-1 rounded-full ${ruleAdherence[rule.id] ? 'bg-green-500/20' : 'bg-red-500/20'}`}>
                         {ruleAdherence[rule.id] ? <CheckCircle className="w-5 h-5 text-[#39FF88]" /> : <XCircle className="w-5 h-5 text-[#FF3B47]" />}
                       </button>
