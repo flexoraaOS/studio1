@@ -1,144 +1,91 @@
 'use client';
-import React, { useEffect } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
-import { useUser, useAuth } from '@/firebase';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import React, { useState, useEffect } from 'react';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger, DropdownMenuSub, DropdownMenuSubTrigger, DropdownMenuSubContent } from '@/components/ui/dropdown-menu';
-import { Settings, LogOut, User, Monitor } from 'lucide-react';
-import Link from 'next/link';
-import { FlexoraaTraderOSLogo } from '@/components/icons';
-import SearchBar from '@/components/search-bar';
-import { cn } from '@/lib/utils';
-import { ThemeToggle } from '@/components/theme-toggle';
-import { Skeleton } from '@/components/ui/skeleton';
-import { RemindersDialog } from '@/components/reminders/reminders-dialog';
+import { Badge } from '@/components/ui/badge';
+import { BookOpen, CheckCircle2, XCircle } from 'lucide-react';
+import { PlaybookTemplate, TradeDraft } from '@/lib/live-trading/types';
+import { FullPlaybookModal } from './FullPlaybookModal';
+import DraftsList from './DraftsList';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
 
-const navItems = [
-    { href: '/dashboard', label: 'Dashboard' },
-    { href: '/trades', label: 'Trades' },
-    { href: '/import', label: 'Import' },
-    { href: '/strategy', label: 'Strategy' },
-    { href: '/analytics', label: 'Analytics' },
-    { href: '/behavioral', label: 'Behavioral' },
-    { href: 'reminders', label: 'Reminders' },
-];
+interface PreTradePanelProps {
+  playbookId: string;
+  playbooks: PlaybookTemplate[];
+  drafts: TradeDraft[];
+  onOpenDraft: (draft: TradeDraft) => void;
+}
 
-export default function AppLayout({ children }: { children: React.ReactNode }) {
-    const { user, isUserLoading } = useUser();
-    const auth = useAuth();
-    const router = useRouter();
-    const pathname = usePathname();
+export default function PreTradePanel({ playbookId, playbooks, drafts, onOpenDraft }: PreTradePanelProps) {
+  const [playbook, setPlaybook] = useState<PlaybookTemplate | null>(null);
+  const [isFullPlaybookOpen, setFullPlaybookOpen] = useState(false);
+  const [checklist, setChecklist] = useState<Record<string, boolean>>({});
 
-    // useEffect(() => {
-    //     if (!isUserLoading && !user) {
-    //         router.push('/login');
-    //     }
-    // }, [isUserLoading, user, router]);
-    
-    const getInitials = (name: string | null | undefined) => {
-        if (!name) return "U";
-        const names = name.split(' ');
-        if (names.length > 1) {
-            return `${names[0][0]}${names[names.length - 1][0]}`.toUpperCase();
-        }
-        if (names.length === 1 && names[0].length > 1) {
-            return names[0].substring(0, 2).toUpperCase();
-        }
-        return "U";
-    };
+  useEffect(() => {
+    const selectedPlaybook = playbooks.find(p => p.id === playbookId) || null;
+    setPlaybook(selectedPlaybook);
+    // Reset checklist when playbook changes
+    const initialChecklist: Record<string, boolean> = {};
+    selectedPlaybook?.rules.forEach(rule => {
+      initialChecklist[rule.id] = false;
+    });
+    setChecklist(initialChecklist);
+  }, [playbookId, playbooks]);
 
-    const handleLogout = async () => {
-        if (auth) {
-            await auth.signOut();
-        }
-        router.push('/login');
-    };
-    
-    if (isUserLoading || !user) {
-        // This will show a loading screen but won't redirect.
-        // Once not loading, if there's no user, it will proceed to render children
-        // which might have their own logic, or just appear broken without user data.
-        // For the dev button, this is what we want.
-    }
+  const handleCheckChange = (ruleId: string, checked: boolean) => {
+    setChecklist(prev => ({ ...prev, [ruleId]: checked }));
+  };
 
-    if (pathname === '/login') {
-        return <>{children}</>;
-    }
-    
+  if (!playbook) {
     return (
-       <div className={cn("flex min-h-screen w-full flex-col", "animated-background")}>
-           <header className="sticky top-0 flex h-16 items-center gap-4 border-b bg-background/80 backdrop-blur-sm px-4 md:px-6 z-10">
-                <nav className="hidden flex-col gap-6 text-lg font-medium md:flex md:flex-row md:items-center md:gap-5 lg:gap-6">
-                    <Link
-                        href="/dashboard"
-                        className="flex items-center gap-2 text-lg font-semibold md:text-base"
-                    >
-                        <FlexoraaTraderOSLogo className="h-6 w-6" />
-                        <span className="sr-only">Flexoraa TraderOS</span>
-                    </Link>
-                    {navItems.map((item) => {
-                        if (item.href === 'reminders') {
-                            return (
-                                <RemindersDialog key={item.href}>
-                                    <button className="text-muted-foreground transition-colors hover:text-primary font-medium">
-                                        {item.label}
-                                    </button>
-                                </RemindersDialog>
-                            );
-                        }
-                        return (
-                            <Link
-                                key={item.href}
-                                href={item.href}
-                                className="text-muted-foreground transition-colors hover:text-primary font-medium"
-                            >
-                                {item.label}
-                            </Link>
-                        );
-                    })}
-                </nav>
-                <div className="flex w-full items-center gap-4 md:ml-auto md:gap-2 lg:gap-4">
-                    <div className="ml-auto flex-1 sm:flex-initial">
-                        <SearchBar />
-                    </div>
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button variant="secondary" size="icon" className="rounded-full">
-                               <Avatar>
-                                    <AvatarImage src={user?.photoURL || ''} alt={user?.displayName || 'User'} />
-                                    <AvatarFallback>{getInitials(user?.displayName)}</AvatarFallback>
-                                </Avatar>
-                                <span className="sr-only">Toggle user menu</span>
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                            <DropdownMenuLabel>{user?.displayName || 'Guest'}</DropdownMenuLabel>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem asChild>
-                                <Link href="/settings" className="flex items-center w-full">
-                                    <Settings className="mr-2" /> Settings
-                                </Link>
-                            </DropdownMenuItem>
-                            <DropdownMenuSub>
-                                <DropdownMenuSubTrigger>
-                                     <Monitor className="mr-2" /> Theme
-                                </DropdownMenuSubTrigger>
-                                <DropdownMenuSubContent>
-                                    <ThemeToggle />
-                                </DropdownMenuSubContent>
-                            </DropdownMenuSub>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem onClick={handleLogout}>
-                                <LogOut className="mr-2" /> Logout
-                            </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-                </div>
-            </header>
-            <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
-                {children}
-            </main>
-        </div>
+      <Card className="bg-[#121213] border-white/10 flex-1">
+        <CardContent className="p-4 text-center text-gray-500">
+          <p>Select a playbook to see its details.</p>
+        </CardContent>
+      </Card>
     );
+  }
+
+  return (
+    <>
+      <Card className="bg-[#121213] border-white/10 flex flex-col">
+        <CardHeader className="p-3 border-b border-white/10">
+          <div className="flex justify-between items-start">
+            <div>
+              <CardTitle className="text-base font-semibold text-white">{playbook.name}</CardTitle>
+              <CardDescription className="text-xs text-gray-500">{playbook.description}</CardDescription>
+            </div>
+            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setFullPlaybookOpen(true)}>
+              <BookOpen className="w-4 h-4" />
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent className="p-3 flex-1 overflow-y-auto space-y-3">
+          <h4 className="text-sm font-semibold text-gray-400">Pre-Flight Checklist</h4>
+          {playbook.rules.slice(0, 5).map(rule => (
+             <div key={rule.id} className="flex items-center space-x-2 bg-[#1A1A1B] p-2 rounded-md border border-white/5">
+                <Checkbox id={rule.id} 
+                    checked={checklist[rule.id]}
+                    onCheckedChange={(checked) => handleCheckChange(rule.id, !!checked)}
+                    className="border-gray-600 data-[state=checked]:bg-[#39FF88] data-[state=checked]:text-black"
+                />
+                <Label htmlFor={rule.id} className="text-xs text-gray-300 leading-tight">
+                    {rule.description}
+                    {rule.isMandatory && <span className="text-red-500 ml-1">*</span>}
+                </Label>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+
+      <DraftsList drafts={drafts} onOpenDraft={onOpenDraft} />
+      
+      <FullPlaybookModal 
+        playbook={playbook}
+        isOpen={isFullPlaybookOpen}
+        onClose={() => setFullPlaybookOpen(false)}
+      />
+    </>
+  );
 }

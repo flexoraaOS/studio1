@@ -1,144 +1,134 @@
 'use client';
-import React, { useEffect } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
-import { useUser, useAuth } from '@/firebase';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger, DropdownMenuSub, DropdownMenuSubTrigger, DropdownMenuSubContent } from '@/components/ui/dropdown-menu';
-import { Settings, LogOut, User, Monitor } from 'lucide-react';
-import Link from 'next/link';
-import { FlexoraaTraderOSLogo } from '@/components/icons';
-import SearchBar from '@/components/search-bar';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { LiveTradeSession, PlaybookTemplate, TradeSide, Instrument, ActiveTrade } from '@/lib/live-trading/types';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Play, Square, ChevronsUpDown, Check } from 'lucide-react';
+import InstrumentSelect from './InstrumentSelect';
 import { cn } from '@/lib/utils';
-import { ThemeToggle } from '@/components/theme-toggle';
-import { Skeleton } from '@/components/ui/skeleton';
-import { RemindersDialog } from '@/components/reminders/reminders-dialog';
+import LiveTimer from './LiveTimer';
 
-const navItems = [
-    { href: '/dashboard', label: 'Dashboard' },
-    { href: '/trades', label: 'Trades' },
-    { href: '/import', label: 'Import' },
-    { href: '/strategy', label: 'Strategy' },
-    { href: '/analytics', label: 'Analytics' },
-    { href: '/behavioral', label: 'Behavioral' },
-    { href: 'reminders', label: 'Reminders' },
-];
 
-export default function AppLayout({ children }: { children: React.ReactNode }) {
-    const { user, isUserLoading } = useUser();
-    const auth = useAuth();
-    const router = useRouter();
-    const pathname = usePathname();
+interface LiveControlBarProps {
+  session: LiveTradeSession;
+  onSessionChange: (session: LiveTradeSession) => void;
+  playbooks: PlaybookTemplate[];
+  onPrepareTrade: () => void;
+  onFinalizeTrade: () => void;
+  activeTrade: ActiveTrade | null;
+}
 
-    // useEffect(() => {
-    //     if (!isUserLoading && !user) {
-    //         router.push('/login');
-    //     }
-    // }, [isUserLoading, user, router]);
-    
-    const getInitials = (name: string | null | undefined) => {
-        if (!name) return "U";
-        const names = name.split(' ');
-        if (names.length > 1) {
-            return `${names[0][0]}${names[names.length - 1][0]}`.toUpperCase();
-        }
-        if (names.length === 1 && names[0].length > 1) {
-            return names[0].substring(0, 2).toUpperCase();
-        }
-        return "U";
-    };
+export default function LiveControlBar({ session, onSessionChange, playbooks, onPrepareTrade, onFinalizeTrade, activeTrade }: LiveControlBarProps) {
+  const handleSessionValueChange = <K extends keyof LiveTradeSession>(key: K, value: LiveTradeSession[K]) => {
+    onSessionChange({ ...session, [key]: value });
+  };
+  
+  const isTradeActive = !!activeTrade;
 
-    const handleLogout = async () => {
-        if (auth) {
-            await auth.signOut();
-        }
-        router.push('/login');
-    };
-    
-    if (isUserLoading || !user) {
-        // This will show a loading screen but won't redirect.
-        // Once not loading, if there's no user, it will proceed to render children
-        // which might have their own logic, or just appear broken without user data.
-        // For the dev button, this is what we want.
-    }
+  return (
+    <header className="sticky top-0 z-10 flex items-center h-16 px-4 border-b border-white/10 bg-gradient-to-b from-[#1B0708] to-[#0B0B0C]">
+      <TooltipProvider>
+        <div className="flex items-center gap-3 w-full">
+          {/* Strategy */}
+          <Select
+            value={session.playbookId}
+            onValueChange={(val) => handleSessionValueChange('playbookId', val)}
+            disabled={isTradeActive}
+          >
+            <SelectTrigger className="w-[250px] bg-transparent border-white/10 rounded-sm">
+              <SelectValue placeholder="Select a playbook..." />
+            </SelectTrigger>
+            <SelectContent className="bg-[#0F0F10] border-white/20 text-gray-200">
+              {playbooks.map(pb => (
+                <SelectItem key={pb.id} value={pb.id} className="focus:bg-white/10">{pb.name}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
 
-    if (pathname === '/login') {
-        return <>{children}</>;
-    }
-    
-    return (
-       <div className={cn("flex min-h-screen w-full flex-col", "animated-background")}>
-           <header className="sticky top-0 flex h-16 items-center gap-4 border-b bg-background/80 backdrop-blur-sm px-4 md:px-6 z-10">
-                <nav className="hidden flex-col gap-6 text-lg font-medium md:flex md:flex-row md:items-center md:gap-5 lg:gap-6">
-                    <Link
-                        href="/dashboard"
-                        className="flex items-center gap-2 text-lg font-semibold md:text-base"
-                    >
-                        <FlexoraaTraderOSLogo className="h-6 w-6" />
-                        <span className="sr-only">Flexoraa TraderOS</span>
-                    </Link>
-                    {navItems.map((item) => {
-                        if (item.href === 'reminders') {
-                            return (
-                                <RemindersDialog key={item.href}>
-                                    <button className="text-muted-foreground transition-colors hover:text-primary font-medium">
-                                        {item.label}
-                                    </button>
-                                </RemindersDialog>
-                            );
-                        }
-                        return (
-                            <Link
-                                key={item.href}
-                                href={item.href}
-                                className="text-muted-foreground transition-colors hover:text-primary font-medium"
-                            >
-                                {item.label}
-                            </Link>
-                        );
-                    })}
-                </nav>
-                <div className="flex w-full items-center gap-4 md:ml-auto md:gap-2 lg:gap-4">
-                    <div className="ml-auto flex-1 sm:flex-initial">
-                        <SearchBar />
-                    </div>
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button variant="secondary" size="icon" className="rounded-full">
-                               <Avatar>
-                                    <AvatarImage src={user?.photoURL || ''} alt={user?.displayName || 'User'} />
-                                    <AvatarFallback>{getInitials(user?.displayName)}</AvatarFallback>
-                                </Avatar>
-                                <span className="sr-only">Toggle user menu</span>
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                            <DropdownMenuLabel>{user?.displayName || 'Guest'}</DropdownMenuLabel>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem asChild>
-                                <Link href="/settings" className="flex items-center w-full">
-                                    <Settings className="mr-2" /> Settings
-                                </Link>
-                            </DropdownMenuItem>
-                            <DropdownMenuSub>
-                                <DropdownMenuSubTrigger>
-                                     <Monitor className="mr-2" /> Theme
-                                </DropdownMenuSubTrigger>
-                                <DropdownMenuSubContent>
-                                    <ThemeToggle />
-                                </DropdownMenuSubContent>
-                            </DropdownMenuSub>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem onClick={handleLogout}>
-                                <LogOut className="mr-2" /> Logout
-                            </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-                </div>
-            </header>
-            <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
-                {children}
-            </main>
+          {/* Instrument */}
+           <InstrumentSelect
+            value={session.instrument}
+            onChange={(val) => handleSessionValueChange('instrument', val)}
+            disabled={isTradeActive}
+          />
+
+          {/* Side */}
+          <div className="flex items-center rounded-sm border border-white/10 p-0.5">
+            <Button
+              size="sm"
+              className={`h-8 px-4 rounded-sm transition-all ${session.side === 'Long' ? 'bg-[#39FF88]/90 text-black' : 'bg-transparent text-gray-400 hover:bg-white/5'}`}
+              onClick={() => handleSessionValueChange('side', 'Long')}
+              disabled={isTradeActive}
+            >
+              Long
+            </Button>
+            <Button
+              size="sm"
+              className={`h-8 px-4 rounded-sm transition-all ${session.side === 'Short' ? 'bg-[#FF3B47]/90 text-black' : 'bg-transparent text-gray-400 hover:bg-white/5'}`}
+              onClick={() => handleSessionValueChange('side', 'Short')}
+              disabled={isTradeActive}
+            >
+              Short
+            </Button>
+          </div>
+
+          {/* Size & Risk */}
+          <div className="flex items-center gap-1">
+             <Input
+                type="number"
+                value={session.size}
+                onChange={(e) => handleSessionValueChange('size', parseFloat(e.target.value))}
+                className="w-28 bg-transparent border-white/10 rounded-sm"
+                placeholder="Size"
+                disabled={isTradeActive}
+            />
+            <Input
+                type="number"
+                value={session.riskPercent}
+                onChange={(e) => handleSessionValueChange('riskPercent', parseFloat(e.target.value))}
+                className="w-24 bg-transparent border-white/10 rounded-sm"
+                placeholder="Risk %"
+                disabled={isTradeActive}
+            />
+          </div>
+
+          <div className="flex-grow" />
+
+          {/* Live Timer */}
+          {isTradeActive && activeTrade.startTime && <LiveTimer startTime={activeTrade.startTime} />}
+
+          {/* Actions */}
+          <div className="flex items-center gap-2">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  className={cn("bg-[#39FF88] text-black hover:bg-[#39FF88]/80 shadow-[0_0_15px_rgba(57,255,136,0.5)]", !isTradeActive && 'hidden')}
+                  onClick={onFinalizeTrade}
+                >
+                  <Square className="w-4 h-4 mr-2"/>
+                  End Trade
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent className="bg-[#0F0F10] border-white/20 text-gray-200"><p>Finalize and log this trade (E)</p></TooltipContent>
+            </Tooltip>
+            
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  className={cn("bg-[#FF3B47] text-white hover:bg-[#FF3B47]/80 shadow-[0_0_15px_rgba(255,59,71,0.5)]", isTradeActive && 'hidden')}
+                  onClick={onPrepareTrade}
+                >
+                  <Play className="w-4 h-4 mr-2"/>
+                  Start Trade
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent className="bg-[#0F0F10] border-white/20 text-gray-200"><p>Start a new live trade session (S)</p></TooltipContent>
+            </Tooltip>
+          </div>
         </div>
-    );
+      </TooltipProvider>
+    </header>
+  );
 }

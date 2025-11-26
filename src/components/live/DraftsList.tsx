@@ -1,144 +1,71 @@
 'use client';
-import React, { useEffect } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
-import { useUser, useAuth } from '@/firebase';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import React from 'react';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger, DropdownMenuSub, DropdownMenuSubTrigger, DropdownMenuSubContent } from '@/components/ui/dropdown-menu';
-import { Settings, LogOut, User, Monitor } from 'lucide-react';
-import Link from 'next/link';
-import { FlexoraaTraderOSLogo } from '@/components/icons';
-import SearchBar from '@/components/search-bar';
-import { cn } from '@/lib/utils';
-import { ThemeToggle } from '@/components/theme-toggle';
-import { Skeleton } from '@/components/ui/skeleton';
-import { RemindersDialog } from '@/components/reminders/reminders-dialog';
+import { FileText, Copy, Trash2 } from 'lucide-react';
+import { TradeDraft } from '@/lib/live-trading/types';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { formatDistanceToNow } from 'date-fns';
 
-const navItems = [
-    { href: '/dashboard', label: 'Dashboard' },
-    { href: '/trades', label: 'Trades' },
-    { href: '/import', label: 'Import' },
-    { href: '/strategy', label: 'Strategy' },
-    { href: '/analytics', label: 'Analytics' },
-    { href: '/behavioral', label: 'Behavioral' },
-    { href: 'reminders', label: 'Reminders' },
-];
+interface DraftsListProps {
+  drafts: TradeDraft[];
+  onOpenDraft: (draft: TradeDraft) => void;
+}
 
-export default function AppLayout({ children }: { children: React.ReactNode }) {
-    const { user, isUserLoading } = useUser();
-    const auth = useAuth();
-    const router = useRouter();
-    const pathname = usePathname();
+export default function DraftsList({ drafts, onOpenDraft }: DraftsListProps) {
 
-    // useEffect(() => {
-    //     if (!isUserLoading && !user) {
-    //         router.push('/login');
-    //     }
-    // }, [isUserLoading, user, router]);
-    
-    const getInitials = (name: string | null | undefined) => {
-        if (!name) return "U";
-        const names = name.split(' ');
-        if (names.length > 1) {
-            return `${names[0][0]}${names[names.length - 1][0]}`.toUpperCase();
-        }
-        if (names.length === 1 && names[0].length > 1) {
-            return names[0].substring(0, 2).toUpperCase();
-        }
-        return "U";
-    };
+  const handleClone = (draftToClone: TradeDraft) => {
+    // This functionality would be handled by the parent hook/component
+    console.log("Cloning draft:", draftToClone.id);
+  };
 
-    const handleLogout = async () => {
-        if (auth) {
-            await auth.signOut();
-        }
-        router.push('/login');
-    };
-    
-    if (isUserLoading || !user) {
-        // This will show a loading screen but won't redirect.
-        // Once not loading, if there's no user, it will proceed to render children
-        // which might have their own logic, or just appear broken without user data.
-        // For the dev button, this is what we want.
-    }
-
-    if (pathname === '/login') {
-        return <>{children}</>;
-    }
-    
-    return (
-       <div className={cn("flex min-h-screen w-full flex-col", "animated-background")}>
-           <header className="sticky top-0 flex h-16 items-center gap-4 border-b bg-background/80 backdrop-blur-sm px-4 md:px-6 z-10">
-                <nav className="hidden flex-col gap-6 text-lg font-medium md:flex md:flex-row md:items-center md:gap-5 lg:gap-6">
-                    <Link
-                        href="/dashboard"
-                        className="flex items-center gap-2 text-lg font-semibold md:text-base"
-                    >
-                        <FlexoraaTraderOSLogo className="h-6 w-6" />
-                        <span className="sr-only">Flexoraa TraderOS</span>
-                    </Link>
-                    {navItems.map((item) => {
-                        if (item.href === 'reminders') {
-                            return (
-                                <RemindersDialog key={item.href}>
-                                    <button className="text-muted-foreground transition-colors hover:text-primary font-medium">
-                                        {item.label}
-                                    </button>
-                                </RemindersDialog>
-                            );
-                        }
-                        return (
-                            <Link
-                                key={item.href}
-                                href={item.href}
-                                className="text-muted-foreground transition-colors hover:text-primary font-medium"
-                            >
-                                {item.label}
-                            </Link>
-                        );
-                    })}
-                </nav>
-                <div className="flex w-full items-center gap-4 md:ml-auto md:gap-2 lg:gap-4">
-                    <div className="ml-auto flex-1 sm:flex-initial">
-                        <SearchBar />
-                    </div>
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button variant="secondary" size="icon" className="rounded-full">
-                               <Avatar>
-                                    <AvatarImage src={user?.photoURL || ''} alt={user?.displayName || 'User'} />
-                                    <AvatarFallback>{getInitials(user?.displayName)}</AvatarFallback>
-                                </Avatar>
-                                <span className="sr-only">Toggle user menu</span>
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                            <DropdownMenuLabel>{user?.displayName || 'Guest'}</DropdownMenuLabel>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem asChild>
-                                <Link href="/settings" className="flex items-center w-full">
-                                    <Settings className="mr-2" /> Settings
-                                </Link>
-                            </DropdownMenuItem>
-                            <DropdownMenuSub>
-                                <DropdownMenuSubTrigger>
-                                     <Monitor className="mr-2" /> Theme
-                                </DropdownMenuSubTrigger>
-                                <DropdownMenuSubContent>
-                                    <ThemeToggle />
-                                </DropdownMenuSubContent>
-                            </DropdownMenuSub>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem onClick={handleLogout}>
-                                <LogOut className="mr-2" /> Logout
-                            </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-                </div>
-            </header>
-            <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
-                {children}
-            </main>
-        </div>
-    );
+  const handleDelete = (id: string) => {
+    // This functionality would be handled by the parent hook/component
+    console.log("Deleting draft:", id);
+  };
+  
+  return (
+    <Card className="bg-[#121213] border-white/10">
+      <CardContent className="p-2 space-y-2">
+        {drafts.length > 0 ? (
+          drafts.map((draft) => (
+            <div key={draft.id} className="flex items-center justify-between bg-[#1A1A1B] p-2 rounded-md border border-white/5 group">
+              <div className="flex-1 min-w-0" onClick={() => onOpenDraft(draft)}>
+                <p className="font-semibold truncate text-sm">{draft.params.instrument?.symbol || 'No Instrument'}</p>
+                <p className="text-xs text-gray-400 truncate">
+                  {draft.playbookName} - {formatDistanceToNow(new Date(draft.createdAt), { addSuffix: true })}
+                </p>
+              </div>
+              <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleClone(draft)}>
+                        <Copy className="w-4 h-4 text-gray-400" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent><p>Clone Draft</p></TooltipContent>
+                  </Tooltip>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleDelete(draft.id)}>
+                        <Trash2 className="w-4 h-4 text-red-500" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent><p>Delete Draft</p></TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
+            </div>
+          ))
+        ) : (
+          <div className="text-center py-8 px-4 border-2 border-dashed border-white/10 rounded-md">
+            <FileText className="mx-auto w-8 h-8 text-gray-600" />
+            <p className="mt-2 text-sm text-gray-500">No prepared drafts.</p>
+            <p className="text-xs text-gray-600">Prepare a trade to see it here.</p>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
 }
