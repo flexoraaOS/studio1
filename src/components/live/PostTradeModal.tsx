@@ -11,6 +11,7 @@ import { PlaybookTemplate, TradeDraft, CompletedTrade } from '@/lib/live-trading
 import { computePnL, computeRMultiple } from '@/lib/live-trading/trade-utils';
 import { useDropzone } from 'react-dropzone';
 import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 export interface ModalState {
   isOpen: boolean;
@@ -92,7 +93,7 @@ export const PostTradeModal: React.FC<PostTradeModalProps> = ({ isOpen, onClose,
     
     if (isNaN(entry) || isNaN(exit) || !side || !instrument) return;
 
-    const pnl = computePnL(entry, exit, size, side);
+    const pnl = computePnL(entry, exit, size, side, instrument);
     const rMultiple = computeRMultiple(entry, exit, stop, side);
 
     const newTrade: CompletedTrade = {
@@ -125,24 +126,24 @@ export const PostTradeModal: React.FC<PostTradeModalProps> = ({ isOpen, onClose,
     (Object.values(ruleAdherence).filter(Boolean).length / playbook.rules.length) * 100 : 0;
 
 
-  const pnl = computePnL(parseFloat(entryPrice), draft?.params.size || 0, draft?.params.side || 'Long', parseFloat(exitPrice));
+  const pnl = computePnL(parseFloat(entryPrice), parseFloat(exitPrice), draft?.params.size || 0, draft?.params.side || 'Long', draft?.params.instrument);
   const netPnl = pnl - parseFloat(fees || '0');
   const rMultiple = computeRMultiple(parseFloat(entryPrice), parseFloat(exitPrice), parseFloat(stopLoss), draft?.params.side || 'Long');
 
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl h-[90vh] bg-[#0F0F10] border-white/10 text-gray-200 font-code flex flex-col">
+      <DialogContent className="max-w-4xl h-auto bg-[#0F0F10] border-white/10 text-gray-200 font-code flex flex-col">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-white">{mode === 'finalize' ? 'Finalize Trade' : 'Log Manual Trade'}</DialogTitle>
           <DialogDescription className="text-gray-400">
-            {mode === 'finalize' && draft ? `Confirm details for: ${draft.params.instrument?.symbol} ${draft.params.side} @ ${draft.params.size / 100000} lots` : 'Enter trade details manually.'}
+            {mode === 'finalize' && draft ? `Confirm details for: ${draft.params.instrument?.symbol} ${draft.params.side} @ ${draft.params.size/100000} lots` : 'Enter trade details manually.'}
           </DialogDescription>
         </DialogHeader>
 
-        <div className="flex-1 grid grid-cols-1 md:grid-cols-[2fr_1fr] gap-6 overflow-hidden py-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 py-4">
           {/* Left Column */}
-          <div className="flex flex-col gap-6 overflow-y-auto pr-4">
+          <div className="flex flex-col gap-6">
             
             {/* Price Inputs */}
             <div className="grid grid-cols-3 gap-4">
@@ -172,24 +173,27 @@ export const PostTradeModal: React.FC<PostTradeModalProps> = ({ isOpen, onClose,
             </div>
 
             {/* Qualitative Inputs */}
-             <div className="grid grid-cols-1 gap-4">
-                <div><Label htmlFor="notes">Trade Rationale & Notes</Label><Textarea id="notes" value={notes} onChange={e => setNotes(e.target.value)} className="bg-[#1A1A1B] border-white/10 min-h-[100px]" placeholder="Pre-trade thoughts, execution notes..."/></div>
-             </div>
+            <div className="flex-1 flex flex-col gap-4">
+                <Label htmlFor="notes">Trade Rationale & Notes</Label>
+                <Textarea id="notes" value={notes} onChange={e => setNotes(e.target.value)} className="bg-[#1A1A1B] border-white/10 flex-1" placeholder="Pre-trade thoughts, execution notes..."/>
+            </div>
 
-            <div {...getRootProps()} className="p-6 border-2 border-dashed border-white/20 rounded-md text-center cursor-pointer hover:bg-white/5">
+            <div {...getRootProps()} className="p-4 border-2 border-dashed border-white/20 rounded-md text-center cursor-pointer hover:bg-white/5">
               <input {...getInputProps()} />
-              {screenshot ? <img src={screenshot} alt="Screenshot preview" className="max-h-40 mx-auto rounded-md" /> : <>
-                <Upload className="mx-auto w-8 h-8 text-gray-500" />
-                <p className="mt-2 text-sm text-gray-400">{isDragActive ? 'Drop screenshot here' : 'Drag & drop or click to upload'}</p>
+              {screenshot ? <img src={screenshot} alt="Screenshot preview" className="max-h-24 mx-auto rounded-md" /> : <>
+                <Upload className="mx-auto w-6 h-6 text-gray-500" />
+                <p className="mt-1 text-xs text-gray-400">{isDragActive ? 'Drop screenshot here' : 'Drag & drop or click to upload'}</p>
               </>}
             </div>
           </div>
 
           {/* Right Column */}
-          <div className="flex flex-col gap-6 overflow-y-auto pr-2">
+          <div className="flex flex-col gap-4">
             <div>
               <h3 className="text-lg font-semibold text-white mb-2">Playbook Rule Adherence</h3>
-              <p className="text-sm text-gray-500 mb-4">Review which rules were followed for this trade.</p>
+              <p className="text-sm text-gray-500 mb-3">Review which rules were followed for this trade.</p>
+            </div>
+            <ScrollArea className="h-[350px] pr-2">
               <div className="space-y-3">
                 {playbook ? playbook.rules.map(rule => (
                   <div key={rule.id} className="p-3 bg-[#1A1A1B] border border-white/10 rounded-md flex items-center justify-between">
@@ -203,13 +207,13 @@ export const PostTradeModal: React.FC<PostTradeModalProps> = ({ isOpen, onClose,
                   </div>
                 )) : <p className="text-gray-500">No playbook associated with this draft.</p>}
               </div>
-            </div>
+            </ScrollArea>
             {playbook && <div className="p-3 bg-white/5 rounded-md text-center text-sm">Adherence Score: <span className="font-bold">{adherenceScore.toFixed(0)}%</span></div>}
           </div>
         </div>
         
         <div className="pt-4 border-t border-white/10 flex justify-end">
-          <Button onClick={handleSave} className="bg-[#FF3B47] text-white hover:bg-[#FF3B47]/80 shadow-[0_0_15px_rgba(255,59,71,0.5)] w-40">
+          <Button onClick={handleSave} variant="destructive" className="w-48">
             <Save className="w-4 h-4 mr-2" />
             Save Finalized Trade
           </Button>
