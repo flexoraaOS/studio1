@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { Badge } from '@/components/ui/badge';
 import { CheckCircle, XCircle, Upload, Save, AlertTriangle } from 'lucide-react';
 import { PlaybookTemplate, TradeDraft, CompletedTrade } from '@/lib/live-trading/types';
 import { computePnL, computeRMultiple } from '@/lib/live-trading/trade-utils';
@@ -48,6 +48,7 @@ export const PostTradeModal: React.FC<PostTradeModalProps> = ({ isOpen, onClose,
   const [stopLoss, setStopLoss] = useState('');
   const [fees, setFees] = useState('0');
   const [notes, setNotes] = useState('');
+  const [tags, setTags] = useState('');
   const [screenshot, setScreenshot] = useState<string | null>(null);
 
   const playbook = playbooks.find(p => p.id === draft?.playbookId);
@@ -57,10 +58,11 @@ export const PostTradeModal: React.FC<PostTradeModalProps> = ({ isOpen, onClose,
   useEffect(() => {
     if (isOpen) {
       setEntryPrice(draft?.params.entryPrice?.toString() || '');
-      setExitPrice(''); // Always clear exit price
+      setExitPrice('');
       setStopLoss(draft?.params.stopLoss?.toString() || '');
       setFees('0');
       setNotes(draft?.notes || '');
+      setTags(draft?.tags?.join(', ') || '');
       setScreenshot(null);
       if (playbook) {
         setRuleAdherence(playbook.rules.reduce((acc, rule) => ({ ...acc, [rule.id]: true }), {}));
@@ -82,7 +84,7 @@ export const PostTradeModal: React.FC<PostTradeModalProps> = ({ isOpen, onClose,
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop, accept: {'image/*':[]} });
 
   const handleSave = () => {
-    if (!draft) return; // Should always have a draft in finalize mode
+    if (!draft) return;
     const { side, size = 0, instrument } = draft.params;
     const entry = parseFloat(entryPrice);
     const exit = parseFloat(exitPrice);
@@ -110,7 +112,7 @@ export const PostTradeModal: React.FC<PostTradeModalProps> = ({ isOpen, onClose,
       rMultiple,
       slippage: 0, // Placeholder
       notes,
-      tags: [],
+      tags: tags.split(',').map(t => t.trim()).filter(Boolean),
       attachments: screenshot ? [{ id: 'ss1', data: screenshot }] : [],
       adherence: ruleAdherence,
     };
@@ -123,6 +125,11 @@ export const PostTradeModal: React.FC<PostTradeModalProps> = ({ isOpen, onClose,
     (Object.values(ruleAdherence).filter(Boolean).length / playbook.rules.length) * 100 : 0;
 
 
+  const pnl = computePnL(parseFloat(entryPrice), parseFloat(exitPrice), draft?.params.size || 0, draft?.params.side || 'Long');
+  const netPnl = pnl - parseFloat(fees || '0');
+  const rMultiple = computeRMultiple(parseFloat(entryPrice), parseFloat(exitPrice), parseFloat(stopLoss), draft?.params.side || 'Long');
+
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl h-[90vh] bg-[#0F0F10] border-white/10 text-gray-200 font-code flex flex-col">
@@ -133,22 +140,49 @@ export const PostTradeModal: React.FC<PostTradeModalProps> = ({ isOpen, onClose,
           </DialogDescription>
         </DialogHeader>
 
-        <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-6 overflow-hidden py-4">
+        <div className="flex-1 grid grid-cols-1 md:grid-cols-[2fr_1fr] gap-6 overflow-hidden py-4">
           {/* Left Column */}
           <div className="flex flex-col gap-6 overflow-y-auto pr-4">
-            <div className="grid grid-cols-2 gap-4">
+            
+            {/* Trade Parameters */}
+            <div className="grid grid-cols-3 gap-4">
+              <div><Label>Instrument</Label><Input value={draft?.params.instrument?.symbol} disabled className="bg-[#1A1A1B] border-white/10" /></div>
+              <div><Label>Side</Label><Input value={draft?.params.side} disabled className="bg-[#1A1A1B] border-white/10" /></div>
+              <div><Label>Size</Label><Input value={draft?.params.size} disabled className="bg-[#1A1A1B] border-white/10" /></div>
+            </div>
+
+            {/* Price Inputs */}
+            <div className="grid grid-cols-3 gap-4">
               <div><Label htmlFor="entryPrice">Entry Price</Label><Input id="entryPrice" value={entryPrice} onChange={e => setEntryPrice(e.target.value)} className="bg-[#1A1A1B] border-white/10" /></div>
               <div><Label htmlFor="exitPrice">Exit Price</Label><Input id="exitPrice" value={exitPrice} onChange={e => setExitPrice(e.target.value)} className="bg-[#1A1A1B] border-white/10" /></div>
               <div><Label htmlFor="stopLoss">Stop Loss</Label><Input id="stopLoss" value={stopLoss} onChange={e => setStopLoss(e.target.value)} className="bg-[#1A1A1B] border-white/10" /></div>
-              <div><Label htmlFor="fees">Fees</Label><Input id="fees" value={fees} onChange={e => setFees(e.target.value)} className="bg-[#1A1A1B] border-white/10" /></div>
+            </div>
+            
+            {/* P&L Section */}
+            <div className="grid grid-cols-3 gap-4 p-4 bg-[#1A1A1B] rounded-md border border-white/10 text-center">
+                <div>
+                  <p className="text-sm text-gray-400">Net P&L</p>
+                  <p className={`text-2xl font-bold ${netPnl >= 0 ? 'text-[#39FF88]' : 'text-[#FF3B47]'}`}>
+                    ${netPnl.toFixed(2)}
+                  </p>
+                </div>
+                 <div>
+                  <p className="text-sm text-gray-400">R-Multiple</p>
+                  <p className={`text-2xl font-bold ${rMultiple >= 0 ? 'text-gray-200' : 'text-red-400'}`}>
+                    {rMultiple.toFixed(2)}R
+                  </p>
+                </div>
+                 <div>
+                  <Label htmlFor="fees" className="text-sm text-gray-400">Fees / Comm.</Label>
+                  <Input id="fees" value={fees} onChange={e => setFees(e.target.value)} className="bg-[#2a2a2c] border-white/10 mt-1 text-center" />
+                </div>
             </div>
 
-            <div className="p-4 bg-[#1A1A1B] rounded-md border border-white/10 text-center">
-              <p className="text-sm text-gray-400">Net P&L</p>
-              <p className={`text-3xl font-bold ${computePnL(parseFloat(entryPrice), parseFloat(exitPrice), draft?.params.size || 0, draft?.params.side || 'Long') - parseFloat(fees) >= 0 ? 'text-[#39FF88]' : 'text-[#FF3B47]'}`}>
-                ${(computePnL(parseFloat(entryPrice), parseFloat(exitPrice), draft?.params.size || 0, draft?.params.side || 'Long') - parseFloat(fees)).toFixed(2)}
-              </p>
-            </div>
+            {/* Qualitative Inputs */}
+             <div className="grid grid-cols-2 gap-4">
+                <div><Label htmlFor="notes">Trade Rationale & Notes</Label><Textarea id="notes" value={notes} onChange={e => setNotes(e.target.value)} className="bg-[#1A1A1B] border-white/10 min-h-[100px]" placeholder="Pre-trade thoughts, execution notes..."/></div>
+                 <div><Label htmlFor="tags">Tags (comma-separated)</Label><Textarea id="tags" value={tags} onChange={e => setTags(e.target.value)} className="bg-[#1A1A1B] border-white/10 min-h-[100px]" placeholder="e.g., News Play, FOMO, Technical Error..."/></div>
+             </div>
 
             <div {...getRootProps()} className="p-6 border-2 border-dashed border-white/20 rounded-md text-center cursor-pointer hover:bg-white/5">
               <input {...getInputProps()} />
@@ -157,8 +191,6 @@ export const PostTradeModal: React.FC<PostTradeModalProps> = ({ isOpen, onClose,
                 <p className="mt-2 text-sm text-gray-400">{isDragActive ? 'Drop screenshot here' : 'Drag & drop or click to upload'}</p>
               </>}
             </div>
-
-            <div><Label htmlFor="notes">Trade Rationale & Notes</Label><Textarea id="notes" value={notes} onChange={e => setNotes(e.target.value)} className="bg-[#1A1A1B] border-white/10 min-h-[100px]" /></div>
           </div>
 
           {/* Right Column */}
