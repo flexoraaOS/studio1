@@ -1,38 +1,80 @@
+
 import { TradeSide, Instrument } from './types';
 
+// --- Universal Constants ---
 const FOREX_STANDARD_LOT_UNITS = 100000;
 
 /**
- * Computes the Profit and Loss (PnL) of a trade.
+ * Determines the pip size for a given Forex pair.
+ * @param symbol The trading symbol (e.g., 'EUR/USD', 'USD/JPY').
+ * @returns The pip size (0.0001 for most pairs, 0.01 for JPY pairs).
+ */
+const getPipSize = (symbol: string): number => {
+  return symbol.toUpperCase().includes('JPY') ? 0.01 : 0.0001;
+};
+
+/**
+ * Calculates the value of one pip for a given trade.
+ * For simplicity in this version, we assume the account currency is the quote currency.
+ * E.g., for EUR/USD, the account is in USD. For USD/JPY, the account is in JPY.
+ * A future version would need to handle cross-currency conversions.
+ * @param instrument The instrument being traded.
+ * @returns The value of one pip for one standard lot.
+ */
+const getPipValuePerLot = (instrument: Instrument): number => {
+  if (!instrument.category.startsWith('Forex')) return 0;
+  const pipSize = getPipSize(instrument.symbol);
+  return FOREX_STANDARD_LOT_UNITS * pipSize; // e.g., 100,000 * 0.0001 = $10
+};
+
+
+/**
+ * Computes the Profit and Loss (PnL) of a trade based on its asset class.
  * @param entry - The entry price.
  * @param exit - The exit price.
- * @param size - The size of the trade in lots (e.g., 1.0 for a standard lot).
+ * @param size - The size of the trade (lots for FX, shares/contracts for others).
  * @param side - The direction of the trade ('Long' or 'Short').
- * @param instrument - The instrument being traded, to determine calculation logic.
- * @returns The raw P&L of the trade.
+ * @param instrument - The instrument being traded.
+ * @returns The gross P&L of the trade in the instrument's quote currency.
  */
 export function computePnL(entry: number, exit: number, size: number, side: TradeSide, instrument?: Instrument): number {
   if (isNaN(entry) || isNaN(exit) || isNaN(size) || !side || !instrument) return 0;
 
-  // For Forex, convert lot size to currency units. The pnl is (exit-entry) * units.
-  if (instrument.category.startsWith('Forex')) {
-    const units = size * FOREX_STANDARD_LOT_UNITS;
-    if (side === 'Long') {
-      return (exit - entry) * units;
+  const priceDiff = side === 'Long' ? exit - entry : entry - exit;
+
+  switch (instrument.category.split(' ')[0]) {
+    case 'Forex': {
+      const pipSize = getPipSize(instrument.symbol);
+      const pips = priceDiff / pipSize;
+      const pipValueForTrade = getPipValuePerLot(instrument) * size;
+      return pips * pipValueForTrade;
     }
-    return (entry - exit) * units;
+    
+    case 'Stocks':
+    case 'Crypto': {
+      // For stocks and crypto, size is the quantity of shares/coins
+      return priceDiff * size;
+    }
+
+    case 'Indices':
+    case 'Metals':
+    case 'Energy':
+    case 'Commodities': {
+       // Assuming for CFDs/Futures, 'size' is number of contracts and contract_size is 1 for simplicity.
+       // A more robust engine would have a lookup for each instrument's contract_size/tick_value.
+       // E.g. Price diff * contract_size * contracts
+       const pointValue = 1; // Assuming 1 point move = $1 per contract for simplicity
+       return priceDiff * pointValue * size;
+    }
+
+    default:
+      // Fallback for simple price difference calculation
+      return priceDiff * size;
   }
-  
-  // For other instruments like stocks or futures, size might represent shares or contracts.
-  // Assuming 'size' is the number of shares/contracts for non-FX instruments.
-  if (side === 'Long') {
-    return (exit - entry) * size;
-  }
-  return (entry - exit) * size;
 }
 
 /**
- * Computes the R-multiple of a trade.
+ * Computes the R-multiple of a trade, a universal risk-based performance metric.
  * @param entry - The entry price.
  * @param exit - The exit price.
  * @param stop - The stop-loss price.
@@ -43,7 +85,7 @@ export function computeRMultiple(entry: number, exit: number, stop: number, side
     if (isNaN(entry) || isNaN(exit) || isNaN(stop) || stop === entry) return 0;
 
     const riskPerUnit = side === 'Long' ? entry - stop : stop - entry;
-    if (riskPerUnit <= 0) return 0;
+    if (riskPerUnit <= 0) return 0; // Stop loss is on the wrong side of entry
 
     const pnlPerUnit = side === 'Long' ? exit - entry : entry - exit;
 
@@ -52,23 +94,10 @@ export function computeRMultiple(entry: number, exit: number, stop: number, side
 
 
 /**
- * Computes the slippage of a trade.
- * For now, this is a placeholder. A real implementation would compare
- * the intended fill price with the actual executed price.
- * @param expectedPrice - The price at which the trade was intended to be filled.
- * @param actualPrice - The price at which the trade was actually filled.
- * @returns The slippage amount.
- */
-export function computeSlippage(expectedPrice: number, actualPrice: number): number {
-    if (isNaN(expectedPrice) || isNaN(actualPrice)) return 0;
-    return Math.abs(actualPrice - expectedPrice);
-}
-
-/**
  * Computes the elapsed time between two timestamps.
  * @param start - The start time (ISO string or Date).
  * @param end - The end time (ISO string or Date).
- * @returns A formatted string representing the elapsed time.
+ * @returns A formatted string representing the elapsed time (HH:MM:SS).
  */
 export function computeElapsedTime(start: string | Date, end: string | Date): string {
   const startDate = new Date(start);
@@ -84,5 +113,3 @@ export function computeElapsedTime(start: string | Date, end: string | Date): st
 
   return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 }
-
-    
